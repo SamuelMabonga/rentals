@@ -15,7 +15,14 @@ export default async function handler(
     if (!req.body)
       return res.status(400).json({ error: "User Data is missing" });
 
-    const { first_name, email, password } = req.body;
+    const {
+      first_name,
+      email,
+      password,
+      last_name,
+      phone_number,
+      national_id,
+    } = req.body;
 
     const userExists = await User.findOne({ email });
 
@@ -31,14 +38,20 @@ export default async function handler(
 
       User.create({
         first_name,
+        last_name,
         email,
+        national_id,
+        phone_number,
         password: hashedPassword,
       })
         .then((data: IUser) => {
           const user = {
+            _id: data._id,
             email: data.email,
             first_name: data.first_name,
-            _id: data._id,
+            last_name: data.last_name,
+            national_id: data.national_id,
+            phone_number: data.phone_number,
           };
 
           return res.status(201).json({
