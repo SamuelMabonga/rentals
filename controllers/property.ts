@@ -63,3 +63,22 @@ export async function createProperty(req: any, res: any) {
     });
   }
 }
+
+//fetch property by id
+export async function fetchSingleProperty(req: any, res: any) {
+  try {
+    let property = await Property.findById(req.params.id);
+    res.status(200).json({
+      success: true,
+      msg: "property fetched successfully",
+      data: property,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch property",
+      data: error,
+    });
+    console.log(error);
+  }
+}

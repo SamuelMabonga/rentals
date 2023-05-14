@@ -1,4 +1,8 @@
-import { createProperty, fetchAllProperties } from "controllers/property";
+import {
+  createProperty,
+  fetchAllProperties,
+  fetchSingleProperty,
+} from "controllers/property";
 import { connectToMongoDB } from "lib/mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -13,6 +17,9 @@ export default async function handler(
   switch (method) {
     case "GET":
       fetchAllProperties(req, res);
+      break;
+    // case "GET":
+    //   fetchSingleProperty(req, res);
       break;
     case "POST":
       createProperty(req, res);
