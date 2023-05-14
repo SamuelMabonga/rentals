@@ -1,4 +1,4 @@
-import { BUIDING_TYPES } from "constants";
+import BUIDING_TYPES from "constants";
 import { Schema, model, models } from "mongoose";
 
 const propertyShema = new Schema({
@@ -18,8 +18,8 @@ const propertyShema = new Schema({
     type: Array,
   },
   building_type: {
-    type: Array,
-    enum: BUIDING_TYPES,
+    type: String,
+    // enum:  // BUIDING_TYPES
   },
   number_of_units: {
     type: String,
