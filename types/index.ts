@@ -1,8 +1,13 @@
 export interface IUser {
-  _id: String;
-  email: String;
-  first_name: String;
-  last_name: String;
-  phone_number: String;
-  national_id: String;
+  _id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  national_id: string;
+}
+
+export interface LoginUserParams {
+  email: string;
+  password: string;
 }
