@@ -5,7 +5,10 @@ const UserShema = new Schema({
     type: String,
     unique: true,
     required: [true, "email is required"],
-    // match: [/^\w+/, "Invalid email address"]      TODO:add email regex
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      "Invalid email address",
+    ],
   },
   first_name: {
     type: String,
