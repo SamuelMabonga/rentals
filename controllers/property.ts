@@ -82,3 +82,28 @@ export async function fetchSingleProperty(req: any, res: any) {
     console.log(error);
   }
 }
+
+//update a property
+export async function updateProperty(req: any, res: any) {
+  try {
+    let property = await Property.findById(req.params.id);
+
+    const data = {
+      name: req.body.name || property.name,
+    };
+    property = await Property.findByIdAndUpdate(req.params.id, data, {
+      new: true,
+    });
+    res.status(200).json({
+      success: true,
+      msg: "property updated successfully",
+      data: property,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to update property",
+      data: error,
+    });
+  }
+}

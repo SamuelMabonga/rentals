@@ -2,6 +2,7 @@ import {
   createProperty,
   fetchAllProperties,
   fetchSingleProperty,
+  updateProperty,
 } from "controllers/property";
 import { connectToMongoDB } from "lib/mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -18,14 +19,14 @@ export default async function handler(
     case "GET":
       fetchAllProperties(req, res);
       break;
-    // case "GET":
-    //   fetchSingleProperty(req, res);
+      // case "GET":
+      //   fetchSingleProperty(req, res);
       break;
     case "POST":
       createProperty(req, res);
       break;
     case "PUT":
-      res.status(200).json({ method, name: "PUT Request" });
+      updateProperty(req, res);
       break;
     case "DELETE":
       res.status(200).json({ method, name: "DELETE Request" });
