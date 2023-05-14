@@ -1,4 +1,4 @@
-import { fetchAllProperties } from "controllers/property";
+import { createProperty, fetchAllProperties } from "controllers/property";
 import { connectToMongoDB } from "lib/mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -15,7 +15,7 @@ export default async function handler(
       fetchAllProperties(req, res);
       break;
     case "POST":
-      res.status(200).json({ method, name: "POST Request" });
+      createProperty(req, res);
       break;
     case "PUT":
       res.status(200).json({ method, name: "PUT Request" });

@@ -18,3 +18,48 @@ export async function fetchAllProperties(req: any, res: any) {
     console.log(error);
   }
 }
+
+// create a property
+export async function createProperty(req: any, res: any) {
+  try {
+    const { cover_photo, profile_photo, name, details } = req.body;
+    console.log("It does not fail after line 30");
+    const requiredFields = ["name"];
+
+    const includesAllFields = requiredFields.every((field) => {
+      return !!req.body[field];
+    });
+    console.log("required fields is", includesAllFields);
+
+    if (!includesAllFields) {
+      return res.status(400).json({
+        success: false,
+        msg: "Please supply all required fields",
+        requiredFields,
+      });
+    }
+
+    const property = new Property({
+      ...req.body,
+    });
+
+    const newProperty = await property.save();
+
+    return res.json({
+      success: true,
+      msg: "New property created",
+      _id: newProperty?._id,
+      name: newProperty?.name,
+      details: newProperty?.details,
+      price: newProperty?.price,
+      building_type: newProperty?.building_type,
+      number_of_units: newProperty?.number_of_units,
+    });
+  } catch (error: any) {
+    console.log(error);
+    return res.status(500).json({
+      msg: error.message,
+      success: false,
+    });
+  }
+}

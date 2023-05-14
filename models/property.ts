@@ -2,6 +2,10 @@ import BUIDING_TYPES from "constants";
 import { Schema, model, models } from "mongoose";
 
 const propertyShema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
   cover_photo: {
     type: String,
   },
