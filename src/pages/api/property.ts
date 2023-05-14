@@ -1,5 +1,6 @@
 import {
   createProperty,
+  deleteProperty,
   fetchAllProperties,
   fetchSingleProperty,
   updateProperty,
@@ -29,7 +30,7 @@ export default async function handler(
       updateProperty(req, res);
       break;
     case "DELETE":
-      res.status(200).json({ method, name: "DELETE Request" });
+      deleteProperty(req, res);
       break;
     default:
       //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);

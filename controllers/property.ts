@@ -107,3 +107,29 @@ export async function updateProperty(req: any, res: any) {
     });
   }
 }
+
+//delete a property
+export async function deleteProperty(req: any, res: any) {
+  try {
+    let property = await Property.findById(req.params.id);
+
+    if (!property) {
+      //   return next("property being deleted has not been found");
+      return "property being deleted has not been found";
+    }
+
+    await Property.deleteOne(property);
+
+    res.json({
+      success: true,
+      msg: "property deleted successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to delete property",
+      data: error,
+    });
+    console.log(error);
+  }
+}
