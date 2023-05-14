@@ -6,3 +6,8 @@ export interface IUser {
   phone_number: string;
   national_id: string;
 }
+
+export interface LoginUserParams {
+  email: string;
+  password: string;
+}
