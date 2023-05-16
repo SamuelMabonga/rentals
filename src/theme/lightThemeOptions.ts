@@ -94,7 +94,7 @@ const lightThemeOptions: ThemeOptions = {
                 borderRadius: "1rem"
             }
           }
-        }
+        },
       ]
     }
   }
