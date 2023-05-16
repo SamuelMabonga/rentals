@@ -110,13 +110,6 @@ export default function Property() {
                 <Typography fontWeight={"600"} color="black" fontSize="1.25rem">Management</Typography>
                 <Tabs
                     scrollButtons={true}
-                    // allowScrollButtonsMobile
-                    // TabScrollButtonProps={}
-                    // ScrollButtonComponent={
-                    //     <IconButton>
-                    //         <ArrowCircleRight />
-                    //     </IconButton>
-                    // }
                     variant="scrollable"
                     value={activeTab}
                     onChange={(event, value) => setActiveTab(value)}
