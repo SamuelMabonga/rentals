@@ -5,6 +5,7 @@ export interface IUser {
   last_name: string;
   phone_number: string;
   national_id: string;
+  verified: boolean;
 }
 
 export interface LoginUserParams {
