@@ -35,6 +35,9 @@ const UserShema = new Schema({
     type: String,
     required: [true, "phone number is required"],
   },
+  verified: {
+    type: String,
+  },
 });
 
 const User = models.User || model("User", UserShema);
