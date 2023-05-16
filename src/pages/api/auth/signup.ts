@@ -25,6 +25,7 @@ export default async function handler(
       national_id,
     } = req.body;
 
+    console.log(email)
     const userExists = await User.findOne({ email });
 
     if (userExists) {

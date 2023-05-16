@@ -1,11 +1,52 @@
 import { Google } from '@mui/icons-material'
 import { Box, Button, Card, Checkbox, Divider, FormControl, FormLabel, TextField, Typography } from '@mui/material'
-import { Londrina_Sketch } from 'next/font/google'
 import Head from 'next/head'
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/router'
+
+const formSchema = yup.object().shape({
+    email: yup.string().required(),
+    password: yup.string().required(),
+})
 
 export default function Login() {
+    const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
+
+    const { handleSubmit, register, formState: { errors } } = useForm({
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+        mode: "onChange",
+        reValidateMode: "onChange",
+        resolver: yupResolver(formSchema)
+    });
+
+    async function onSubmit(values: any) {
+        setIsLoading(true)
+        console.log(values)
+        const {email, password} = values
+
+        const result = await signIn("credentials", {
+            redirect: false,
+            email,
+            password,
+            });
+
+        console.log(result)
+        
+        if (result?.ok) {
+            router.push("/dashboard")
+        }
+
+    }
+    
     return (
         <>
             <Head>
@@ -18,10 +59,9 @@ export default function Login() {
                 <Box
                     width="100vw"
                     minHeight={"100vh"}
-                    // sx={{
-                    //     bgcolor: "secondary.main",
-                    //     backgroundImage: "url('https://res.cloudinary.com/dfmoqlbyl/image/upload/v1682337286/maara-ai/darkPrint_zlxrsy.svg')"
-                    // }}
+                    sx={{
+                        bgcolor: "primary.light",
+                    }}
                     display="flex"
                     justifyContent={"center"}
                     alignItems={"center"}
@@ -29,7 +69,7 @@ export default function Login() {
                 >
                     <Card
                         sx={{
-                            bgcolor: "secondary.light",
+                            bgcolor: "white",
                             width: ["90vw", "30rem"],
                             padding: "1rem",
                             display: "flex",
@@ -38,41 +78,34 @@ export default function Login() {
                             my: "auto"
                         }}
                     >
-                        <Box display={"flex"} flexDirection="column" gap="1rem">
-                        <Typography variant="h6" sx={{marginX: "auto"}}>Maara AI</Typography>
-                        <Typography variant="h4" fontWeight="900" sx={{marginX: "auto"}}>Hi, Welcome back!</Typography>
-                        <Typography variant="body1" sx={{marginX: "auto"}}>Enter your credentials to continue</Typography>
+                        <Typography color="primary.dark" mx="auto">Rentals</Typography>
+                        <Box display="flex" flexDirection="column">
+                            <Typography color="primary.dark" mx="auto" fontSize="1.5rem" fontWeight="600">Login</Typography>
+                            <Typography color="primary.dark" mx="auto" textAlign="center">Enter your credentials to continue</Typography>
                         </Box>
-                        <Button variant="contained" sx={{ width: "100%", padding: "1rem", display: "flex", gap: "1rem" }}>
-                            <Google />
-                            Sign in with Google
-                        </Button>
-                        <Box display="flex" alignItems="center" >
-                            <Box height="1px" width="100%" sx={{ backgroundColor: "primary.main" }} />
-                            <Typography sx={{ padding: "0.25rem" }}>OR</Typography>
-                            <Box height="1px" width="100%" sx={{ backgroundColor: "primary.main" }} />
-                        </Box>
-                        <Typography variant="body1" marginX="auto">Sign in with Email Address</Typography>
+                        <form id="login-form" onSubmit={handleSubmit(onSubmit)}>
                         <Box width="100%" display="flex" flexDirection="column" gap="1rem">
                             <TextField
-                                name="email"
+                                variant="outlined"
+                                {...register("email")}
                                 placeholder="Email"
+                                sx={{
+                                    width: "100%"
+                                }}
                             />
                             <TextField
-                                name="password"
+                                variant="outlined"
+                                {...register("password")}
                                 placeholder="Password"
+                                sx={{
+                                    width: "100%"
+                                }}
                             />
                         </Box>
-                        <Box display="flex" justifyContent={"space-between"} alignItems="center">
-                            <FormControl sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                                <Checkbox name="remember-me" sx={{ width: "fit-content", }} />
-                                <FormLabel sx={{ width: "fit-content" }}>Remember me</FormLabel>
-                            </FormControl>
-                            <Link href="/">Forgot password</Link>
-                        </Box>
-                        <Button variant="contained" sx={{padding: "1rem"}}>Sign In</Button>
-                        <Box height="1px" width="100%" sx={{ backgroundColor: "primary.main" }} />
-                        <Link href="/">Don't have an account?</Link>
+                        </form>
+                        <Button disabled={isLoading} type="submit" form="login-form" variant="contained" sx={{ padding: "1rem" }}>Login</Button>
+                        <Divider orientation="horizontal" />
+                        <Link href="/" style={{ marginRight: "auto", marginLeft: "auto" }}><Typography>Don't have an account?</Typography></Link>
                     </Card>
                 </Box>
             </main>
