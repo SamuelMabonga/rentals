@@ -117,12 +117,20 @@ export const PropertiesTable = <T extends object>({ data }: ReactTableProps<T>) 
                 {table.getRowModel().rows.map((row) => (
                     <TableRow
                         key={row.id}
-                        sx={{border: "1px solid grey", borderRadius: "1rem"}}
+                        sx={{
+                            border: "1px solid grey",
+                            borderRadius: "1rem",
+                            bgcolor: "white",
+                            cursor: "pointer",
+                            "&:hover": {
+                                bgcolor: "#F6F2FA"
+                            }
+                        }}
                     >
                         {row.getVisibleCells().map((cell) => (
                             <TableCell key={cell.id}
                                 sx={{
-                                    backgroundColor: "white",
+                                    backgroundColor: "inherit",
                                     border: "solid primary.dark",
                                     borderWidth: "1px 0 1px 0",
                                     borderRadius: "0",

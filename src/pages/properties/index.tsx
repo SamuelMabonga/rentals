@@ -1,7 +1,8 @@
 import { Box, Button, TextField, Typography } from "@mui/material"
 import DashboardLayout from "Components/Dashboard/DashboardLayout"
 import { PropertiesTable } from "Components/Properties/PropertiesTable"
-import React from "react"
+import PropertyForm from "Components/Properties/PropertyForm"
+import React, { useState } from "react"
 
 const dummyData: any = () => {
     const items = [];
@@ -48,6 +49,7 @@ const data = [
 ]
 
 export default function Index() {
+    const [openCreateForm, setOpenCreateForm] = useState(false)
     return (
         <DashboardLayout>
             <Typography color="black" fontSize="1.5rem" fontWeight="600">My Properties</Typography>
@@ -60,9 +62,10 @@ export default function Index() {
                         width: "20rem"
                     }}
                 />
-                <Button variant="contained" sx={{ml: "auto"}}>Create New</Button>
+                <Button variant="contained" sx={{ml: "auto"}} onClick={() => setOpenCreateForm(true)}>Create New</Button>
             </Box>
             <PropertiesTable data={data} />
+            <PropertyForm open={openCreateForm} setIsOpen={setOpenCreateForm} />
         </DashboardLayout>
     )
 }
