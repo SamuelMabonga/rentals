@@ -3,7 +3,7 @@ import FileInput from "Components/FileInput"
 import { CollectionsContext } from "context/context"
 import React, { useContext } from "react"
 
-export default function UnitTypeForm() {
+export default function UnitForm() {
     const {
         showUnitTypeForm: open,
         setShowUnitTypeForm: setIsOpen
@@ -15,7 +15,7 @@ export default function UnitTypeForm() {
             maxWidth="sm"
         >
             <DialogTitle sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Typography fontWeight="600" fontSize={["1.125rem", "1.25rem"]}>Create a unit type</Typography>
+                <Typography fontWeight="600" fontSize={["1.125rem", "1.25rem"]}>Create a unit</Typography>
                 <IconButton onClick={() => setIsOpen(false)}>
                     <Box width="1.5rem" height="1.5rem">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -33,15 +33,7 @@ export default function UnitTypeForm() {
                         />
                     </FormControl>
                     <FormControl>
-                        <FormLabel>Description</FormLabel>
-                        <TextField
-                            multiline
-                            rows={4}
-                            placeholder=""
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <FormLabel>Features</FormLabel>
+                        <FormLabel>Unit Type</FormLabel>
                         <Autocomplete
                             options={[{ label: "Yes", value: "Yes" }]}
                             renderInput={(params) =>
@@ -52,8 +44,6 @@ export default function UnitTypeForm() {
                             }
                         />
                     </FormControl>
-                    <FileInput />
-                    <FileInput />
                 </form>
             </DialogContent>
             <DialogActions sx={{padding: "1.5rem"}}>
