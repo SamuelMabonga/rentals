@@ -1,7 +1,10 @@
 import { Box, Button, TextField, Typography } from "@mui/material"
 import DashboardLayout from "Components/Dashboard/DashboardLayout"
 import { PropertiesTable } from "Components/Properties/PropertiesTable"
-import React from "react"
+import PropertyForm from "Components/Properties/Forms/PropertyForm"
+import React, { useContext, useState } from "react"
+import { CollectionsContext } from "context/context"
+import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
 
 const dummyData: any = () => {
     const items = [];
@@ -47,22 +50,32 @@ const data = [
     }
 ]
 
-export default function Index() {
+export default function Properties() {
+    const [openCreateForm, setOpenCreateForm] = useState(false)
+    const {
+        activePropertiesTab: activeTab,
+        setActivePropertiesTab: setActiveTab,
+        setShowUnitTypeForm
+    }: any = useContext(CollectionsContext)
     return (
-        <DashboardLayout>
+        <>
             <Typography color="black" fontSize="1.5rem" fontWeight="600">My Properties</Typography>
-            <Box width="100%" display="flex">
+            <Box width="100%" display={"flex"} flexDirection={["column", "row"]} gap="1rem">
                 <TextField
                     name="search"
                     placeholder="Search"
                     size="small"
                     sx={{
-                        width: "20rem"
+                        width: ["100%", "20rem"]
                     }}
                 />
-                <Button variant="contained" sx={{ml: "auto"}}>Create New</Button>
+                <Button variant="contained" sx={{ml: "auto"}} onClick={() => setShowUnitTypeForm(true)}>Create New</Button>
             </Box>
             <PropertiesTable data={data} />
-        </DashboardLayout>
+            <PropertyForm open={openCreateForm} setIsOpen={setOpenCreateForm} />
+            <UnitTypeForm />
+        </>
     )
 }
+
+Properties.auth = true

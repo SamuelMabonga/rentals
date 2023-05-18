@@ -1,9 +1,44 @@
 import { Avatar, Box, Button, IconButton, Tab, Tabs, TextField, Typography } from "@mui/material"
 import DashboardLayout from "Components/Dashboard/DashboardLayout"
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import Image from "next/image"
-import { PropertiesTable } from "Components/Properties/PropertiesTable"
-import { ArrowCircleRight } from "@mui/icons-material"
+import { UnitsTable } from "Components/Properties/UnitsTable"
+import { TenantsTable } from "Components/Properties/TenantsTable"
+import { BookingsTable } from "Components/Properties/Bookings"
+import { StaffTable } from "Components/Properties/StaffTable"
+import { UnitTypesTable } from "Components/Properties/UnitTypesTable"
+import { FeaturesTable } from "Components/Properties/FeaturesTable"
+import { TicketsTable } from "Components/Properties/TicketsTable"
+import { CollectionsContext } from "context/context"
+import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
+
+function TableSwitch({ activeTab }: any) {
+    switch (activeTab) {
+        case "units":
+            return <UnitsTable />
+
+        case "tenants":
+            return <TenantsTable />
+
+        case "bookings":
+            return <BookingsTable />
+
+        case "staff":
+            return <StaffTable />
+
+        case "unitTypes":
+            return <UnitTypesTable />
+
+        case "features":
+            return <FeaturesTable />
+
+        case "tickets":
+            return <TicketsTable />
+
+        default:
+            return <></>
+    }
+}
 
 const data = [
     {
@@ -38,14 +73,14 @@ const data = [
 
 function Detail() {
     return (
-        <Box display="flex" alignItems="center" color="black" flexDirection="row" gap="0.5rem" border="1px solid red">
-            <Box width="1.5rem" height="1.5rem">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+        <Box display="flex" alignItems="center" color="gray" flexDirection="row" gap="0.25rem">
+            <Box width="1.25rem" height="1.25rem">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                 </svg>
             </Box>
-            <Typography lineHeight={"100%"}>
+            <Typography lineHeight={"100%"} fontSize="0.875rem">
                 Wandegeya
             </Typography>
         </Box>
@@ -53,18 +88,21 @@ function Detail() {
 }
 
 export default function Property() {
-    const [activeTab, setActiveTab] = useState("units")
+    const {
+        activePropertiesTab: activeTab,
+        setActivePropertiesTab: setActiveTab,
+        setShowUnitTypeForm
+    }: any = useContext(CollectionsContext)
+
     return (
-        <DashboardLayout>
+        <>
             <Box
                 width="100%"
                 position="relative"
-                // border="1px solid blue"
                 sx={{
                     letterSpacing: 0,
                     wordSpacing: 0,
                     fontSize: 0,
-
                 }}
             >
                 <Image
@@ -78,7 +116,7 @@ export default function Property() {
                     }}
                 />
 
-                <Box position="absolute" display="flex" border="1px solid red" height="0" alignItems="center" ml={["1rem", "4rem"]}>
+                <Box position="absolute" display="flex" height="0" alignItems="center" ml={["1rem", "4rem"]}>
                     <Avatar
                         alt=""
                         sx={{
@@ -90,26 +128,25 @@ export default function Property() {
             </Box>
 
             <Box width="100%" mt={["1.5rem", "4rem"]} display="flex" flexDirection="column" gap="1rem">
-                <Typography fontSize="1.5rem" fontWeight="600" color="black">Polo Apartments</Typography>
-                <Box display="flex" flexDirection="row" flexWrap="wrap" gap="0.5rem 1rem">
+                <Typography fontSize="1.5rem" fontWeight="600" color="primary.dark">Polo Apartments</Typography>
+                <Box display="flex" flexDirection="row" flexWrap="wrap" gap="0.5rem 0.5rem">
                     <Detail />
                     <Detail />
                     <Detail />
                     <Detail />
                 </Box>
-                <Typography color="black">
+                <Typography color="grey">
                     This cabin comes with Smart Home System and beautiful viking style. You can see sunrise in the morning with City View from full Glass Window.
                     This unit is surrounded by business district of West Surabaya that offers you the city life as well as wide range of culinary.
                     This apartment equipped with Washing Machine, Electric Stove, Microwave, Refrigerator, Cutlery.
                 </Typography>
-                <Button variant="contained">View full profile</Button>
+                <Button variant="outlined" sx={{ width: "fit-content" }}>View full profile</Button>
             </Box>
 
 
-            <Box width="100%" overflow="hidden" display="flex" flexDirection="column" gap="1rem">
-                <Typography fontWeight={"600"} color="black" fontSize="1.25rem">Management</Typography>
+            <Box mt="2rem" width="100%" height="fit-content" overflow="hidden" display="flex" flexDirection="column" gap="1rem">
+                {/* <Typography fontWeight={"600"} color="black" fontSize="1.25rem">Management</Typography> */}
                 <Tabs
-                    scrollButtons={true}
                     variant="scrollable"
                     value={activeTab}
                     onChange={(event, value) => setActiveTab(value)}
@@ -118,7 +155,7 @@ export default function Property() {
                     <Tab label="Tenants" value="tenants" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Bookings" value="bookings" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Staff" value="staff" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
-                    <Tab label="Unit Types" value="untiTypes" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
+                    <Tab label="Unit Types" value="unitTypes" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Features" value="features" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Tickets" value="tickets" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                 </Tabs>
@@ -131,10 +168,48 @@ export default function Property() {
                             width: ["100%", "20rem"]
                         }}
                     />
-                    <Button variant="contained" sx={{ ml: ["auto"] }}>Create New</Button>
+                    <Button
+                        variant="contained"
+                        sx={{ ml: ["auto"] }}
+                        onClick={() => {
+                            if (activeTab === "unitTypes") {
+                                return setShowUnitTypeForm(true)
+                            }
+
+                            if (activeTab === "units") {
+                                return setShowUnitTypeForm(true)
+                            }
+
+                            if (activeTab === "tenants") {
+                                return setShowUnitTypeForm(true)
+                            }
+
+                            if (activeTab === "tickets") {
+                                return setShowUnitTypeForm(true)
+                            }
+
+                            if (activeTab === "staff") {
+                                return setShowUnitTypeForm(true)
+                            }
+
+                            if (activeTab === "bookings") {
+                                return setShowUnitTypeForm(true)
+                            }
+
+                            if (activeTab === "features") {
+                                return setShowUnitTypeForm(true)
+                            }
+
+                        }}
+                    >
+                        Create New
+                    </Button>
                 </Box>
-                <PropertiesTable data={data} />
+                <TableSwitch activeTab={activeTab} />
             </Box>
-        </DashboardLayout>
+            <UnitTypeForm />
+        </>
     )
 }
+
+Property.auth = true
