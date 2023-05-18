@@ -1,15 +1,17 @@
 import { Settings } from "@mui/icons-material"
 import { Avatar, Box, Button, IconButton, Typography } from "@mui/material"
+import { useIsomorphicLayoutEffect } from "framer-motion"
 import { signOut, useSession } from "next-auth/react"
 import Head from "next/head"
 import { useRouter } from "next/router"
-import React from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 
 function NavItem({ label, to, svg }: any) {
     const router = useRouter()
 
     // const [isActive, setIsActive] = 
+
     return (
         <Button
             variant={"outlined"}
@@ -22,14 +24,20 @@ function NavItem({ label, to, svg }: any) {
                 backgroundColor: router.pathname.startsWith(to) ? "primary.light" : "none",
                 width: "100%",
                 display: "flex",
-                justifyContent: "flex-start"
+                gap: "0.5rem",
+                p: "1rem",
+                justifyContent: ["flex-start"]
             }}
-            startIcon={
-                <Box width="1.5rem" height="1.5rem">
-                    {svg}
-                </Box>
-            }>
-            {label}
+            // startIcon={
+            //     <Box width="1.5rem" height="1.5rem" border="1px solid red" mx={["auto"]}>
+            //         {svg}
+            //     </Box>
+            // }
+        >
+            <Box width="1.5rem" height="1.5rem" mx={["auto", "auto", 0]}>
+                {svg}
+            </Box>
+            <Typography display={["none", "none", "flex"]}>{label}</Typography>
         </Button>
     )
 }
@@ -45,6 +53,41 @@ export default function DashboardLayout({ children }: any) {
     })
 
     console.log(status)
+    
+
+    // SIDE NAV WIDTH
+    const sideNavRef: any = useRef()
+    const container: any = useRef()
+    const navBar: any = useRef()
+    const [width, setWidth] = useState(0)
+    const [sideNavWidth, setSideNavWidth] = useState(0)
+    const [navBarHeight, setNavBarHeight] = useState(0)
+
+    // useIsomorphicLayoutEffect(() => {
+    //     function handleResize() {
+    //          console.log('resized to: ', window.innerWidth, 'x', window.innerHeight)
+    //          setWidth(window.innerWidth - sideNavRef.current.offsetWidth)
+    //     }
+        
+    //     window.addEventListener('resize', handleResize)
+    // }, [])
+
+    useIsomorphicLayoutEffect(() => {
+        if (!sideNavRef.current) return; // wait for the elementRef to be available
+        if (!navBar.current) return; // wait for the elementRef to be available
+        const resizeObserver: any = new ResizeObserver(() => {
+            // Do what you want to do when the size of the element changes
+            const navWidth = sideNavRef.current.offsetWidth
+            const barHeight = navBar.current.offsetHeight
+            const viewWidth = window.innerWidth
+            setWidth(viewWidth - navWidth)
+            setSideNavWidth(navWidth)
+            setNavBarHeight(barHeight)
+        });
+        resizeObserver.observe(container.current);
+        return () => resizeObserver.disconnect(); // clean up 
+    }, [container?.current?.innerHeight])
+
     return (
         <>
             <Head>
@@ -54,29 +97,45 @@ export default function DashboardLayout({ children }: any) {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main style={{ width: "100%", minHeight: "100vh" }}>
-                <Box display="flex" width="100%" minHeight="100vh" sx={{ bgcolor: "primary.light" }}>
+                <Box
+                    ref={container}
+                    display="flex"
+                    width="100%" 
+                    minHeight="100vh" 
+                    maxHeight={["fit-content", "100vh"]} 
+                    sx={{
+                        bgcolor: "primary.light",
+                        overflowY: ["hidden", "scroll"]
+                    }}
+                >
                     {/* NAV */}
                     <Box
-                        minWidth={["fit-content", "fit-content", "20rem"]}
+                        ref={sideNavRef}
+                        position="fixed"
+                        left={0}
+                        height="100vh"
+                        minWidth={["fit-content", "fit-content", "fit-content", "20rem"]}
                         display={["none", "flex"]}
                         flexDirection="column"
                         gap="4rem"
                         sx={{ bgcolor: "white" }}
-                        padding={["1rem", "1rem", "1rem 1rem 1rem 8rem"]}
+                        padding={["0 1rem 1rem 1rem", "0 1rem 1rem 1rem", "0 1rem 1rem 1rem", "0 1rem 1rem 8rem"]}
                         border="1px solid primary.dark"
                     >
-                        <Typography color="black">Rentals</Typography>
+                        <Box height={`${navBarHeight}px`} display="flex" alignItems="center">
+                            <Typography color="black">Rentals</Typography>
+                        </Box>
                         <Box display="flex" flexDirection="column" gap="0.5rem" alignItems="center">
                             <Avatar
                                 variant="circular"
                                 alt="Samuel Mabonga"
                                 sx={{
-                                    width: "5rem",
-                                    height: "5rem"
+                                    width: ["2rem", "3rem", "5rem"],
+                                    height: ["2rem", "3rem", "5rem"]
                                 }}
                             />
-                            <Box display="flex" flexDirection="column" alignItems="center">
-                                <Typography textAlign="center" color="black">Samuel Mabonga</Typography>
+                            <Box display={["none", "none", "flex"]} flexDirection="column" alignItems="center">
+                                <Typography textAlign="center" color="black" fontWeight={"600"}>Samuel Mabonga</Typography>
                                 <Button variant="outlined" size="small" sx={{ mt: "0.5rem" }}>Edit</Button>
                             </Box>
                         </Box>
@@ -131,17 +190,36 @@ export default function DashboardLayout({ children }: any) {
                     </Box>
 
                     {/* DASHBOARD CONTENT */}
-                    <Box border="1px solid red" width="100%" display="flex" flexDirection="column">
+                    <Box
+                        ml={[0, `${sideNavWidth}px`]}
+                        position="relative"
+                        // border="1px solid red"
+                        width={width}
+                        display="flex"
+                        flexDirection="column"
+                        height="fit-content"
+                        // sx={{
+                        //     overflowY: ["hidden", "scroll"]
+                        // }}
+                    >
                         <Box
-                            padding={["1rem", "1rem", "1rem 8rem 1rem 1rem"]}
-                            width="100%"
+                            ref={navBar}
+                            position="fixed"
+                            top={0}
+                            right={0}
+                            width={width}
+                            zIndex={2}
+                            padding={["1rem", "1rem", "1rem", "1rem 8rem 1rem 1rem"]}
+                            bgcolor={"white"}
                             display="flex"
                             justifyContent={"space-between"}
                             alignItems="center"
-                            border="1px solid red"
+                            // border="1px solid red"
                         >
-                            <Typography color="black">Dashboard</Typography>
+                            <Typography color="black" display={["flex", "none"]}>Rentals</Typography>
+                            <Typography color="black" display={["none", "flex"]}>Dashboard</Typography>
 
+                            <Box display="flex" gap="0.5rem" alignItems="center">
                             <IconButton>
                                 <Box width="1.5rem" height="1.5rem">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
@@ -151,15 +229,30 @@ export default function DashboardLayout({ children }: any) {
 
                                 </Box>
                             </IconButton>
+
+                            <Avatar
+                                variant="circular"
+                                alt="Samuel Mabonga"
+                                sx={{
+                                    width: ["2rem"],
+                                    height: ["2rem"],
+                                    display: ["flex", "none"]
+                                }}
+                            />
+                            </Box>
                         </Box>
 
                         <Box
+                            mt={`${navBarHeight}px`}
                             width="100%"
-                            padding={["1rem", "1rem", "1rem 8rem 1rem 1rem"]}
-                            border="1px solid red"
+                            padding={["1rem", "1rem", "1rem", "1rem 8rem 1rem 1rem"]}
+                            // border="1px solid red"
                             display="flex"
                             flexDirection="column"
                             gap="1.5rem"
+                            // sx={{
+                            //     overflowY: ["hidden", "scroll"]
+                            // }}
                         >
                             {children}
                         </Box>

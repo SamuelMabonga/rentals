@@ -4,6 +4,42 @@ import React, { useState } from "react"
 import Image from "next/image"
 import { PropertiesTable } from "Components/Properties/PropertiesTable"
 import { ArrowCircleRight } from "@mui/icons-material"
+import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
+import { UnitsTable } from "Components/Properties/UnitsTable"
+import { TenantsTable } from "Components/Properties/TenantsTable"
+import { BookingsTable } from "Components/Properties/Bookings"
+import { StaffTable } from "Components/Properties/StaffTable"
+import { UnitTypesTable } from "Components/Properties/UnitTypesTable"
+import { FeaturesTable } from "Components/Properties/FeaturesTable"
+import { TicketsTable } from "Components/Properties/TicketsTable"
+
+function TableSwitch({activeTab}: any) {
+    switch (activeTab) {
+        case "units":
+            return <UnitsTable />
+
+        case "tenants":
+            return <TenantsTable />
+
+        case "bookings":
+            return <BookingsTable />
+
+        case "staff":
+            return <StaffTable />
+
+        case "unitTypes":
+            return <UnitTypesTable />
+
+        case "features":
+            return <FeaturesTable />
+
+        case "tickets":
+            return <TicketsTable />
+
+        default:
+            return <UnitsTable />
+    }
+}
 
 const data = [
     {
@@ -54,6 +90,7 @@ function Detail() {
 
 export default function Property() {
     const [activeTab, setActiveTab] = useState("units")
+    const [showUnitTypeForm, setShowUnitTypeForm] = useState(false)
     return (
         <DashboardLayout>
             <Box
@@ -106,7 +143,7 @@ export default function Property() {
             </Box>
 
 
-            <Box width="100%" overflow="hidden" display="flex" flexDirection="column" gap="1rem">
+            <Box width="100%" height="fit-content" overflow="hidden" display="flex" flexDirection="column" gap="1rem">
                 <Typography fontWeight={"600"} color="black" fontSize="1.25rem">Management</Typography>
                 <Tabs
                     scrollButtons={true}
@@ -118,7 +155,7 @@ export default function Property() {
                     <Tab label="Tenants" value="tenants" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Bookings" value="bookings" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Staff" value="staff" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
-                    <Tab label="Unit Types" value="untiTypes" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
+                    <Tab label="Unit Types" value="unitTypes" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Features" value="features" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Tickets" value="tickets" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                 </Tabs>
@@ -133,7 +170,7 @@ export default function Property() {
                     />
                     <Button variant="contained" sx={{ ml: ["auto"] }}>Create New</Button>
                 </Box>
-                <PropertiesTable data={data} />
+                <TableSwitch activeTab={activeTab} />
             </Box>
         </DashboardLayout>
     )
