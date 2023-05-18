@@ -69,7 +69,7 @@ export default function Properties() {
                         width: ["100%", "20rem"]
                     }}
                 />
-                <Button variant="contained" sx={{ml: "auto"}} onClick={() => setShowUnitTypeForm(true)}>Create New</Button>
+                <Button variant="contained" sx={{ml: "auto"}} onClick={() => setOpenCreateForm(true)}>Create New</Button>
             </Box>
             <PropertiesTable data={data} />
             <PropertyForm open={openCreateForm} setIsOpen={setOpenCreateForm} />
