@@ -1,5 +1,5 @@
 import { Google } from '@mui/icons-material'
-import { Box, Button, Card, Checkbox, Divider, FormControl, FormLabel, TextField, Typography } from '@mui/material'
+import { Box, Button, Card, Checkbox, Divider, FormControl, FormLabel, LinearProgress, TextField, Typography } from '@mui/material'
 import Head from 'next/head'
 import Link from 'next/link'
 import React, { useState } from 'react'
@@ -31,22 +31,22 @@ export default function Login() {
     async function onSubmit(values: any) {
         setIsLoading(true)
         console.log(values)
-        const {email, password} = values
+        const { email, password } = values
 
         const result = await signIn("credentials", {
             redirect: false,
             email,
             password,
-            });
+        });
 
         console.log(result)
-        
+
         if (result?.ok) {
             router.push("/dashboard")
         }
 
     }
-    
+
     return (
         <>
             <Head>
@@ -71,41 +71,48 @@ export default function Login() {
                         sx={{
                             bgcolor: "white",
                             width: ["90vw", "30rem"],
-                            padding: "1rem",
-                            display: "flex",
-                            gap: "2rem",
-                            flexDirection: "column",
-                            my: "auto"
+                            my: "auto",
+                            borderRadius: "0.75rem"
                         }}
                     >
-                        <Typography color="primary.dark" mx="auto">Rentals</Typography>
-                        <Box display="flex" flexDirection="column">
-                            <Typography color="primary.dark" mx="auto" fontSize="1.5rem" fontWeight="600">Login</Typography>
-                            <Typography color="primary.dark" mx="auto" textAlign="center">Enter your credentials to continue</Typography>
+                        <LinearProgress sx={{display: isLoading ? "block" : "none"}} />
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "2rem",
+                                padding: "1.5rem"
+                            }}
+                        >
+                            <Typography color="primary.dark" mx="auto">Rentals</Typography>
+                            <Box display="flex" flexDirection="column">
+                                <Typography color="primary.dark" mx="auto" fontSize="1.5rem" fontWeight="600">Login</Typography>
+                                <Typography color="primary.dark" mx="auto" textAlign="center">Enter your credentials to continue</Typography>
+                            </Box>
+                            <form id="login-form" onSubmit={handleSubmit(onSubmit)}>
+                                <Box width="100%" display="flex" flexDirection="column" gap="1rem">
+                                    <TextField
+                                        variant="outlined"
+                                        {...register("email")}
+                                        placeholder="Email"
+                                        sx={{
+                                            width: "100%"
+                                        }}
+                                    />
+                                    <TextField
+                                        variant="outlined"
+                                        {...register("password")}
+                                        placeholder="Password"
+                                        sx={{
+                                            width: "100%"
+                                        }}
+                                    />
+                                </Box>
+                            </form>
+                            <Button disabled={isLoading} type="submit" form="login-form" variant="contained" sx={{ padding: "1rem" }}>Login</Button>
+                            <Divider orientation="horizontal" />
+                            <Link href="/" style={{ marginRight: "auto", marginLeft: "auto" }}><Typography>Don't have an account?</Typography></Link>
                         </Box>
-                        <form id="login-form" onSubmit={handleSubmit(onSubmit)}>
-                        <Box width="100%" display="flex" flexDirection="column" gap="1rem">
-                            <TextField
-                                variant="outlined"
-                                {...register("email")}
-                                placeholder="Email"
-                                sx={{
-                                    width: "100%"
-                                }}
-                            />
-                            <TextField
-                                variant="outlined"
-                                {...register("password")}
-                                placeholder="Password"
-                                sx={{
-                                    width: "100%"
-                                }}
-                            />
-                        </Box>
-                        </form>
-                        <Button disabled={isLoading} type="submit" form="login-form" variant="contained" sx={{ padding: "1rem" }}>Login</Button>
-                        <Divider orientation="horizontal" />
-                        <Link href="/" style={{ marginRight: "auto", marginLeft: "auto" }}><Typography>Don't have an account?</Typography></Link>
                     </Card>
                 </Box>
             </main>

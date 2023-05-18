@@ -38,7 +38,7 @@ function NavItem({ label, to, svg }: any) {
 
 export default function DashboardLayout({ children }: any) {
     const router = useRouter()
-    const { status } = useSession({
+    const { status, data: session } = useSession({
         required: true,
         onUnauthenticated() {
             // The user is not authenticated, handle it here.
@@ -46,7 +46,13 @@ export default function DashboardLayout({ children }: any) {
         },
     })
 
-    console.log(status)
+    console.log(session)
+
+    const {user}: any = session || {}
+    const {
+        first_name,
+        last_name,
+    } = user || {}
     
 
     // SIDE NAV WIDTH
@@ -116,14 +122,14 @@ export default function DashboardLayout({ children }: any) {
                         <Box display="flex" flexDirection="column" gap="0.5rem" alignItems="center">
                             <Avatar
                                 variant="circular"
-                                alt="Samuel Mabonga"
+                                alt={`${first_name} ${last_name}`}
                                 sx={{
                                     width: ["2rem", "3rem", "5rem"],
                                     height: ["2rem", "3rem", "5rem"]
                                 }}
                             />
                             <Box display={["none", "none", "flex"]} flexDirection="column" alignItems="center">
-                                <Typography textAlign="center" color="black" fontWeight={"600"}>Samuel Mabonga</Typography>
+                                <Typography textAlign="center" color="black" fontWeight={"600"}>{`${first_name} ${last_name}`}</Typography>
                                 <Button variant="outlined" size="small" sx={{ mt: "0.5rem" }}>Edit</Button>
                             </Box>
                         </Box>
