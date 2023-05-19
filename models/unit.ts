@@ -1,6 +1,6 @@
 import { Schema, model, models } from "mongoose";
 
-const UnitsShema = new Schema({
+const UnitShema = new Schema({
   image: {
     type: String,
   },
@@ -11,7 +11,12 @@ const UnitsShema = new Schema({
   tenant: {
     type: String,
   },
-
+  unit_type: {
+    type: String,
+  },
+  unit_status: {
+    type: String,
+  },
   created_at: {
     type: Date,
   },
@@ -20,6 +25,6 @@ const UnitsShema = new Schema({
   },
 });
 
-const Units = models.Units || model("Units", UnitsShema);
+const Unit = models.Unit || model("Unit", UnitShema);
 
-export default Units;
+export default Unit;
