@@ -1,4 +1,3 @@
-import Property from "models/property";
 import Unit from "models/unit";
 
 // get all units
@@ -121,7 +120,7 @@ export async function deleteUnit(req: any, res: any) {
       return "unit being deleted has not been found";
     }
 
-    await unit.deleteOne(unit);
+    await Unit.deleteOne(unit);
 
     res.json({
       success: true,
