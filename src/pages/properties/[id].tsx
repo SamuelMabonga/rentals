@@ -11,6 +11,12 @@ import { FeaturesTable } from "Components/Properties/FeaturesTable"
 import { TicketsTable } from "Components/Properties/TicketsTable"
 import { CollectionsContext } from "context/context"
 import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
+import { GetServerSideProps, InferGetServerSidePropsType } from "next"
+import { getSession } from "next-auth/react"
+
+type PageProps = {
+    data: any;
+};
 
 function TableSwitch({ activeTab }: any) {
     switch (activeTab) {
@@ -40,37 +46,6 @@ function TableSwitch({ activeTab }: any) {
     }
 }
 
-const data = [
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    }
-]
-
 function Detail() {
     return (
         <Box display="flex" alignItems="center" color="gray" flexDirection="row" gap="0.25rem">
@@ -87,12 +62,16 @@ function Detail() {
     )
 }
 
-export default function Property() {
+export default function Property({
+    data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const {
         activePropertiesTab: activeTab,
         setActivePropertiesTab: setActiveTab,
         setShowUnitTypeForm
     }: any = useContext(CollectionsContext)
+
+    console.log(data)
 
     return (
         <>
@@ -213,3 +192,40 @@ export default function Property() {
 }
 
 Property.auth = true
+
+export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
+    const session: any = await getSession({ req: context.req });
+
+    const {query}: any = context
+    const { id } = query;
+
+    console.log("Get server props", id)
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/login', // Redirect to the login page if user is not authenticated
+                permanent: false,
+            },
+        };
+    }
+
+    // Retrieve the access token from the session
+    const accessToken = session?.accessToken;
+
+    // Make the API request with the access token included in the headers
+    const response = await fetch(`http://localhost:3000/api/property?id=${id}`, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+        method: "GET"
+    });
+
+    const data = await response.json();
+
+    return {
+        props: {
+            data,
+        },
+    };
+};

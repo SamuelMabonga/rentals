@@ -1,62 +1,64 @@
 import { Box, Button, TextField, Typography } from "@mui/material"
-import DashboardLayout from "Components/Dashboard/DashboardLayout"
 import { PropertiesTable } from "Components/Properties/PropertiesTable"
 import PropertyForm from "Components/Properties/Forms/PropertyForm"
 import React, { useContext, useState } from "react"
 import { CollectionsContext } from "context/context"
 import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
+import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
+import { getSession, useSession } from "next-auth/react"
 
-const dummyData: any = () => {
-    const items = [];
-    for (let i = 0; i < 10; i++) {
-      items.push({
-        id: i,
-        name: `Item ${i}`,
-        price: 100,
-        quantity: 1,
-      });
+type Property = {
+    // name: string;
+    // stargazers_count: number;
+};
+
+type PageProps = {
+    data: any;
+};
+
+
+export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
+    const session: any = await getSession({ req: context.req });
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/login', // Redirect to the login page if user is not authenticated
+                permanent: false,
+            },
+        };
     }
-    return items;
-   }
 
-const data = [
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    }
-]
+    // Retrieve the access token from the session
+    const accessToken = session?.accessToken;
 
-export default function Properties() {
+    // Make the API request with the access token included in the headers
+    const response = await fetch('http://localhost:3000/api/property', {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+        method: "GET"
+    });
+
+    const data = await response.json();
+
+    return {
+        props: {
+            data,
+        },
+    };
+};
+
+
+
+export default function Properties({
+    data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
     const [openCreateForm, setOpenCreateForm] = useState(false)
-    const {
-        activePropertiesTab: activeTab,
-        setActivePropertiesTab: setActiveTab,
-        setShowUnitTypeForm
-    }: any = useContext(CollectionsContext)
+
+    console.log(data)
+
     return (
         <>
             <Typography color="black" fontSize="1.5rem" fontWeight="600">My Properties</Typography>
@@ -69,9 +71,9 @@ export default function Properties() {
                         width: ["100%", "20rem"]
                     }}
                 />
-                <Button variant="contained" sx={{ml: "auto"}} onClick={() => setOpenCreateForm(true)}>Create New</Button>
+                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenCreateForm(true)}>Create New</Button>
             </Box>
-            <PropertiesTable data={data} />
+            <PropertiesTable data={data.data} />
             <PropertyForm open={openCreateForm} setIsOpen={setOpenCreateForm} />
             <UnitTypeForm />
         </>

@@ -67,7 +67,7 @@ export async function createProperty(req: any, res: any) {
 //fetch property by id
 export async function fetchSingleProperty(req: any, res: any) {
   try {
-    let property = await Property.findById(req.params.id);
+    let property = await Property.findById(req.query.id);
     res.status(200).json({
       success: true,
       msg: "property fetched successfully",

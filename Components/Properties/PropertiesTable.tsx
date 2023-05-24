@@ -95,16 +95,11 @@ export const PropertiesTable = <T extends object>({ data }: ReactTableProps<T>) 
         []
     );
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
     return (
         <TableRenderer
             data={data}
             columns={columns}
+            onRowClick={(rowId) => router.push(`/properties/${rowId}`)}
         />
     );
 };

@@ -8,19 +8,10 @@ import { CollectionsContext } from 'context/context';
 interface ReactTableProps<T extends object> {
     data: T[];
     columns: ColumnDef<T>[];
+    onRowClick: (obj: any) => void
 }
 
-type Item = {
-    image: string;
-    name: string;
-    price: string;
-    rate: string;
-    units: string;
-    dateAdded: string;
-    actions: any;
-}
-
-export const TableRenderer = <T extends object>({ data, columns}: ReactTableProps<T>) => {
+export const TableRenderer = <T extends object>({ data, columns, onRowClick}: ReactTableProps<T>) => {
 
     const table = useReactTable({
         data,
@@ -52,7 +43,7 @@ export const TableRenderer = <T extends object>({ data, columns}: ReactTableProp
                     ))}
                 </TableHead>
                 <TableBody>
-                    {table.getRowModel().rows.map((row) => (
+                    {table.getRowModel().rows.map((row: any) => (
                         <TableRow
                             key={row.id}
                             sx={{
@@ -64,9 +55,9 @@ export const TableRenderer = <T extends object>({ data, columns}: ReactTableProp
                                     bgcolor: "#F6F2FA"
                                 }
                             }}
-                            // onClick={() => router.push("/properties/gwdjdw")}
+                            onClick={() => onRowClick(row.original._id)}
                         >
-                            {row.getVisibleCells().map((cell) => (
+                            {row.getVisibleCells().map((cell: any) => (
                                 <TableCell key={cell.id}
                                     sx={{
                                         color: "gray",

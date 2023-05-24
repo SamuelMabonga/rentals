@@ -46,8 +46,6 @@ export default function DashboardLayout({ children }: any) {
         },
     })
 
-    console.log(session)
-
     const {user}: any = session || {}
     const {
         first_name,
@@ -98,7 +96,7 @@ export default function DashboardLayout({ children }: any) {
                     minHeight="100vh" 
                     maxHeight={["fit-content", "100vh"]} 
                     sx={{
-                        bgcolor: "primary.light",
+                        bgcolor: "white",
                         overflowY: ["hidden", "scroll"]
                     }}
                 >
@@ -180,6 +178,10 @@ export default function DashboardLayout({ children }: any) {
                                 }
                             />
                         </Box>
+
+                        <Box>
+                            <button onClick={() => signOut()}>logout</button>
+                        </Box>
                     </Box>
 
                     {/* DASHBOARD CONTENT */}
@@ -243,6 +245,7 @@ export default function DashboardLayout({ children }: any) {
                             display="flex"
                             flexDirection="column"
                             gap="1.5rem"
+                            bgcolor={"primary.light"}
                             // sx={{
                             //     overflowY: ["hidden", "scroll"]
                             // }}
