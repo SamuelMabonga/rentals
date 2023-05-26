@@ -1,4 +1,3 @@
-import { Google } from '@mui/icons-material'
 import { Box, Button, Card, Checkbox, Divider, FormControl, FormLabel, LinearProgress, TextField, Typography } from '@mui/material'
 import Head from 'next/head'
 import Link from 'next/link'
