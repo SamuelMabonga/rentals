@@ -1,7 +1,24 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { FormControl, FormLabel, Input, Typography, Box } from "@mui/material";
+import { CollectionsContext } from 'context/context';
 
 export default function FileInput() {
+    // CONTEXT
+    const {
+        setImageToUpload,
+        setOpenImageUploader
+    }: any = useContext(CollectionsContext)
+
+    function handleChange(event: any) {
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(event.target.files[0]);
+        fileReader.onload = (e: any) => {
+            console.log("e.target.result", e.target.result);
+            setImageToUpload(e.target.result)
+            setOpenImageUploader(true)
+        }
+
+    };
     return (
         <FormControl>
             <FormLabel>Profile photo</FormLabel>
@@ -11,6 +28,7 @@ export default function FileInput() {
                     sx={{
                         display: "none"
                     }}
+                    onChange={handleChange}
                 />
                 <Box>
                     <Box width="4rem" height="4rem" mx="auto">

@@ -6,6 +6,7 @@ import { ThemeProvider, CssBaseline, createTheme } from '@mui/material';
 
 
 import '../styles/globals.css';
+import "../styles/ReactCrop.css"
 import createEmotionCache from '@/utility/createEmotionCache';
 import lightThemeOptions from '@/theme/lightThemeOptions';
 import { SessionProvider, useSession } from 'next-auth/react';

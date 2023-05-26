@@ -20,6 +20,15 @@ const CollectionsProvider = ({children}: any) => {
 
     // FORMS
     const [showUnitTypeForm, setShowUnitTypeForm] = useState(false)
+    
+    // PROPERTY FORM
+    const [showPropertyForm, setShowPropertyForm] = useState(false)
+    const [propertyToEdit, setPropertyToEdit] = useState(false)
+
+
+    // IMAGE UPLOADER
+    const [openImageUploader, setOpenImageUploader] = useState(false)
+    const [imageToUpload, setImageToUpload] = useState("https://scaleflex.airstore.io/demo/stephen-walker-unsplash.jpg")
 
     return (
         <CollectionsContext.Provider value={{
@@ -33,7 +42,20 @@ const CollectionsProvider = ({children}: any) => {
 
             // FORMS
             showUnitTypeForm,
-            setShowUnitTypeForm
+            setShowUnitTypeForm,
+
+            // Property form
+            showPropertyForm,
+            setShowPropertyForm,
+            propertyToEdit,
+            setPropertyToEdit,
+
+            
+            // Image Uploader
+            openImageUploader,
+            setOpenImageUploader,
+            imageToUpload,
+            setImageToUpload
         }}>
             {children}
         </CollectionsContext.Provider>

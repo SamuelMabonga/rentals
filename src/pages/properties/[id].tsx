@@ -73,6 +73,12 @@ export default function Property({
 
     console.log(data)
 
+    const {
+        name,
+        details,
+        gallery
+    } = data.data
+
     return (
         <>
             <Box
@@ -107,7 +113,7 @@ export default function Property({
             </Box>
 
             <Box width="100%" mt={["1.5rem", "4rem"]} display="flex" flexDirection="column" gap="1rem">
-                <Typography fontSize="1.5rem" fontWeight="600" color="primary.dark">Polo Apartments</Typography>
+                <Typography fontSize="1.5rem" fontWeight="600" color="primary.dark">{name}</Typography>
                 <Box display="flex" flexDirection="row" flexWrap="wrap" gap="0.5rem 0.5rem">
                     <Detail />
                     <Detail />

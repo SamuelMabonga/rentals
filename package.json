@@ -23,6 +23,7 @@
     "@types/react-dom": "18.2.3",
     "@types/uuid": "^9.0.1",
     "bcryptjs": "^2.4.3",
+    "cloudinary-react": "^1.8.1",
     "eslint": "8.39.0",
     "eslint-config-next": "13.4.0",
     "framer-motion": "^10.12.12",
@@ -34,13 +35,16 @@
     "nodemailer": "^6.9.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-filerobot-image-editor": "^4.4.0",
     "react-hook-form": "^7.43.9",
+    "react-image-crop": "^8.6.12",
     "typescript": "5.0.4",
     "uuid": "^9.0.0",
     "yup": "^1.1.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
-    "@types/jsonwebtoken": "^9.0.2"
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/react-image-crop": "^8.1.3"
   }
 }

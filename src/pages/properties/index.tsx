@@ -6,6 +6,8 @@ import { CollectionsContext } from "context/context"
 import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import { getSession, useSession } from "next-auth/react"
+import ImageCropper from "Components/Common/ImageCropper"
+// import ImageUploader from "Components/Common/ImageUploader"
 
 type Property = {
     // name: string;
@@ -54,10 +56,12 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
 export default function Properties({
     data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+        // CONTEXT
+        const {
+            setShowPropertyForm,
+        }: any = useContext(CollectionsContext)
 
     const [openCreateForm, setOpenCreateForm] = useState(false)
-
-    console.log(data)
 
     return (
         <>
@@ -71,11 +75,14 @@ export default function Properties({
                         width: ["100%", "20rem"]
                     }}
                 />
-                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenCreateForm(true)}>Create New</Button>
+                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setShowPropertyForm(true)}>Create New</Button>
             </Box>
             <PropertiesTable data={data.data} />
-            <PropertyForm open={openCreateForm} setIsOpen={setOpenCreateForm} />
+            {/* <ImageCropper open={true} /> */}
+
+            <PropertyForm />
             <UnitTypeForm />
+            {/* <ImageUploader /> */}
         </>
     )
 }
