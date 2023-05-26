@@ -220,7 +220,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     const accessToken = session?.accessToken;
 
     // Make the API request with the access token included in the headers
-    const response = await fetch(`http://localhost:3000/api/property?id=${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/property?id=${id}`, {
         headers: {
             Authorization: `Bearer ${accessToken}`,
         },
