@@ -1,4 +1,3 @@
-import { Settings } from "@mui/icons-material"
 import { Avatar, Box, Button, IconButton, Typography } from "@mui/material"
 // import ImageUploader from "Components/Common/ImageUploader"
 import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
