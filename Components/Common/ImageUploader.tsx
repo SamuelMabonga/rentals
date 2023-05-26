@@ -1,4 +1,3 @@
-import { Close, CloseRounded } from '@mui/icons-material';
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
 import { CollectionsContext } from 'context/context';
 import dynamic from 'next/dynamic';
