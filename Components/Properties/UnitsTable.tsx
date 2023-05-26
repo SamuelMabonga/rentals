@@ -208,7 +208,8 @@ export const UnitsTable = <T extends object>({ }: ReactTableProps<T>) => {
     return (
         <TableRenderer
             data={data}
-            columns={columns}
-        />
+            columns={columns} onRowClick={function (obj: any): void {
+                throw new Error('Function not implemented.');
+            } }        />
     );
 };

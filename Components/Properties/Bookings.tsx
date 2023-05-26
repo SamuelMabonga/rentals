@@ -143,6 +143,8 @@ export const BookingsTable = <T extends object>({ }: ReactTableProps<T>) => {
         <TableRenderer
             data={data}
             columns={columns}
-        />
+            onRowClick={function (obj: any): void {
+                throw new Error('Function not implemented.');
+            } }        />
     );
 };
