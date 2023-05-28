@@ -102,12 +102,6 @@ export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
     const {
         activePropertiesTab: activeTab,
         setActivePropertiesTab: setActiveTab,
