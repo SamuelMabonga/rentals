@@ -2,50 +2,41 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
 import FileInput from "Components/FileInput"
-import fetchAProperty from "apis/fetchAProperty"
 import fetchBillingPeriods from "apis/fetchBillingPeriods"
 import fetchFeatures from "apis/fetchFeatures"
-import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
-import fetchUnitTypes from "apis/fetchUnitTypes"
 import { CollectionsContext } from "context/context"
-import { fetchAllBillingPeriods } from "controllers/billingPeriods"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/router"
 import React, { useContext, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
 const formSchema = yup.object().shape({
     // name: yup.string().required("Name is required"),
-    // description: yup.string().required("Description is required"),
+    // price: yup.string().required("Price is required"),
 })
 
-export default function UnitForm() {
+export default function PropertyFeatureForm() {
     // CONTEXT
     const {
-        openUnitForm: open,
-        setOpenUnitForm: setIsOpen,
-        unitToEdit: toEdit,
-        setUnitToEdit: setToEdit
+        openPropertyFeaturesForm: open,
+        setOpenPropertyFeaturesForm: setIsOpen,
+
+        propertyFeatureToEdit: toEdit,
+        setPropertyFeatureToEdit: setToEdit
     }: any = useContext(CollectionsContext)
 
-    const router = useRouter()
-    const {id}: any = router.query
-
-    // SESSION
-    const { status, data: session }: any = useSession()
-    const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
-    const { data: features }: any = useQuery({ queryKey: ['propertyFeatures'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
-    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
-    const { data: unitTypes }: any = useQuery({ queryKey: ['unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
+    const session: any = useSession()
+    const { data: features }: any = useQuery({ queryKey: ['features'], queryFn: () => fetchFeatures(session.data.accessToken) })
+    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.data.accessToken) })
 
     const [isLoading, setIsLoading] = useState(false)
 
     const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
         defaultValues: {
-            name: "",
-            description: "",
-            features: ""
+            feature: "",
+            price: "",
+            billingPeriod: ""
+            // features: ""
         },
         mode: "onChange",
         reValidateMode: "onChange",
@@ -55,7 +46,7 @@ export default function UnitForm() {
     useEffect(() => {
         if (toEdit?.name) {
             setValue("name", toEdit.name)
-            setValue("description", toEdit.details)
+            setValue("price", toEdit.price)
             return
         }
 
@@ -67,56 +58,53 @@ export default function UnitForm() {
         setIsLoading(true)
 
         const data = {
-            name: values.name,
-            unitType: values.unitType._id,
+            feature: values.feature._id,
+            price: values.price,
+            billingPeriod: values.billingPeriod._id
         }
 
-        console.log(data)
 
-
-        // // EDIT A PROPERTY
+        // // EDIT A PROPERTY FEATURE
         // if (toEdit?.name) {
         //     const edited = {
         //         ...toEdit,
         //         name: values.name,
-        //         details: values.description
+        //         price: values.price
         //     }
         //     try {
-        //         const res = await fetch(`/api/property?id=${toEdit._id}`,{
+        //         const res = await fetch(`/api/propertyFeatures?id=${toEdit._id}`, {
         //             method: 'PUT',
-        //             headers:{
-        //                 'Content-Type':'application/json',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
         //                 Authorization: `Bearer ${session.data.accessToken}`,
         //             },
-        //             body: JSON.stringify({...edited})
+        //             body: JSON.stringify({ ...edited })
         //         })
         //         const response = await res.json();
         //         console.log(response)
         //         setIsLoading(false)
         //         return
-        //     } catch(error) {
+        //     } catch (error) {
         //         setIsLoading(false)
         //         console.log(error)
         //         return
         //     }
         // }
 
-        // POST A PROPERTY
+        // // POST A PROPERTY FEATURE
         try {
-            const res = await fetch('/api/unit',{
+            const res = await fetch('/api/propertyFeatures', {
                 method: 'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                    Authorization: `Bearer ${session.accessToken}`,
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({...data})
+                body: JSON.stringify({ ...data })
             })
             const response = await res.json();
             console.log(response)
             setIsLoading(false)
             setIsOpen(false)
-            return
-        } catch(error) {
+        } catch (error) {
             setIsLoading(false)
             console.log(error)
         }
@@ -130,7 +118,7 @@ export default function UnitForm() {
         >
             <LinearProgress sx={{ display: isLoading ? "block" : "none" }} />
             <DialogTitle sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Typography fontWeight="600">Create new unit </Typography>
+                <Typography fontWeight="600">Create new property feature</Typography>
                 <IconButton onClick={() => {
                     setToEdit({})
                     setIsOpen(false)
@@ -144,32 +132,47 @@ export default function UnitForm() {
             </DialogTitle>
             <DialogContent>
                 <form
-                    id="unit-form"
+                    id="property-features-form"
                     onSubmit={handleSubmit(onSubmit)}
                     style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}
                 >
                     <FormControl>
-                        <FormLabel>Name</FormLabel>
-                        <TextField
-                            placeholder=""
-                            {...register("name")}
-                        // value={}
-                        />
-                        <FormHelperText>{errors?.name?.message}</FormHelperText>
-                    </FormControl>
-                    <FormControl>
-                        <FormLabel>Unit Type</FormLabel>
+                        <FormLabel>Feature</FormLabel>
                         <Autocomplete
-                            // {...register("features")}/
-                            options={unitTypes.data}
+                            // {...register("feature")}
+                            options={features.data}
                             getOptionLabel={(option: any) => option.name}
-                            onChange={(event, value) => setValue("unitType", value)}
                             renderInput={(params) =>
                                 <TextField
                                     {...params}
                                     placeholder=""
                                 />
                             }
+                            onChange={(event, value) => setValue("feature", value)}
+                        />
+                    </FormControl>
+                    <FormControl>
+                        <FormLabel>Price</FormLabel>
+                        <TextField
+                            placeholder=""
+                            {...register("price")}
+                        // value={}
+                        />
+                        <FormHelperText>{errors?.name?.message}</FormHelperText>
+                    </FormControl>
+                    <FormControl>
+                        <FormLabel>Billing Period</FormLabel>
+                        <Autocomplete
+                            // {...register("features")}
+                            options={billingPeriods.data}
+                            getOptionLabel={(option: any) => option.name}
+                            renderInput={(params) =>
+                                <TextField
+                                    {...params}
+                                    placeholder=""
+                                />
+                            }
+                            onChange={(event, value) => setValue("billingPeriod", value)}
                         />
                     </FormControl>
                 </form>
@@ -178,9 +181,9 @@ export default function UnitForm() {
                 <Button
                     variant="contained"
                     type="submit"
-                    form="unit-form"
+                    form="property-features-form"
                 >
-                    {toEdit?.name ? `Edit unit` : `Create unit`}
+                    {toEdit?.name ? `Edit Property Feature` : `Create Property Feature`}
                 </Button>
             </DialogActions>
         </Dialog>

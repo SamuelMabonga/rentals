@@ -2,11 +2,14 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
 import FileInput from "Components/FileInput"
+import fetchAProperty from "apis/fetchAProperty"
 import fetchBillingPeriods from "apis/fetchBillingPeriods"
 import fetchFeatures from "apis/fetchFeatures"
+import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
 import { CollectionsContext } from "context/context"
 import { fetchAllBillingPeriods } from "controllers/billingPeriods"
 import { useSession } from "next-auth/react"
+import { useRouter } from "next/router"
 import React, { useContext, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
@@ -25,9 +28,13 @@ export default function UnitTypeForm() {
         setUnitTypeToEdit: setToEdit
     }: any = useContext(CollectionsContext)
 
+    const router = useRouter()
+    const {id}: any = router.query
+
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data: features }: any = useQuery({ queryKey: ['features'], queryFn: () => fetchFeatures(session.accessToken) })
+    const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
+    const { data: features }: any = useQuery({ queryKey: ['propertyFeatures'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
     const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
 
     const [isLoading, setIsLoading] = useState(false)
@@ -55,19 +62,17 @@ export default function UnitTypeForm() {
     }, [toEdit])
 
     async function onSubmit(values: any) {
-        console.log(values)
         setIsLoading(true)
 
         const data = {
             ...values,
             details: values.description,
             features: values.features.map((item: any) => item._id),
-            billingPeriod: values.billingPeriod._id
+            billingPeriod: values.billingPeriod._id,
+            property: property.data._id
         }
 
         console.log(data)
-
-        console.log("session", session)
 
 
         // // EDIT A PROPERTY
@@ -169,7 +174,7 @@ export default function UnitTypeForm() {
                             // {...register("features")}/
                             options={features.data}
                             multiple
-                            getOptionLabel={(option: any) => option.name}
+                            getOptionLabel={(option: any) => option.feature.name}
                             onChange={(event, value) => setValue("features", value)}
                             renderInput={(params) =>
                                 <TextField

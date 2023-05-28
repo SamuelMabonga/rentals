@@ -53,6 +53,7 @@ export async function createUnitType(req: any, res: any) {
       price: newUnitType?.price,
       units: newUnitType?.units,
       defaultFeatures: newUnitType?.features,
+      property: newUnitType?.property,
       created_at: newUnitType?.created_at,
     });
   } catch (error: any) {

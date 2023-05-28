@@ -17,9 +17,13 @@ const UnitTypeShema = new Schema({
   units: {
     type: Array,
   },
+  property: {
+    type: Schema.Types.ObjectId,
+    ref: 'Property',
+  },
   defaultFeatures: [{
       type: Schema.Types.ObjectId,
-      ref: 'Feature',
+      ref: 'PropertyFeatures',
   }]
 }, {
   timestamps: true

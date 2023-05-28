@@ -22,6 +22,11 @@ import BillingPeriodsForm from "Components/Properties/Forms/BillingPeriodsForm"
 import fetchBillingPeriods from "apis/fetchBillingPeriods"
 import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
 import fetchUnitTypes from "apis/fetchUnitTypes"
+import PropertyFeatureForm from "Components/Properties/Forms/PropertyFeatureForm"
+import { PropertyFeaturesTable } from "Components/Properties/PropertyFeaturesTable"
+import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
+import UnitForm from "Components/Properties/Forms/UnitForm"
+import fetchUnits from "apis/fetchUnits"
 
 type PageProps = {
     // data: any;
@@ -53,6 +58,9 @@ function TableSwitch({ activeTab }: any) {
         case "billingPeriods":
             return <BillingPeriodsTable />
 
+        case "propertyFeatures":
+            return <PropertyFeaturesTable />
+
         default:
             return <></>
     }
@@ -82,7 +90,9 @@ export default function Property({
         setActivePropertiesTab: setActiveTab,
         setShowUnitTypeForm,
         setOpenFeaturesForm,
-        setOpenBillingPeriodsForm
+        setOpenBillingPeriodsForm,
+        setOpenPropertyFeaturesForm,
+        setOpenUnitForm
     }: any = useContext(CollectionsContext)
 
        // SESSION
@@ -161,6 +171,7 @@ export default function Property({
                     <Tab label="Features" value="features" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Tickets" value="tickets" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Billing Periods" value="billingPeriods" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
+                    <Tab label="Property Features" value="propertyFeatures" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                 </Tabs>
                 <Box width="100%" display="flex" flexWrap="wrap" gap="1rem">
                     <TextField
@@ -180,7 +191,7 @@ export default function Property({
                             }
 
                             if (activeTab === "units") {
-                                return setShowUnitTypeForm(true)
+                                return setOpenUnitForm(true)
                             }
 
                             if (activeTab === "tenants") {
@@ -207,6 +218,10 @@ export default function Property({
                                 return setOpenBillingPeriodsForm(true)
                             }
 
+                            if (activeTab === "propertyFeatures") {
+                                return setOpenPropertyFeaturesForm(true)
+                            }
+
                         }}
                     >
                         Create New
@@ -217,6 +232,8 @@ export default function Property({
             <FeaturesForm />
             <BillingPeriodsForm />
             <UnitTypeForm />
+            <PropertyFeatureForm />
+            <UnitForm />
         </>
     )
 }
@@ -250,6 +267,8 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
             await queryClient.prefetchQuery(['features'], () => fetchFeatures(accessToken)),
             await queryClient.prefetchQuery(['billingPeriods'], () => fetchBillingPeriods(accessToken)),
             await queryClient.prefetchQuery(['unitTypes'], () => fetchUnitTypes(accessToken)),
+            await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
+            await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
         ])
     
         return {

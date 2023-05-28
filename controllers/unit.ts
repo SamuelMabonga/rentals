@@ -3,7 +3,7 @@ import Unit from "models/unit";
 // get all units
 export async function fetchAllUnits(req: any, res: any) {
   try {
-    let units = await Unit.find();
+    let units = await Unit.find().populate("unitType");
     res.status(200).json({
       success: true,
       msg: "units fetched successfully",
@@ -39,6 +39,7 @@ export async function createUnit(req: any, res: any) {
 
     const unit = new Unit({
       ...req.body,
+      status: "Vacant"
     });
 
     const newUnit = await unit.save();

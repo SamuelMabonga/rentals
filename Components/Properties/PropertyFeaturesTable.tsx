@@ -1,13 +1,14 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useContext, useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import Image from "next/image"
 import { useRouter } from 'next/router';
-import { CollectionsContext } from 'context/context';
 import { TableRenderer } from 'Components/TableRenderer';
 import { useQuery } from '@tanstack/react-query';
-import fetchUnitTypes from 'apis/fetchUnitTypes';
+import fetchFeatures from 'apis/fetchFeatures';
 import { useSession } from 'next-auth/react';
+import fetchPropertyFeatures from 'apis/fetchPropertyFeatures';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -19,19 +20,16 @@ type Item = {
     name: string;
     price: string;
     rate: string;
-    units: string;
     dateAdded: string;
     actions: any;
 }
 
-export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
-    const [openForm, setOpenForm] = useState(false)
-
+export const PropertyFeaturesTable = <T extends object>({ }: ReactTableProps<T>) => {
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchUnitTypes(session.accessToken) })
+    const { data }: any = useQuery({ queryKey: ['propertyFeatures'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
 
-
+    console.log(data)
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -53,7 +51,7 @@ export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
             {
                 header: 'Name',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'name',
+                accessorKey: 'feature.name',
             },
             {
                 header: 'Price',
@@ -61,19 +59,9 @@ export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
                 accessorKey: 'price',
             },
             {
-                header: 'Rate',
+                header: 'Billing Period',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'rate',
-            },
-            {
-                header: 'Units',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'units',
-            },
-            {
-                header: 'Date Created',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'dateAdded',
+                accessorKey: 'billingPeriod.name',
             },
             {
                 header: 'Actions',
@@ -101,23 +89,17 @@ export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
-    const {
-        activePropertiesTab: activeTab,
-        setActivePropertiesTab: setActiveTab,
-        setShowUnitTypeForm
-    }: any = useContext(CollectionsContext)
-
-    function setShow(event: any) {
-        return setShowUnitTypeForm(true)
-    }
+    const table = useReactTable({
+        data,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+    });
 
     return (
         <TableRenderer
             data={data.data}
-            columns={columns}
-            onRowClick={function (obj: any): void {
+            columns={columns} onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
-            } }
-        />
+            }} />
     );
 };
