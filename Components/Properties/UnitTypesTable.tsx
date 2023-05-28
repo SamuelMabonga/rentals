@@ -2,11 +2,12 @@ import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCel
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useContext, useMemo, useState } from 'react';
-import Image from "next/image"
 import { useRouter } from 'next/router';
-import UnitTypeForm from './Forms/UnitTypeForm';
 import { CollectionsContext } from 'context/context';
 import { TableRenderer } from 'Components/TableRenderer';
+import { useQuery } from '@tanstack/react-query';
+import fetchUnitTypes from 'apis/fetchUnitTypes';
+import { useSession } from 'next-auth/react';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -26,40 +27,11 @@ type Item = {
 export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
     const [openForm, setOpenForm] = useState(false)
 
+    // SESSION
+    const { status, data: session }: any = useSession()
+    const { data }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchUnitTypes(session.accessToken) })
 
-    const data = [
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            price: "string",
-            rate: "string",
-            units: "string",
-            dateAdded: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            price: "string",
-            rate: "string",
-            units: "string",
-            dateAdded: "string",
-        }, {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            price: "string",
-            rate: "string",
-            units: "string",
-            dateAdded: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            price: "string",
-            rate: "string",
-            units: "string",
-            dateAdded: "string",
-        },
-    ]
+
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -129,12 +101,6 @@ export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
     const {
         activePropertiesTab: activeTab,
         setActivePropertiesTab: setActiveTab,
@@ -147,8 +113,11 @@ export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
 
     return (
         <TableRenderer
-            data={data}
+            data={data.data}
             columns={columns}
+            onRowClick={function (obj: any): void {
+                throw new Error('Function not implemented.');
+            } }
         />
     );
 };

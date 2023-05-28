@@ -5,6 +5,9 @@ import { useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/TableRenderer';
+import { useQuery } from '@tanstack/react-query';
+import fetchFeatures from 'apis/fetchFeatures';
+import { useSession } from 'next-auth/react';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -21,43 +24,11 @@ type Item = {
 }
 
 export const FeaturesTable = <T extends object>({ }: ReactTableProps<T>) => {
-    const data = [
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        price: "string",
-        rate: "string",
-        dateAdded: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        price: "string",
-        rate: "string",
-        dateAdded: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        price: "string",
-        rate: "string",
-        dateAdded: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        price: "string",
-        rate: "string",
-        dateAdded: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        price: "string",
-        rate: "string",
-        dateAdded: "string",
-    },
-]
+    // SESSION
+    const { status, data: session }: any = useSession()
+    const { data }: any = useQuery({ queryKey: ['features'], queryFn: () => fetchFeatures(session.accessToken) })
+
+    console.log(data)
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -130,8 +101,9 @@ export const FeaturesTable = <T extends object>({ }: ReactTableProps<T>) => {
 
     return (
         <TableRenderer
-            data={data}
-            columns={columns}
-        />
+            data={data.data}
+            columns={columns} onRowClick={function (obj: any): void {
+                throw new Error('Function not implemented.');
+            }} />
     );
 };

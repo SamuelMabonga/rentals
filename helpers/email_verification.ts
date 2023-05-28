@@ -11,7 +11,7 @@ function sendEmailVerification(
 ) {
   // url for sending the email
 //   TODO: refactor to use .env value 
-  const currenturl = `http://localhost:3000/`;
+  const currenturl = process.env.NEXT_PUBLIC_HOST;
 
   // const uniqueString = uuidv4() + _id
   const uniqueString = 1245 + _id;

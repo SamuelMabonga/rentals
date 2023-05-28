@@ -1,62 +1,41 @@
 import { Box, Button, TextField, Typography } from "@mui/material"
-import DashboardLayout from "Components/Dashboard/DashboardLayout"
 import { PropertiesTable } from "Components/Properties/PropertiesTable"
 import PropertyForm from "Components/Properties/Forms/PropertyForm"
 import React, { useContext, useState } from "react"
 import { CollectionsContext } from "context/context"
-import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
+// import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
+import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
+import { getSession, useSession } from "next-auth/react"
+import ImageCropper from "Components/Common/ImageCropper"
+import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
+import fetchProperties from "apis/fetchProperties"
+// import ImageUploader from "Components/Common/ImageUploader"
 
-const dummyData: any = () => {
-    const items = [];
-    for (let i = 0; i < 10; i++) {
-      items.push({
-        id: i,
-        name: `Item ${i}`,
-        price: 100,
-        quantity: 1,
-      });
-    }
-    return items;
-   }
+// type Property = {
+//     // name: string;
+//     // stargazers_count: number;
+// };
 
-const data = [
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    }
-]
+type PageProps = {
+    // data: any;
+};
 
-export default function Properties() {
-    const [openCreateForm, setOpenCreateForm] = useState(false)
+
+export default function Properties({
+    // data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    // CONTEXT
     const {
-        activePropertiesTab: activeTab,
-        setActivePropertiesTab: setActiveTab,
-        setShowUnitTypeForm
+        setShowPropertyForm,
     }: any = useContext(CollectionsContext)
+
+    // SESSION
+    const { status, data: session }: any = useSession()
+
+    const [openCreateForm, setOpenCreateForm] = useState(false)
+
+    const { data }: any = useQuery({ queryKey: ['properties'], queryFn: () => fetchProperties(session.accessToken) })
+
     return (
         <>
             <Typography color="black" fontSize="1.5rem" fontWeight="600">My Properties</Typography>
@@ -69,13 +48,46 @@ export default function Properties() {
                         width: ["100%", "20rem"]
                     }}
                 />
-                <Button variant="contained" sx={{ml: "auto"}} onClick={() => setShowUnitTypeForm(true)}>Create New</Button>
+                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setShowPropertyForm(true)}>Create New</Button>
             </Box>
-            <PropertiesTable data={data} />
-            <PropertyForm open={openCreateForm} setIsOpen={setOpenCreateForm} />
-            <UnitTypeForm />
+            <PropertiesTable data={data.data} />
+            {/* <ImageCropper open={true} /> */}
+
+            <PropertyForm />
+            {/* <UnitTypeForm /> */}
+            {/* <ImageUploader /> */}
         </>
     )
 }
 
 Properties.auth = true
+
+
+
+export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
+    const session: any = await getSession({ req: context.req });
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/login', // Redirect to the login page if user is not authenticated
+                permanent: false,
+            },
+        };
+    }
+
+    // Retrieve the access token from the session
+    const accessToken = session?.accessToken;
+
+    // REACT QUERY
+    const queryClient = new QueryClient()
+
+    await queryClient.prefetchQuery(['properties'], () => fetchProperties(accessToken))
+
+    return {
+        props: {
+            dehydratedState: dehydrate(queryClient),
+        },
+    };
+};
+

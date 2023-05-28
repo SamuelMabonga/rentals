@@ -1,7 +1,5 @@
 import { Avatar, Box, Button, IconButton, Typography } from "@mui/material"
-import DashboardLayout from "Components/Dashboard/DashboardLayout"
 import { signOut, useSession } from "next-auth/react"
-import Head from "next/head"
 import { useRouter } from "next/router"
 import React from "react"
 

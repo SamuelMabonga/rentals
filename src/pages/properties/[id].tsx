@@ -10,7 +10,27 @@ import { UnitTypesTable } from "Components/Properties/UnitTypesTable"
 import { FeaturesTable } from "Components/Properties/FeaturesTable"
 import { TicketsTable } from "Components/Properties/TicketsTable"
 import { CollectionsContext } from "context/context"
+import { GetServerSideProps, InferGetServerSidePropsType } from "next"
+import { getSession, useSession } from "next-auth/react"
+import FeaturesForm from "Components/Properties/Forms/FeaturesForm"
+import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
+import fetchAProperty from "apis/fetchAProperty"
+import { useRouter } from "next/router"
+import fetchFeatures from "apis/fetchFeatures"
+import { BillingPeriodsTable } from "Components/Properties/BillingPeriodsTable"
+import BillingPeriodsForm from "Components/Properties/Forms/BillingPeriodsForm"
+import fetchBillingPeriods from "apis/fetchBillingPeriods"
 import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
+import fetchUnitTypes from "apis/fetchUnitTypes"
+import PropertyFeatureForm from "Components/Properties/Forms/PropertyFeatureForm"
+import { PropertyFeaturesTable } from "Components/Properties/PropertyFeaturesTable"
+import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
+import UnitForm from "Components/Properties/Forms/UnitForm"
+import fetchUnits from "apis/fetchUnits"
+
+type PageProps = {
+    // data: any;
+};
 
 function TableSwitch({ activeTab }: any) {
     switch (activeTab) {
@@ -35,41 +55,16 @@ function TableSwitch({ activeTab }: any) {
         case "tickets":
             return <TicketsTable />
 
+        case "billingPeriods":
+            return <BillingPeriodsTable />
+
+        case "propertyFeatures":
+            return <PropertyFeaturesTable />
+
         default:
             return <></>
     }
 }
-
-const data = [
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        status: "string",
-        tenants: "string",
-        dateCreated: "string",
-    }
-]
 
 function Detail() {
     return (
@@ -87,12 +82,34 @@ function Detail() {
     )
 }
 
-export default function Property() {
+export default function Property({
+    // data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const {
         activePropertiesTab: activeTab,
         setActivePropertiesTab: setActiveTab,
-        setShowUnitTypeForm
+        setShowUnitTypeForm,
+        setOpenFeaturesForm,
+        setOpenBillingPeriodsForm,
+        setOpenPropertyFeaturesForm,
+        setOpenUnitForm
     }: any = useContext(CollectionsContext)
+
+       // SESSION
+       const { status, data: session }: any = useSession()
+
+    const router = useRouter()
+    const {id}: any = router.query
+
+    const { data }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
+
+    console.log(data)
+
+    const {
+        name,
+        details,
+        gallery
+    } = data.data
 
     return (
         <>
@@ -128,18 +145,13 @@ export default function Property() {
             </Box>
 
             <Box width="100%" mt={["1.5rem", "4rem"]} display="flex" flexDirection="column" gap="1rem">
-                <Typography fontSize="1.5rem" fontWeight="600" color="primary.dark">Polo Apartments</Typography>
+                <Typography fontSize="1.5rem" fontWeight="600" color="primary.dark">{name}</Typography>
                 <Box display="flex" flexDirection="row" flexWrap="wrap" gap="0.5rem 0.5rem">
                     <Detail />
                     <Detail />
                     <Detail />
                     <Detail />
                 </Box>
-                <Typography color="grey">
-                    This cabin comes with Smart Home System and beautiful viking style. You can see sunrise in the morning with City View from full Glass Window.
-                    This unit is surrounded by business district of West Surabaya that offers you the city life as well as wide range of culinary.
-                    This apartment equipped with Washing Machine, Electric Stove, Microwave, Refrigerator, Cutlery.
-                </Typography>
                 <Button variant="outlined" sx={{ width: "fit-content" }}>View full profile</Button>
             </Box>
 
@@ -158,6 +170,8 @@ export default function Property() {
                     <Tab label="Unit Types" value="unitTypes" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Features" value="features" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Tickets" value="tickets" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
+                    <Tab label="Billing Periods" value="billingPeriods" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
+                    <Tab label="Property Features" value="propertyFeatures" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                 </Tabs>
                 <Box width="100%" display="flex" flexWrap="wrap" gap="1rem">
                     <TextField
@@ -177,7 +191,7 @@ export default function Property() {
                             }
 
                             if (activeTab === "units") {
-                                return setShowUnitTypeForm(true)
+                                return setOpenUnitForm(true)
                             }
 
                             if (activeTab === "tenants") {
@@ -197,7 +211,15 @@ export default function Property() {
                             }
 
                             if (activeTab === "features") {
-                                return setShowUnitTypeForm(true)
+                                return setOpenFeaturesForm(true)
+                            }
+
+                            if (activeTab === "billingPeriods") {
+                                return setOpenBillingPeriodsForm(true)
+                            }
+
+                            if (activeTab === "propertyFeatures") {
+                                return setOpenPropertyFeaturesForm(true)
                             }
 
                         }}
@@ -207,9 +229,51 @@ export default function Property() {
                 </Box>
                 <TableSwitch activeTab={activeTab} />
             </Box>
+            <FeaturesForm />
+            <BillingPeriodsForm />
             <UnitTypeForm />
+            <PropertyFeatureForm />
+            <UnitForm />
         </>
     )
 }
 
 Property.auth = true
+
+export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
+    const session: any = await getSession({ req: context.req });
+
+    const {query}: any = context
+    const { id } = query;
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/login', // Redirect to the login page if user is not authenticated
+                permanent: false,
+            },
+        };
+    }
+
+    // Retrieve the access token from the session
+    const accessToken = session?.accessToken;
+
+
+        // REACT QUERY
+        const queryClient = new QueryClient()
+
+        await Promise.all([
+            await queryClient.prefetchQuery(['property'], () => fetchAProperty(accessToken, id)),
+            await queryClient.prefetchQuery(['features'], () => fetchFeatures(accessToken)),
+            await queryClient.prefetchQuery(['billingPeriods'], () => fetchBillingPeriods(accessToken)),
+            await queryClient.prefetchQuery(['unitTypes'], () => fetchUnitTypes(accessToken)),
+            await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
+            await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
+        ])
+    
+        return {
+            props: {
+                dehydratedState: dehydrate(queryClient),
+            },
+        };
+};
