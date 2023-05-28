@@ -9,27 +9,28 @@ import * as yup from "yup"
 
 const formSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
-    description: yup.string().required("Description is required"),
+    price: yup.string().required("Price is required"),
 })
 
-export default function PropertyForm() {
+export default function FeaturesForm() {
     // CONTEXT
     const {
-        showPropertyForm: open,
-        setShowPropertyForm: setIsOpen,
-        propertyToEdit: toEdit,
-        setPropertyToEdit: setToEdit
+        openFeaturesForm: open,
+        setOpenFeaturesForm: setIsOpen,
+
+        featureToEdit: toEdit,
+        setFeatureToEdit: setToEdit
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
 
     const [isLoading, setIsLoading] = useState(false)
-    
+
     const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
         defaultValues: {
             name: "",
-            description: "",
-            features: ""
+            price: "",
+            // features: ""
         },
         mode: "onChange",
         reValidateMode: "onChange",
@@ -39,7 +40,7 @@ export default function PropertyForm() {
     useEffect(() => {
         if (toEdit?.name) {
             setValue("name", toEdit.name)
-            setValue("description", toEdit.details)
+            setValue("price", toEdit.price)
             return
         }
 
@@ -52,7 +53,7 @@ export default function PropertyForm() {
 
         const data = {
             name: values.name,
-            details: values.description
+            price: values.price
         }
 
 
@@ -61,22 +62,22 @@ export default function PropertyForm() {
             const edited = {
                 ...toEdit,
                 name: values.name,
-                details: values.description
+                price: values.price
             }
             try {
-                const res = await fetch(`/api/property?id=${toEdit._id}`,{
+                const res = await fetch(`/api/feature?id=${toEdit._id}`, {
                     method: 'PUT',
-                    headers:{
-                        'Content-Type':'application/json',
+                    headers: {
+                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${session.data.accessToken}`,
                     },
-                    body: JSON.stringify({...edited})
+                    body: JSON.stringify({ ...edited })
                 })
                 const response = await res.json();
                 console.log(response)
                 setIsLoading(false)
                 return
-            } catch(error) {
+            } catch (error) {
                 setIsLoading(false)
                 console.log(error)
                 return
@@ -85,18 +86,18 @@ export default function PropertyForm() {
 
         // POST A PROPERTY
         try {
-            const res = await fetch('/api/property',{
+            const res = await fetch('/api/feature', {
                 method: 'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                    Authorization: `Bearer ${session.data.accessToken}`,
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({...data})
+                body: JSON.stringify({ ...data })
             })
             const response = await res.json();
             console.log(response)
             setIsLoading(false)
-        } catch(error) {
+            setIsOpen(false)
+        } catch (error) {
             setIsLoading(false)
             console.log(error)
         }
@@ -108,9 +109,9 @@ export default function PropertyForm() {
             fullWidth
             maxWidth="sm"
         >
-                                    <LinearProgress sx={{display: isLoading ? "block" : "none"}} />
+            <LinearProgress sx={{ display: isLoading ? "block" : "none" }} />
             <DialogTitle sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Typography fontWeight="600">Create new property</Typography>
+                <Typography fontWeight="600">Create new feature</Typography>
                 <IconButton onClick={() => {
                     setToEdit({})
                     setIsOpen(false)
@@ -124,7 +125,7 @@ export default function PropertyForm() {
             </DialogTitle>
             <DialogContent>
                 <form
-                    id="property-form"
+                    id="features-form"
                     onSubmit={handleSubmit(onSubmit)}
                     style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}
                 >
@@ -138,17 +139,16 @@ export default function PropertyForm() {
                         <FormHelperText>{errors?.name?.message}</FormHelperText>
                     </FormControl>
                     <FormControl>
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>Price</FormLabel>
                         <TextField
-                            {...register("description")}
-                            multiline
-                            rows={4}
                             placeholder=""
+                            {...register("price")}
+                            // value={}
                         />
-                        <FormHelperText>{errors?.description?.message}</FormHelperText>
+                        <FormHelperText>{errors?.name?.message}</FormHelperText>
                     </FormControl>
                     <FormControl>
-                        <FormLabel>Features</FormLabel>
+                        <FormLabel>Rate</FormLabel>
                         <Autocomplete
                             // {...register("features")}
                             options={[{ label: "Yes", value: "Yes" }]}
@@ -161,16 +161,15 @@ export default function PropertyForm() {
                         />
                     </FormControl>
                     <FileInput />
-                    <FileInput />
                 </form>
             </DialogContent>
-            <DialogActions sx={{padding: "1.5rem"}}>
+            <DialogActions sx={{ padding: "1.5rem" }}>
                 <Button
                     variant="contained"
                     type="submit"
-                    form="property-form"
+                    form="features-form"
                 >
-                    {toEdit?.name ? `Edit Property` : `Create Property`}
+                    {toEdit?.name ? `Edit Feature` : `Create Feature`}
                 </Button>
             </DialogActions>
         </Dialog>

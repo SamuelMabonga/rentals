@@ -18,14 +18,14 @@ export default async function handler(
   const { query: {id} }: any = req;
   const token: any = req.headers.authorization?.replace('Bearer ', '');
 
-  const decodedToken = jwt.verify(token, 'your-secret-key');
+  const decodedToken: any = jwt.verify(token, 'your-secret-key');
 
   // const token = await getToken({ req })
 
   const session = await getSession({ req });
 
   // console.log("Token --", token)
-  // console.log("Token decoded --", decodedToken)
+  console.log("Token decoded --", decodedToken)
 
   // HANDLE PERMISSION CONTROL HERE
   if (!token) {
@@ -41,7 +41,10 @@ export default async function handler(
   //type of request
   // console.log(req)
 
-  console.log("Slug", id) 
+  // USER
+  const {
+    _id: user
+  } = decodedToken.user
 
   const { method } = req;
   switch (method) {
@@ -56,7 +59,7 @@ export default async function handler(
       //   fetchSingleProperty(req, res);
       // break;
     case "POST":
-      createProperty(req, res);
+      createProperty(req, res, user);
       break;
     case "PUT":
       updateProperty(req, res);

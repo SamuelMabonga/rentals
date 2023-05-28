@@ -53,6 +53,9 @@ const options: NextAuthOptions = {
       return token;
     },
     session: async ({ session, token }:any) => {
+      // console.log("session.....", session)
+      // console.log("token.....", token)
+
       if (token && token.user) {
         const accessToken = jwt.sign(
           { user: token.user },

@@ -20,7 +20,7 @@ export async function fetchAllProperties(req: any, res: any) {
 }
 
 // create a property
-export async function createProperty(req: any, res: any) {
+export async function createProperty(req: any, res: any, user: string) {
   try {
     const { cover_photo, profile_photo, name, details } = req.body;
     console.log("It does not fail after line 30");
@@ -39,8 +39,11 @@ export async function createProperty(req: any, res: any) {
       });
     }
 
+    console.log("OWNER HERERE", user)
+
     const property = new Property({
       ...req.body,
+      owner: user
     });
 
     const newProperty = await property.save();
@@ -67,7 +70,7 @@ export async function createProperty(req: any, res: any) {
 //fetch property by id
 export async function fetchSingleProperty(req: any, res: any) {
   try {
-    let property = await Property.findById(req.query.id);
+    let property = await Property.findById(req.query.id).populate("owner");
     res.status(200).json({
       success: true,
       msg: "property fetched successfully",
@@ -86,12 +89,12 @@ export async function fetchSingleProperty(req: any, res: any) {
 //update a property
 export async function updateProperty(req: any, res: any) {
   try {
-    let property = await Property.findById(req.params.id);
+    let property = await Property.findById(req.query.id);
 
     const data = {
       name: req.body.name || property.name,
     };
-    property = await Property.findByIdAndUpdate(req.params.id, data, {
+    property = await Property.findByIdAndUpdate(req.query.id, data, {
       new: true,
     });
     res.status(200).json({

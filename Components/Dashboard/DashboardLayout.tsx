@@ -1,6 +1,5 @@
 import { Avatar, Box, Button, IconButton, Typography } from "@mui/material"
 // import ImageUploader from "Components/Common/ImageUploader"
-import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
 import { useIsomorphicLayoutEffect } from "framer-motion"
 import { signOut, useSession } from "next-auth/react"
 import dynamic from "next/dynamic"
@@ -264,7 +263,6 @@ export default function DashboardLayout({ children }: any) {
                         </Box>
                     </Box>
                 </Box>
-                <UnitTypeForm />
                 <ImageUploader />
             </main>
         </>

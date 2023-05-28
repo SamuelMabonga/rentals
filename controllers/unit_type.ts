@@ -3,7 +3,7 @@ import UnitType from "models/unit_type";
 // get all unit_types
 export async function fetchAllUnitTypes(req: any, res: any) {
   try {
-    let unit_types = await UnitType.find();
+    let unit_types = await UnitType.find().populate("billingPeriod").populate("defaultFeatures");
     res.status(200).json({
       success: true,
       msg: "unit types fetched successfully",
@@ -52,6 +52,7 @@ export async function createUnitType(req: any, res: any) {
       rate: newUnitType?.rate,
       price: newUnitType?.price,
       units: newUnitType?.units,
+      defaultFeatures: newUnitType?.features,
       created_at: newUnitType?.created_at,
     });
   } catch (error: any) {
@@ -66,7 +67,7 @@ export async function createUnitType(req: any, res: any) {
 //fetch unit type by id
 export async function fetchSingleUnitType(req: any, res: any) {
   try {
-    let unit_type = await UnitType.findById(req.params.id);
+    let unit_type = await UnitType.findById(req.params.id).populate("billingPeriod").populate("defaultFeatures");
     res.status(200).json({
       success: true,
       msg: "unit type fetched successfully",

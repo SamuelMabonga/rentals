@@ -23,7 +23,15 @@ const CollectionsProvider = ({children}: any) => {
     
     // PROPERTY FORM
     const [showPropertyForm, setShowPropertyForm] = useState(false)
-    const [propertyToEdit, setPropertyToEdit] = useState(false)
+    const [propertyToEdit, setPropertyToEdit] = useState()
+
+    // FEATURE FORM
+    const [openFeaturesForm, setOpenFeaturesForm] = useState(false)
+    const [featureToEdit, setFeatureToEdit] = useState()
+
+    // BILLING PERIODS FORM
+    const [openBillingPeriodsForm, setOpenBillingPeriodsForm] = useState(false)
+    const [billingPeriodsToEdit, setBillingPeriodsToEdit] = useState(false)
 
 
     // IMAGE UPLOADER
@@ -49,6 +57,18 @@ const CollectionsProvider = ({children}: any) => {
             setShowPropertyForm,
             propertyToEdit,
             setPropertyToEdit,
+
+            // Features form
+            openFeaturesForm,
+            setOpenFeaturesForm,
+            featureToEdit,
+            setFeatureToEdit,
+
+            // Billing Periods
+            openBillingPeriodsForm,
+            setOpenBillingPeriodsForm,
+            billingPeriodsToEdit,
+            setBillingPeriodsToEdit,
 
             
             // Image Uploader

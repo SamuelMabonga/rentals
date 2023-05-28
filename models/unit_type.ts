@@ -11,15 +11,18 @@ const UnitTypeShema = new Schema({
   price: {
     type: String,
   },
-  rate: {
+  billingPeriod: {
     type: String,
   },
   units: {
     type: Array,
   },
-  created_at: {
-    type: Date,
-  }
+  defaultFeatures: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Feature',
+  }]
+}, {
+  timestamps: true
 });
 
 const UnitType = models.UnitType || model("UnitType", UnitTypeShema);
