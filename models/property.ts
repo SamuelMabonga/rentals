@@ -5,6 +5,7 @@ const propertySchema = new Schema({
   name: {
     type: String,
     required: true,
+    unique: true
   },
   owner: {
     type: Schema.Types.ObjectId,
