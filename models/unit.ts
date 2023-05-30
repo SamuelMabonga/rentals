@@ -7,6 +7,7 @@ const UnitShema = new Schema({
   name: {
     required: true,
     type: String,
+    unique: true
   },
   unitType: {
     type: Schema.Types.ObjectId,
