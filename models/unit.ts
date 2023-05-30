@@ -12,6 +12,10 @@ const UnitShema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'UnitType',
   },
+  property: {
+    type: Schema.Types.ObjectId,
+    ref: 'Property',
+  },
   status: {
     type: String,
   },

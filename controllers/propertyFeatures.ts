@@ -83,15 +83,15 @@ export async function fetchSinglePropertyFeature(req: any, res: any) {
 //update a property feature
 export async function updatePropertyFeature(req: any, res: any) {
   try {
-    let propertyFeature = await PropertyFeatures.findById(req.params.id);
+    let propertyFeature = await PropertyFeatures.findById(req.query.id);
 
     const data = {
-      name: req.body.name || propertyFeature.name,
-      image: req.body.image || propertyFeature.image,
-      rate: req.body.rate || propertyFeature.rate,
+      feature: req.body.feature || propertyFeature.feature,
+      billingPeriod: req.body.billingPeriod || propertyFeature.billingPeriod,
       price: req.body.price || propertyFeature.price,
+      property: propertyFeature.property
     };
-    propertyFeature = await PropertyFeatures.findByIdAndUpdate(req.params.id, data, {
+    propertyFeature = await PropertyFeatures.findByIdAndUpdate(req.query.id, data, {
       new: true,
     });
     res.status(200).json({
@@ -100,6 +100,7 @@ export async function updatePropertyFeature(req: any, res: any) {
       data: propertyFeature,
     });
   } catch (error) {
+    console.log("The error", error)
     res.status(400).json({
       success: false,
       msg: "failed to update property feature",
