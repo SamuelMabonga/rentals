@@ -39,11 +39,11 @@ export async function createProperty(req: any, res: any, user: string) {
       });
     }
 
-    console.log("OWNER HERERE", user)
+    console.log("OWNER HERERE", user);
 
     const property = new Property({
       ...req.body,
-      owner: user
+      owner: user,
     });
 
     const newProperty = await property.save();
@@ -51,12 +51,7 @@ export async function createProperty(req: any, res: any, user: string) {
     return res.json({
       success: true,
       msg: "New property created",
-      _id: newProperty?._id,
-      name: newProperty?.name,
-      details: newProperty?.details,
-      price: newProperty?.price,
-      building_type: newProperty?.building_type,
-      number_of_units: newProperty?.number_of_units,
+      data: newProperty,
     });
   } catch (error: any) {
     console.log(error);

@@ -6,6 +6,7 @@ export interface IUser {
   phone_number: string;
   national_id: string;
   verified: boolean;
+  role: string
 }
 
 export interface LoginUserParams {

@@ -24,6 +24,7 @@ export default async function handler(
 
   connectToMongoDB().catch((err) => res.json(err));
 
+
   //type of request
   // console.log(req)
 

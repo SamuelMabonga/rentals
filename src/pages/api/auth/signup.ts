@@ -23,6 +23,7 @@ export default async function handler(
       last_name,
       phone_number,
       national_id,
+      role
     } = req.body;
 
     console.log(email)
@@ -46,6 +47,7 @@ export default async function handler(
         phone_number,
         password: hashedPassword,
         verified: false,
+        role
       })
         .then(async (data: IUser) => {
           //send verification email
@@ -59,6 +61,7 @@ export default async function handler(
             national_id: data.national_id,
             phone_number: data.phone_number,
             verified: data.verified,
+            role: data.role
           };
 
           return res.json({
