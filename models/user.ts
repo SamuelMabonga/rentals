@@ -38,6 +38,9 @@ const UserShema = new Schema({
   verified: {
     type: String,
   },
+  role: {
+    type: String,
+  },
 });
 
 const User = models.User || model("User", UserShema);

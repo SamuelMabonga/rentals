@@ -1,13 +1,48 @@
 import Property from "models/property";
+import User from "models/user";
+
+export function authRole(res: any, role: string, user: any) {
+  if (user.role == !role) {
+    res.status(401);
+    return res.send("Not allowed.");
+  }
+}
+
+//use case - when returning a single property
+export function caViewProperty(user: any, property: any) {
+  return user.role === "admin" || property.owner === user._id;
+}
+
+export function scopedProperties(user: any, properties: any) {
+  if (user.role === "admin") return properties;
+  return properties.filter((property: any) => property.owner === user._id);
+}
+
+export function canDeleteProperty(user: any, property: any) {
+  return (
+    // user.role === ROLE.ADMIN ||
+    //only person that created it can delete it
+    property.owner === user._id
+  );
+}
 
 // get all properties
-export async function fetchAllProperties(req: any, res: any) {
+export async function fetchAllProperties(req: any, res: any, userId: string) {
   try {
-    let properties = await Property.find();
+    let properties;
+    //set user
+    let user = await User.findById(userId);
+
+    user.role === "admin"
+      ? (properties = await Property.find())
+      : (properties = await Property.findOne({ owner: `${userId}` }));
+
     res.status(200).json({
       success: true,
       msg: "properties fetched successfully",
       data: properties,
+      user,
+      userId,
     });
   } catch (error) {
     res.status(400).json({
@@ -39,11 +74,10 @@ export async function createProperty(req: any, res: any, user: string) {
       });
     }
 
-    console.log("OWNER HERERE", user)
+    console.log("OWNER HERERE", user);
 
     const property = new Property({
       ...req.body,
-      owner: user
     });
 
     const newProperty = await property.save();
@@ -51,12 +85,7 @@ export async function createProperty(req: any, res: any, user: string) {
     return res.json({
       success: true,
       msg: "New property created",
-      _id: newProperty?._id,
-      name: newProperty?.name,
-      details: newProperty?.details,
-      price: newProperty?.price,
-      building_type: newProperty?.building_type,
-      number_of_units: newProperty?.number_of_units,
+      data: newProperty,
     });
   } catch (error: any) {
     console.log(error);
@@ -68,13 +97,14 @@ export async function createProperty(req: any, res: any, user: string) {
 }
 
 //fetch property by id
-export async function fetchSingleProperty(req: any, res: any) {
+export async function fetchSingleProperty(req: any, res: any, owner: string) {
   try {
     let property = await Property.findById(req.query.id).populate("owner");
     res.status(200).json({
       success: true,
       msg: "property fetched successfully",
       data: property,
+      owner,
     });
   } catch (error) {
     res.status(400).json({
