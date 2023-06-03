@@ -1,18 +1,24 @@
 import {
-  createUnit,
-  deleteUnit,
-  fetchAllUnits,
-  fetchSingleUnit,
-  updateUnit,
-} from "controllers/unit";
+  deleteUser,
+  fetchAllUsers,
+  fetchSingleUser,
+  updateUser,
+} from "controllers/user";
 import authenticateUser from "helpers/authenticate_user";
 import { connectToMongoDB } from "lib/mongodb";
+import User from "models/user";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  //id for fetching single User
+  const {
+    query: { id },
+  }: any = req;
+
+
   authenticateUser(req, res);
 
   connectToMongoDB().catch((err) => res.json(err));
@@ -20,19 +26,18 @@ export default async function handler(
   const { method } = req;
   switch (method) {
     case "GET":
-      fetchAllUnits(req, res);
+      if (!id) {
+        return fetchAllUsers(req, res);
+      } else {
+        fetchSingleUser(req, res);
+      }
       break;
-      // case "GET":
-      //   fetchSingleUnit(req, res);
-      break;
-    case "POST":
-      createUnit(req, res);
-      break;
+    
     case "PUT":
-      updateUnit(req, res);
+      updateUser(req, res);
       break;
     case "DELETE":
-      deleteUnit(req, res);
+      deleteUser(req, res);
       break;
     default:
       //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);

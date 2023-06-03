@@ -5,6 +5,7 @@ import {
   fetchSingleTicket,
   updateTicket,
 } from "controllers/ticket";
+import authenticateUser from "helpers/authenticate_user";
 import { connectToMongoDB } from "lib/mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -12,8 +13,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  connectToMongoDB().catch((err) => res.json(err));
+  authenticateUser(req, res);
 
+  connectToMongoDB().catch((err) => res.json(err));
   //type of request
   const { method } = req;
   switch (method) {
