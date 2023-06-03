@@ -32,25 +32,10 @@ export async function fetchAllProperties(req: any, res: any, userId: string) {
     let properties;
     //set user
     let user = await User.findById(userId);
-    //check if user role matches roles allowed to access data
-    // user && authRole(res, "admin", user);
-    // if (user) {
-    //   authRole(res, "admin", user);
-    // }
 
     user.role === "admin"
       ? (properties = await Property.find())
       : (properties = await Property.findOne({ owner: `${userId}` }));
-
-    // if (user.role !== "admin") {
-    //   properties = await Property.findOne({ owner: `${userId}` });
-    // }
-
-    // if (user.role === "admin") {
-    //   properties = properties;
-    // } else {
-    //   properties = properties.filter((property) => property.owner === user._id);
-    // }
 
     res.status(200).json({
       success: true,
