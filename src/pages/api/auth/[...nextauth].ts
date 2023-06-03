@@ -64,6 +64,7 @@ const options: NextAuthOptions = {
         );
         session.accessToken = accessToken;
         session.user = token.user as IUser;
+        console.log(session)
       }
       return session;
     },
