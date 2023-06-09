@@ -43,6 +43,7 @@ const UserShema = new Schema({
   role: {
     type: String,
   },
+  isEmail_verified: { type: Boolean, default: false },
 });
 
 UserShema.plugin(mongoosastic)

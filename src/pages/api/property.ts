@@ -3,6 +3,7 @@ import {
   deleteProperty,
   fetchAllProperties,
   fetchSingleProperty,
+  searchProperty,
   updateProperty,
 } from "controllers/property";
 import { connectToMongoDB } from "lib/mongodb";
@@ -17,36 +18,34 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const {
-    query: { id, userId },
+    query: { id, search },
   }: any = req;
 
   const decodedToken = authenticateUser(req, res);
 
   connectToMongoDB().catch((err) => res.json(err));
 
-  console.log("DECODED TOKEN", decodedToken)
-
-
   //type of request
   // console.log(req)
 
   // USER
-  const { _id: userFetching } = decodedToken.user;
+  const { _id } = decodedToken.user;
 
   const { method } = req;
   switch (method) {
     case "GET":
       if (!id) {
-        return fetchAllProperties(req, res, userFetching);
+        return fetchAllProperties(req, res, _id);
       } else {
-        fetchSingleProperty(req, res, userId);
+        fetchSingleProperty(req, res, _id);
       }
+      if (search) searchProperty(req, res, search);
       break;
     // case "GET":
     //   fetchSingleProperty(req, res);
     // break;
     case "POST":
-      createProperty(req, res, userFetching);
+      createProperty(req, res, _id);
       break;
     case "PUT":
       updateProperty(req, res);

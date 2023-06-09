@@ -1,9 +1,4 @@
-import {
-  deleteUser,
-  fetchAllUsers,
-  fetchSingleUser,
-  updateUser,
-} from "controllers/user";
+import { verifyEmail } from "controllers/verify_email";
 import authenticateUser from "helpers/authenticate_user";
 import { connectToMongoDB } from "lib/mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -17,27 +12,13 @@ export default async function handler(
     query: { id },
   }: any = req;
 
-
-  authenticateUser(req, res);
-
-  connectToMongoDB().catch((err) => res.json(err));
   //type of request
   const { method } = req;
   switch (method) {
     case "GET":
-      if (!id) {
-        return fetchAllUsers(req, res);
-      } else {
-        fetchSingleUser(req, res);
-      }
+      id && verifyEmail(req, res);
       break;
-    
-    case "PUT":
-      updateUser(req, res);
-      break;
-    case "DELETE":
-      deleteUser(req, res);
-      break;
+
     default:
       //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);
       res.status(405).end(`Method ${method} not Allowed`);
