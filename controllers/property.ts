@@ -166,3 +166,26 @@ export async function deleteProperty(req: any, res: any) {
     console.log(error);
   }
 }
+
+// @desc    search
+// @route   GET /api/property?search=searchQuery
+export async function searchProperty(req: any, res: any, searchQuery: any) {
+  try {
+    let findParams = searchQuery ? { $text: { $search: searchQuery } } : {};
+
+    const properties = await Property.find({ ...findParams });
+
+    res.status(200).json({
+      success: true,
+      msg: "properties searched successfully",
+      data: properties,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to search properties",
+      data: error,
+    });
+    console.log(error);
+  }
+}
