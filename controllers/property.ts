@@ -1,13 +1,6 @@
 import Property from "models/property";
 import User from "models/user";
 
-export function authRole(res: any, role: string, user: any) {
-  if (user.role == !role) {
-    res.status(401);
-    return res.send("Not allowed.");
-  }
-}
-
 //use case - when returning a single property
 export function caViewProperty(user: any, property: any) {
   return user.role === "admin" || property.owner === user._id;
@@ -168,22 +161,30 @@ export async function deleteProperty(req: any, res: any) {
 }
 
 // @desc    search
-// @route   GET /api/property?search=searchQuery
-export async function searchProperty(req: any, res: any, searchQuery: any) {
+// @route   GET /api/property?searchQuery=searchQuery
+export async function searchProperty(req: any, res: any, searchQuery: string) {
   try {
-    let findParams = searchQuery ? { $text: { $search: searchQuery } } : {};
+    let findParams = searchQuery
+      ? {
+          $text: {
+            $search: searchQuery,
+            $caseSensitive: false,
+            $diacriticSensitive: false,
+          },
+        }
+      : {};
 
     const properties = await Property.find({ ...findParams });
 
     res.status(200).json({
       success: true,
-      msg: "properties searched successfully",
+      msg: `${searchQuery} searched successfully`,
       data: properties,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      msg: "failed to search properties",
+      msg: `failed to search ${searchQuery}`,
       data: error,
     });
     console.log(error);
