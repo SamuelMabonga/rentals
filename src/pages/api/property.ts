@@ -35,10 +35,20 @@ export default async function handler(
   const { method } = req;
   switch (method) {
     case "GET":
-      if (role === "admin") return adminFetchAllProperties(req, res);
-      if (id) return fetchSingleProperty(req, res, id);
-      if (searchQuery) return searchProperty(req, res, searchQuery);
-      fetchAllProperties(req, res, _id);
+      if (role === "admin") {
+        if (id) {
+          fetchSingleProperty(req, res, id);
+        } else if (searchQuery) {
+          searchProperty(req, res, searchQuery);
+        }
+        return adminFetchAllProperties(req, res);
+      } else if (id) {
+        fetchSingleProperty(req, res, id);
+      } else if (searchQuery) {
+        searchProperty(req, res, searchQuery);
+      } else {
+        fetchAllProperties(req, res, _id);
+      }
       break;
     case "POST":
       createProperty(req, res, _id);
