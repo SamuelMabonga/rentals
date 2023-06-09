@@ -130,7 +130,7 @@ export async function updateProperty(req: any, res: any) {
 //delete a property
 export async function deleteProperty(req: any, res: any) {
   try {
-    let property = await Property.findById(req.params.id);
+    let property = await Property.findById(req.query.id);
 
     if (!property) {
       //   return next("property being deleted has not been found");

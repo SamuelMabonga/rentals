@@ -1,6 +1,6 @@
 import { Schema, model, models } from "mongoose";
 
-const BookingShema = new Schema({
+const BookingSchema = new Schema({
   image: {
     type: String,
   },
@@ -16,9 +16,14 @@ const BookingShema = new Schema({
   },
   end_date: {
     type: Date,
-  }
+  },
 });
 
-const Booking = models.Booking || model("Booking", BookingShema);
+//indexed fields for searching
+BookingSchema.index({
+  name: "text",
+});
+
+const Booking = models.Booking || model("Booking", BookingSchema);
 
 export default Booking;
