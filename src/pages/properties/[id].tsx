@@ -27,6 +27,7 @@ import { PropertyFeaturesTable } from "Components/Properties/PropertyFeaturesTab
 import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
 import UnitForm from "Components/Properties/Forms/UnitForm"
 import fetchUnits from "apis/fetchUnits"
+import BookingForm from "Components/Properties/Forms/BookingForm"
 
 type PageProps = {
     // data: any;
@@ -92,7 +93,8 @@ export default function Property({
         setOpenFeaturesForm,
         setOpenBillingPeriodsForm,
         setOpenPropertyFeaturesForm,
-        setOpenUnitForm
+        setOpenUnitForm,
+        setOpenBookingForm,
     }: any = useContext(CollectionsContext)
 
        // SESSION
@@ -207,7 +209,7 @@ export default function Property({
                             }
 
                             if (activeTab === "bookings") {
-                                return setShowUnitTypeForm(true)
+                                return setOpenBookingForm(true)
                             }
 
                             if (activeTab === "features") {
@@ -234,6 +236,7 @@ export default function Property({
             <UnitTypeForm />
             <PropertyFeatureForm />
             <UnitForm />
+            <BookingForm />
         </>
     )
 }

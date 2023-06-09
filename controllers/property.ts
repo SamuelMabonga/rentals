@@ -27,22 +27,24 @@ export function canDeleteProperty(user: any, property: any) {
 }
 
 // get all properties
-export async function fetchAllProperties(req: any, res: any, userId: string) {
+export async function fetchAllProperties(req: any, res: any, userFetching: string) {
   try {
     let properties;
     //set user
-    let user = await User.findById(userId);
+    let user = await User.findById(userFetching);
 
-    user.role === "admin"
+    console.log("ROLE", userFetching)
+
+    user?.role === "admin"
       ? (properties = await Property.find())
-      : (properties = await Property.findOne({ owner: `${userId}` }));
+      : (properties = await Property.findOne({ owner: `${userFetching}` }));
 
     res.status(200).json({
       success: true,
       msg: "properties fetched successfully",
       data: properties,
       user,
-      userId,
+      userFetching,
     });
   } catch (error) {
     res.status(400).json({
@@ -55,7 +57,7 @@ export async function fetchAllProperties(req: any, res: any, userId: string) {
 }
 
 // create a property
-export async function createProperty(req: any, res: any, user: string) {
+export async function createProperty(req: any, res: any, userFetching: string) {
   try {
     const { cover_photo, profile_photo, name, details } = req.body;
     console.log("It does not fail after line 30");
@@ -74,10 +76,11 @@ export async function createProperty(req: any, res: any, user: string) {
       });
     }
 
-    console.log("OWNER HERERE", user);
+    console.log("OWNER HERERE", userFetching);
 
     const property = new Property({
       ...req.body,
+      owner: userFetching
     });
 
     const newProperty = await property.save();

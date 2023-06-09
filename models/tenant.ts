@@ -9,9 +9,10 @@ const TenantShema = new Schema({
     type: String,
   },
   unit: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: "Unit"
   },
-  entry_date: {
+  start_date: {
     type: Date,
   },
   end_date: {

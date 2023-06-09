@@ -24,18 +24,20 @@ export default async function handler(
 
   connectToMongoDB().catch((err) => res.json(err));
 
+  console.log("DECODED TOKEN", decodedToken)
+
 
   //type of request
   // console.log(req)
 
   // USER
-  // const { _id: user } = decodedToken.user;
+  const { _id: userFetching } = decodedToken.user;
 
   const { method } = req;
   switch (method) {
     case "GET":
       if (!id) {
-        return fetchAllProperties(req, res, userId);
+        return fetchAllProperties(req, res, userFetching);
       } else {
         fetchSingleProperty(req, res, userId);
       }
@@ -44,7 +46,7 @@ export default async function handler(
     //   fetchSingleProperty(req, res);
     // break;
     case "POST":
-      createProperty(req, res, userId);
+      createProperty(req, res, userFetching);
       break;
     case "PUT":
       updateProperty(req, res);

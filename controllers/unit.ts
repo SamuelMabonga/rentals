@@ -3,7 +3,20 @@ import Unit from "models/unit";
 // get all units
 export async function fetchAllUnits(req: any, res: any) {
   try {
-    let units = await Unit.find().populate("unitType");
+    const {
+      unitType
+    } = req.query
+    // let units = await Unit.find().populate("unitType");
+
+
+    console.log("UNIT TYPE", unitType)
+
+    let units
+
+    unitType !== undefined ?
+      (units = await Unit.find({unitType: unitType}).populate("unitType"))
+      : (units = await Unit.find().populate("unitType"));
+
     res.status(200).json({
       success: true,
       msg: "units fetched successfully",

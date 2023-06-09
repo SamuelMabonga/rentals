@@ -1,4 +1,6 @@
 import { Schema, model, models } from "mongoose";
+// import mongoosastic from 'mongoosastic'
+const mongoosastic = require('mongoosastic');
 
 const UserShema = new Schema({
   email: {
@@ -42,6 +44,8 @@ const UserShema = new Schema({
     type: String,
   },
 });
+
+UserShema.plugin(mongoosastic)
 
 const User = models.User || model("User", UserShema);
 

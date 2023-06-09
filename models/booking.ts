@@ -1,16 +1,24 @@
 import { Schema, model, models } from "mongoose";
 
 const BookingShema = new Schema({
-  image: {
-    type: String,
-  },
   name: {
     required: true,
     type: String,
   },
-  unit: {
-    type: String,
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
   },
+  unit: {
+    type: Schema.Types.ObjectId,
+    ref: 'Unit',
+  },
+  additionalFeatures: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'PropertyFeatures',
+    }
+  ],
   start_date: {
     type: Date,
   },

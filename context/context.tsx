@@ -48,6 +48,10 @@ const CollectionsProvider = ({children}: any) => {
     const [openUnitForm, setOpenUnitForm] = useState(false)
     const [unitToEdit, setUnitToEdit] = useState(false)
 
+    // BOOKING FORM
+    const [openBookingForm, setOpenBookingForm] = useState(false)
+    const [bookingToEdit, setBookingToEdit] = useState(false)
+
 
     // IMAGE UPLOADER
     const [openImageUploader, setOpenImageUploader] = useState(false)
@@ -97,6 +101,12 @@ const CollectionsProvider = ({children}: any) => {
             setOpenUnitForm,
             unitToEdit,
             setUnitToEdit,
+
+            // Bookings form
+            openBookingForm, 
+            setOpenBookingForm,
+            bookingToEdit,
+            setBookingToEdit,
 
             // SNACKBAR MESSAGE
             snackbarMessage,

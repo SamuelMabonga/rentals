@@ -1,6 +1,8 @@
 import { yupResolver } from "@hookform/resolvers/yup"
 import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
+import { useQuery } from "@tanstack/react-query"
 import FileInput from "Components/FileInput"
+import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
 import { CollectionsContext } from "context/context"
 import { useSession } from "next-auth/react"
 import React, { useContext, useEffect, useState } from "react"
@@ -21,6 +23,9 @@ export default function PropertyForm() {
         setPropertyToEdit: setToEdit,
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
+
+    // fetch property features
+    const { data: features }: any = useQuery({ queryKey: ['propertyFeatures'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
 
     const session: any = useSession()
 
@@ -96,6 +101,21 @@ export default function PropertyForm() {
             })
             const response = await res.json();
             console.log(response)
+            if (!response.success) {
+                setIsLoading(false)
+                return setSnackbarMessage({
+                    open: true,
+                    vertical: 'top',
+                    horizontal: 'center',
+                    message: "Failed to create property",
+                    icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" style={{color: "red"}}>
+  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+</svg>
+
+                    </Box>
+                })
+            }
             setIsLoading(false)
             setSnackbarMessage({
                 open: true,
@@ -159,11 +179,11 @@ export default function PropertyForm() {
                         />
                         <FormHelperText>{errors?.description?.message}</FormHelperText>
                     </FormControl>
-                    <FormControl>
+                    {/* <FormControl>
                         <FormLabel>Features</FormLabel>
                         <Autocomplete
                             // {...register("features")}
-                            options={[{ label: "Yes", value: "Yes" }]}
+                            options={features?.data}
                             renderInput={(params) =>
                                 <TextField
                                     {...params}
@@ -171,7 +191,7 @@ export default function PropertyForm() {
                                 />
                             }
                         />
-                    </FormControl>
+                    </FormControl> */}
                     <FileInput />
                     <FileInput />
                 </form>
