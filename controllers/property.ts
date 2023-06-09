@@ -1,13 +1,6 @@
 import Property from "models/property";
 import User from "models/user";
 
-export function authRole(res: any, role: string, user: any) {
-  if (user.role == !role) {
-    res.status(401);
-    return res.send("Not allowed.");
-  }
-}
-
 //use case - when returning a single property
 export function caViewProperty(user: any, property: any) {
   return user.role === "admin" || property.owner === user._id;
