@@ -5,6 +5,7 @@ import {
   fetchSingleProperty,
   searchProperty,
   updateProperty,
+  adminFetchAllProperties,
 } from "controllers/property";
 import { connectToMongoDB } from "lib/mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -29,12 +30,13 @@ export default async function handler(
   // console.log(req)
 
   // USER
-  const { _id } = decodedToken.user;
+  const { _id, role } = decodedToken.user;
 
   const { method } = req;
   switch (method) {
     case "GET":
-      if (id) return fetchSingleProperty(req, res, _id);
+      if (role === "admin") return adminFetchAllProperties(req, res);
+      if (id) return fetchSingleProperty(req, res, id);
       if (searchQuery) return searchProperty(req, res, searchQuery);
       fetchAllProperties(req, res, _id);
       break;
