@@ -18,7 +18,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const {
-    query: { id, search },
+    query: { id, searchQuery },
   }: any = req;
 
   const decodedToken = authenticateUser(req, res);
@@ -34,16 +34,10 @@ export default async function handler(
   const { method } = req;
   switch (method) {
     case "GET":
-      if (!id) {
-        return fetchAllProperties(req, res, _id);
-      } else {
-        fetchSingleProperty(req, res, _id);
-      }
-      if (search) searchProperty(req, res, search);
+      if (id) return fetchSingleProperty(req, res, _id);
+      if (searchQuery) return searchProperty(req, res, searchQuery);
+      fetchAllProperties(req, res, _id);
       break;
-    // case "GET":
-    //   fetchSingleProperty(req, res);
-    // break;
     case "POST":
       createProperty(req, res, _id);
       break;
