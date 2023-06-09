@@ -1,6 +1,6 @@
 import Booking from "models/booking";
 
-// get admin all bookings
+// get all bookings
 export async function fetchAllBookings(req: any, res: any) {
   try {
     let bookings = await Booking.find();
