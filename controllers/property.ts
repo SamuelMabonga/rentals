@@ -4,7 +4,7 @@ import Property from "models/property";
 //none admin fetch properties
 export async function fetchAllProperties(req: any, res: any, userId: string) {
   try {
-    let properties = await Property.findOne({ owner: `${userId}` });
+    let properties = await Property.find({ owner: `${userId}` });
 
     res.status(200).json({
       success: true,
@@ -84,16 +84,16 @@ export async function createProperty(req: any, res: any, user: string) {
 }
 
 //fetch property by id
-export async function fetchSingleProperty(req: any, res: any, id: string) {
+export async function fetchSingleProperty(req: any, res: any) {
   try {
-    let property = await Property.findById(id).populate("owner");
-    res.status(200).json({
+    let property = await Property.findById(req.query.id)
+    res.json({
       success: true,
       msg: "property fetched successfully",
       data: property,
     });
   } catch (error) {
-    res.status(400).json({
+    res.json({
       success: false,
       msg: "failed to fetch property",
       data: error,
