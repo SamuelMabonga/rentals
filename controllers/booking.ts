@@ -20,7 +20,8 @@ export async function fetchAllBookings(req: any, res: any) {
         ]
       })
 
-    res.status(200).json({
+
+    res.json({
       success: true,
       msg: "bookings fetched successfully",
       data: bookings,
@@ -34,6 +35,7 @@ export async function fetchAllBookings(req: any, res: any) {
     console.log(error);
   }
 }
+
 
 // create a booking
 export async function createBooking(req: any, res: any) {
@@ -82,8 +84,8 @@ export async function createBooking(req: any, res: any) {
 //fetch booking by id
 export async function fetchSingleBooking(req: any, res: any) {
   try {
-    let booking = await Booking.findById(req.params.id);
-    res.status(200).json({
+    let booking = await Booking.findById(req.query.id);
+    res.json({
       success: true,
       msg: "booking fetched successfully",
       data: booking,
@@ -127,7 +129,7 @@ export async function updateBooking(req: any, res: any) {
 //delete a booking
 export async function deleteBooking(req: any, res: any) {
   try {
-    let booking = await Booking.findById(req.params.id);
+    let booking = await Booking.findById(req.query.id);
 
     if (!booking) {
       //   return next("booking being deleted has not been found");
@@ -144,6 +146,37 @@ export async function deleteBooking(req: any, res: any) {
     res.status(400).json({
       success: false,
       msg: "failed to delete booking",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// @desc    search
+// @route   GET /api/booking?searchQuery=searchQuery
+export async function searchBooking(req: any, res: any, searchQuery: string) {
+  try {
+    let findParams = searchQuery
+      ? {
+          $text: {
+            $search: searchQuery,
+            $caseSensitive: false,
+            $diacriticSensitive: false,
+          },
+        }
+      : {};
+
+    const booking = await Booking.find({ ...findParams });
+
+    res.status(200).json({
+      success: true,
+      msg: `${searchQuery} searched successfully`,
+      data: booking,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: `failed to search ${searchQuery}`,
       data: error,
     });
     console.log(error);

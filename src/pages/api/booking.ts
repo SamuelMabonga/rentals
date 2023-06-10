@@ -3,6 +3,7 @@ import {
   deleteBooking,
   fetchAllBookings,
   fetchSingleBooking,
+  searchBooking,
   updateBooking,
 } from "controllers/booking";
 import authenticateUser from "helpers/authenticate_user";
@@ -13,18 +14,28 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  authenticateUser(req, res);
+  const {
+    query: { id, searchQuery },
+  }: any = req;
+
+  const decodedToken = authenticateUser(req, res);
 
   connectToMongoDB().catch((err) => res.json(err));
+
+  // USER
+  const { _id, role } = decodedToken.user;
 
   //type of request
   const { method } = req;
   switch (method) {
     case "GET":
-      fetchAllBookings(req, res);
-      break;
-      // case "GET":
-      //   fetchSingleBooking(req, res);
+       if (id) {
+        fetchSingleBooking(req, res);
+      } else if (searchQuery) {
+        searchBooking(req, res, searchQuery);
+      } else {
+        fetchAllBookings(req, res);
+      }
       break;
     case "POST":
       createBooking(req, res);
