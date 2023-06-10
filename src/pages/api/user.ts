@@ -18,7 +18,6 @@ export default async function handler(
     query: { id, searchQuery },
   }: any = req;
 
-
   authenticateUser(req, res);
 
   connectToMongoDB().catch((err) => res.json(err));
@@ -26,15 +25,14 @@ export default async function handler(
   const { method } = req;
   switch (method) {
     case "GET":
-      if (!id) {
-        return fetchAllUsers(req, res);
+      if (id) {
+        return fetchSingleUser(req, res);
       } else if (searchQuery) {
-        return searchUser(req, res, searchQuery)
+        return searchUser(req, res);
       } else {
-        fetchSingleUser(req, res);
+        fetchAllUsers(req, res);
       }
       break;
-    
     case "PUT":
       updateUser(req, res);
       break;

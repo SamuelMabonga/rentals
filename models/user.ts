@@ -48,6 +48,8 @@ const UserShema = new Schema({
 //indexed fields for searching
 UserShema.index({
   email: "text",
+  first_name: 'text',
+  last_name: 'text'
 });
 
 const User = models.User || model("User", UserShema);
