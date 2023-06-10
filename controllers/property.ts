@@ -1,43 +1,35 @@
 import Property from "models/property";
-import User from "models/user";
-
-//use case - when returning a single property
-export function caViewProperty(user: any, property: any) {
-  return user.role === "admin" || property.owner === user._id;
-}
-
-export function scopedProperties(user: any, properties: any) {
-  if (user.role === "admin") return properties;
-  return properties.filter((property: any) => property.owner === user._id);
-}
-
-export function canDeleteProperty(user: any, property: any) {
-  return (
-    // user.role === ROLE.ADMIN ||
-    //only person that created it can delete it
-    property.owner === user._id
-  );
-}
 
 // get all properties
-export async function fetchAllProperties(req: any, res: any, userFetching: string) {
+//none admin fetch properties
+export async function fetchAllProperties(req: any, res: any, userId: string) {
   try {
-    let properties;
-    //set user
-    let user = await User.findById(userFetching);
-
-    console.log("ROLE", userFetching)
-
-    user?.role === "admin"
-      ? (properties = await Property.find())
-      : (properties = await Property.findOne({ owner: `${userFetching}` }));
+    let properties = await Property.find({ owner: `${userId}` });
 
     res.status(200).json({
       success: true,
       msg: "properties fetched successfully",
       data: properties,
-      user,
-      userFetching,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch  properties",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// get admin all properties
+export async function adminFetchAllProperties(req: any, res: any) {
+  try {
+    let properties = await Property.find();
+
+    res.status(200).json({
+      success: true,
+      msg: "properties fetched successfully",
+      data: properties,
     });
   } catch (error) {
     res.status(400).json({
@@ -93,17 +85,16 @@ export async function createProperty(req: any, res: any, userFetching: string) {
 }
 
 //fetch property by id
-export async function fetchSingleProperty(req: any, res: any, owner: string) {
+export async function fetchSingleProperty(req: any, res: any) {
   try {
-    let property = await Property.findById(req.query.id).populate("owner");
-    res.status(200).json({
+    let property = await Property.findById(req.query.id)
+    res.json({
       success: true,
       msg: "property fetched successfully",
       data: property,
-      owner,
     });
   } catch (error) {
-    res.status(400).json({
+    res.json({
       success: false,
       msg: "failed to fetch property",
       data: error,
@@ -143,7 +134,7 @@ export async function deleteProperty(req: any, res: any) {
     let property = await Property.findById(req.params.id);
 
     if (!property) {
-      //   return next("property being deleted has not been found");
+      // return next("property being deleted has not been found");
       return "property being deleted has not been found";
     }
 
@@ -164,7 +155,7 @@ export async function deleteProperty(req: any, res: any) {
 }
 
 // @desc    search
-// @route   GET /api/property?searchQuery=searchQuery
+// @route   GET /api/user?searchQuery=searchQuery
 export async function searchProperty(req: any, res: any, searchQuery: string) {
   try {
     let findParams = searchQuery

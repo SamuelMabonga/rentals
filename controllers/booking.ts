@@ -3,7 +3,23 @@ import Booking from "models/booking";
 // get all bookings
 export async function fetchAllBookings(req: any, res: any) {
   try {
-    let bookings = await Booking.find();
+    let bookings = await Booking.find()
+      .populate({
+        path: "unit",
+        populate: [
+          {path: "unitType"}
+        ]
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [
+          {path: "feature"}
+        ]
+      })
+
     res.status(200).json({
       success: true,
       msg: "bookings fetched successfully",
@@ -22,7 +38,7 @@ export async function fetchAllBookings(req: any, res: any) {
 // create a booking
 export async function createBooking(req: any, res: any) {
   try {
-    const requiredFields = ["name"];
+    const requiredFields = ["user"];
 
     const includesAllFields = requiredFields.every((field) => {
       return !!req.body[field];
@@ -39,6 +55,7 @@ export async function createBooking(req: any, res: any) {
 
     const booking = new Booking({
       ...req.body,
+      status: "Pending"
     });
 
     const newBooking = await booking.save();
@@ -47,11 +64,11 @@ export async function createBooking(req: any, res: any) {
       success: true,
       msg: "New booking created",
       _id: newBooking?._id,
-      name: newBooking?.name,
-      image: newBooking?.image,
-      unit: newBooking?.unit,
-      start_date: newBooking?.start_date,
-      end_date: newBooking?.end_date,
+      // name: newBooking?.name,
+      // image: newBooking?.image,
+      // unit: newBooking?.unit,
+      // start_date: newBooking?.start_date,
+      // end_date: newBooking?.end_date,
     });
   } catch (error: any) {
     console.log(error);
@@ -84,16 +101,12 @@ export async function fetchSingleBooking(req: any, res: any) {
 //update a booking
 export async function updateBooking(req: any, res: any) {
   try {
-    let booking = await Booking.findById(req.params.id);
+    let booking = await Booking.findById(req.query.id);
 
     const data = {
-      name: req.body.name || booking.name,
-      image: req.body.image || booking.image,
-      unit: req.body.unit || booking.unit,
-      start_date: req.body.start_date || booking.start_date,
-      end_date: req.body.end_date || booking.end_date,
+      ...req.body
     };
-    booking = await Booking.findByIdAndUpdate(req.params.id, data, {
+    booking = await Booking.findByIdAndUpdate(req.query.id, data, {
       new: true,
     });
     res.status(200).json({
@@ -102,6 +115,7 @@ export async function updateBooking(req: any, res: any) {
       data: booking,
     });
   } catch (error) {
+    console.log(error)
     res.status(400).json({
       success: false,
       msg: "failed to update booking",

@@ -2,7 +2,6 @@ import { Schema, model, models } from "mongoose";
 
 const BookingShema = new Schema({
   name: {
-    required: true,
     type: String,
   },
   user: {
@@ -19,12 +18,17 @@ const BookingShema = new Schema({
       ref: 'PropertyFeatures',
     }
   ],
-  start_date: {
+  startDate: {
     type: Date,
   },
-  end_date: {
+  endDate: {
     type: Date,
+  },
+  status: {
+    type: String
   }
+}, {
+  timestamps: true
 });
 
 const Booking = models.Booking || model("Booking", BookingShema);

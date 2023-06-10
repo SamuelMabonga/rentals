@@ -1,8 +1,8 @@
-'use client';
+// 'use client';
 
 import { yupResolver } from "@hookform/resolvers/yup"
 import { CheckCircle } from "@mui/icons-material"
-import { Autocomplete, Avatar, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
+import { Autocomplete, Avatar, Box, Button, Chip, CircularProgress, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
 import FileInput from "Components/FileInput"
 import fetchUnitTypeUnits from "apis/fetchUnitTypeUnits"
@@ -21,6 +21,7 @@ import fetchPropertyFeatures from "apis/fetchPropertyFeatures";
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
+import moment from "moment"
 
 const steps = [
     'Select a tenant',
@@ -45,8 +46,31 @@ function HorizontalStepper({ step }: any) {
 
 
 const formSchema = yup.object().shape({
-    unitType: yup.string().required("Unit type is required"),
-    // price: yup.string().required("Price is required"),
+    userSearchTerm: yup.string().required(),
+    user: yup.object().shape({
+        _id: yup.string().required("Required"),
+        first_name: yup.string().required("Required"),
+        last_name: yup.string().required("Required")
+    }),
+    unitType: yup.object().shape({
+        _id: yup.string().required("Required"),
+        name: yup.string().required("Required")
+    }),
+    unit: yup.object().shape({
+        _id: yup.string().required("Required"),
+        name: yup.string().required("Required")
+    }),
+    additionalFeatures: yup.array().of(
+        yup.object().shape({
+            _id: yup.string().required("Required"),
+            feature: yup.object().shape({
+                _id: yup.string().required("Required"),
+                name: yup.string().required("Required")
+            }),
+        })
+    ),
+    startDate: yup.string().required("Required"),
+    endDate: yup.string().required("Required")
 })
 
 export default function BookingForm() {
@@ -71,9 +95,26 @@ export default function BookingForm() {
 
     const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
         defaultValues: {
-            name: "",
-            price: "",
-            // features: ""
+            userSearchTerm: "",
+            user: {
+                _id: "",
+                first_name: "",
+                last_name: ""
+            },
+            unitType: {
+                _id: "",
+                name: ""
+            },
+            unit: {
+                _id: "",
+                name: ""
+            },
+            additionalFeatures: [
+                {_id: "", feature: {_id: "", name: ""}}
+            ],
+            startDate: "",
+            endDate: ""
+
         },
         mode: "onChange",
         reValidateMode: "onChange",
@@ -99,42 +140,56 @@ export default function BookingForm() {
             price: values.price
         }
 
+        console.log("VALUES", values)
 
-        // EDIT A PROPERTY
-        if (toEdit?.name) {
-            const edited = {
-                ...toEdit,
-                name: values.name,
-                price: values.price
-            }
-            try {
-                const res = await fetch(`/api/feature?id=${toEdit._id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${session.data.accessToken}`,
-                    },
-                    body: JSON.stringify({ ...edited })
-                })
-                const response = await res.json();
-                console.log(response)
-                setIsLoading(false)
-                return
-            } catch (error) {
-                setIsLoading(false)
-                console.log(error)
-                return
-            }
+        const postData = {
+            user: values.user._id,
+            unit: values.unit._id,
+            additionalFeatures: [...values.additionalFeatures.map((item: any) => item._id)],
+            startDate: values.startDate,
+            endDate: values.endDate
         }
 
+
+
+
+        // // EDIT A PROPERTY
+        // if (toEdit?.name) {
+        //     const edited = {
+        //         ...toEdit,
+        //         name: values.name,
+        //         price: values.price
+        //     }
+        //     try {
+        //         const res = await fetch(`/api/feature?id=${toEdit._id}`, {
+        //             method: 'PUT',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //                 Authorization: `Bearer ${session.data.accessToken}`,
+        //             },
+        //             body: JSON.stringify({ ...edited })
+        //         })
+        //         const response = await res.json();
+        //         console.log(response)
+        //         setIsLoading(false)
+        //         return
+        //     } catch (error) {
+        //         setIsLoading(false)
+        //         console.log(error)
+        //         return
+        //     }
+        // }
+
         // POST A PROPERTY
+        console.log("SESSION", session)
         try {
-            const res = await fetch('/api/feature', {
+            const res = await fetch('/api/booking', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.data.accessToken}`,
                 },
-                body: JSON.stringify({ ...data })
+                body: JSON.stringify({ ...postData })
             })
             const response = await res.json();
             console.log(response)
@@ -154,6 +209,7 @@ export default function BookingForm() {
         } catch (error) {
             setIsLoading(false)
             console.log(error)
+
         }
     }
 
@@ -161,50 +217,16 @@ export default function BookingForm() {
     // FETCH UNITS
     const [loadingUnits, setLoadingUnits] = useState(false)
     const [selectedUnit, setSelectedUnit] = useState<any>()
-
-    const [units, setUnits] = useState<any>()
-    async function fetchUnits() {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/unit?unitType=${watch("unitType")}`, {
-            headers: {
-                Authorization: `Bearer ${session.data.accessToken}`,
-            },
-            method: "GET"
-        });
-
-        const res = await response.json();
-        setUnits(res.data)
-        setLoadingUnits(false)
-    }
-    useEffect(() => {
-        if (!watch("unitType")) return
-
-        setLoadingUnits(true)
-
-        fetchUnits()
-
-    }, [watch("unitType")])
-
-    console.log("Units", units)
-
+    const [units, setUnits] = useState<any>([])
 
     // STEPPER
     const [step, setStep] = useState(0)
 
 
     // SEARCH
-    const [searchTerm, setSearchTerm] = useState("")
-    async function searchUsers() {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/searchUsers?search=${searchTerm}`, {
-            headers: {
-                Authorization: `Bearer ${session.data.accessToken}`,
-            },
-            method: "GET"
-        });
-
-        const res = await response.json();
-        setUnits(res.data)
-        setLoadingUnits(false)
-    }
+    const [searchingUsers, setSearchingUsers] = useState(false)
+    const [searchedUsers, setSearchedUsers] = useState([])
+    const [selectedUser, setSelectedUser] = useState<any>()
 
     return (
         <Dialog
@@ -229,7 +251,7 @@ export default function BookingForm() {
             <DialogContent>
                 <HorizontalStepper step={step} />
                 <form
-                    id="features-form"
+                    id="booking-form"
                     onSubmit={handleSubmit(onSubmit)}
                     style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1.5rem" }}
                 >
@@ -238,10 +260,77 @@ export default function BookingForm() {
                         <FormControl>
                             <FormLabel>Search for a user</FormLabel>
                             <TextField
-                                name="search"
-                                onChange={(event) => setSearchTerm(event.target.value)}
+                                {...register("userSearchTerm")}
+                                onChange={async (event) => {
+                                    if (event.target.value === "") {
+                                        setSearchedUsers([])
+                                    }
+
+                                    if (event?.target?.value?.length > 2) {
+                                        setSearchingUsers(true)
+                                        try {
+                                            const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user?searchQuery=${event.target.value}`, {
+                                                headers: {
+                                                    Authorization: `Bearer ${session.data.accessToken}`,
+                                                },
+                                                method: "GET"
+                                            });
+
+                                            const res = await response.json();
+                                            setSearchedUsers(res.data)
+                                            return setSearchingUsers(false)
+                                        } catch (error) {
+                                            alert("Search error")
+                                        }
+                                    }
+                                }}
                             />
+                            {/* <FormHelperText>{errors?.userSearchTerm}</FormHelperText> */}
                         </FormControl>
+
+                        <CircularProgress sx={{ display: searchingUsers ? "flex" : "none", mx: "auto" }} />
+
+                        <Collapse in={searchedUsers?.length > 0}>
+                            <Box display="flex" flexDirection="column" gap="0.5rem">
+                                {
+                                    searchedUsers?.map((user: any, i: any) => (
+                                        <Box
+                                            key={i}
+                                            width="100%"
+                                            display="flex"
+                                            flexDirection="row"
+                                            alignItems="center"
+                                            gap="0.5rem"
+                                            padding="0.75rem"
+                                            border="1px solid"
+                                            borderColor={selectedUser?._id === user._id ? "primary.main" : "lightgrey"}
+                                            bgcolor={selectedUser?._id === user._id ? "primary.light" : "transparent"}
+                                            borderRadius="0.5rem"
+                                            sx={{ cursor: "pointer" }}
+                                            onClick={() => {
+                                                setSelectedUser(user)
+                                                setValue("user", user)
+
+                                                console.log("USER", user)
+                                            }}
+                                        >
+                                            <Avatar sx={{ width: "3.5rem", height: "3.5rem" }} />
+                                            <Box>
+                                                <Typography>{`${user.first_name} ${user.last_name}`}</Typography>
+                                                {/* <Chip size="small" label={!user?.tenant ? "Vacant" : "Occupied"} /> */}
+                                            </Box>
+
+                                            <Box display={selectedUser?._id === user._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6" style={{ color: "inherit" }}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </Box>
+
+                                        </Box>
+                                    ))
+                                }
+                            </Box>
+                        </Collapse>
                     </Box>
 
 
@@ -252,9 +341,26 @@ export default function BookingForm() {
                                 // {...register("features")}
                                 options={unitTypes.data}
                                 getOptionLabel={(option: any) => option.name}
-                                onChange={(event, value) => {
+                                onChange={async (event, value) => {
                                     setSelectedUnit(null)
-                                    setValue("unitType", value._id)
+                                    setValue("unitType", value)
+                                    setLoadingUnits(true)
+
+                                    try {
+                                        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/unit?unitType=${value._id}`, {
+                                            headers: {
+                                                Authorization: `Bearer ${session.data.accessToken}`,
+                                            },
+                                            method: "GET"
+                                        });
+                                
+                                        const res = await response.json();
+                                        setUnits(res.data)
+                                        setLoadingUnits(false)
+                                    } catch (error) {
+                                        setLoadingUnits(false)
+                                        alert("Fetch units error")
+                                    }
                                 }}
                                 renderInput={(params) =>
                                     <TextField
@@ -270,42 +376,47 @@ export default function BookingForm() {
 
                         <Box display={loadingUnits ? "none" : "flex"} flexDirection="column" gap="0.5rem">
                             <Typography display={watch("unitType") ? "flex" : "none"}>Rooms Available</Typography>
-                            <Box display="flex" flexDirection="column" gap="0.5rem">
-                                {
-                                    units?.map((item: any, i: any) => {
-                                        return (
-                                            <Box
-                                                key={i}
-                                                width="100%"
-                                                display="flex"
-                                                flexDirection="row"
-                                                alignItems="center"
-                                                gap="0.5rem"
-                                                padding="0.75rem"
-                                                border="1px solid"
-                                                borderColor={selectedUnit?._id === item._id ? "primary.main" : "lightgrey"}
-                                                bgcolor={selectedUnit?._id === item._id ? "primary.light" : "transparent"}
-                                                borderRadius="0.5rem"
-                                                sx={{ cursor: "pointer" }}
-                                                onClick={() => setSelectedUnit(item)}
-                                            >
-                                                <Avatar sx={{ width: "3.5rem", height: "3.5rem" }} />
-                                                <Box>
-                                                    <Typography>{item.name}</Typography>
-                                                    <Chip size="small" label={!item?.tenant ? "Vacant" : "Occupied"} />
-                                                </Box>
+                            <Collapse in={units?.length > 0}>
+                                <Box display="flex" flexDirection="column" gap="0.5rem">
+                                    {
+                                        units?.map((item: any, i: any) => {
+                                            return (
+                                                <Box
+                                                    key={i}
+                                                    width="100%"
+                                                    display="flex"
+                                                    flexDirection="row"
+                                                    alignItems="center"
+                                                    gap="0.5rem"
+                                                    padding="0.75rem"
+                                                    border="1px solid"
+                                                    borderColor={selectedUnit?._id === item._id ? "primary.main" : "lightgrey"}
+                                                    bgcolor={selectedUnit?._id === item._id ? "primary.light" : "transparent"}
+                                                    borderRadius="0.5rem"
+                                                    sx={{ cursor: "pointer" }}
+                                                    onClick={() => {
+                                                        setSelectedUnit(item)
+                                                        setValue("unit", item)
+                                                    }}
+                                                >
+                                                    <Avatar sx={{ width: "3.5rem", height: "3.5rem" }} />
+                                                    <Box>
+                                                        <Typography>{item.name}</Typography>
+                                                        <Chip size="small" label={!item?.tenant ? "Vacant" : "Occupied"} />
+                                                    </Box>
 
-                                                <Box display={selectedUnit?._id === item._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6" style={{ color: "inherit" }}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                </Box>
+                                                    <Box display={selectedUnit?._id === item._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6" style={{ color: "inherit" }}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </Box>
 
-                                            </Box>
-                                        )
-                                    })
-                                }
-                            </Box>
+                                                </Box>
+                                            )
+                                        })
+                                    }
+                                </Box>
+                            </Collapse>
                         </Box>
                     </Box>
 
@@ -318,10 +429,13 @@ export default function BookingForm() {
                                 multiple
                                 options={features.data}
                                 getOptionLabel={(option: any) => option.feature.name}
-                                // onChange={(event, value: any) => {
-                                //     setSelectedUnit(null)
-                                //     setValue("features", value._id)
-                                // }}
+                                onChange={(event, value: any) => {
+                                    setSelectedUnit(null)
+                                    if (value?.length < 1) {
+                                        return setValue("additionalFeatures", [{_id: "", feature: [{_id: "", name: ""}]}])
+                                    }
+                                    setValue("additionalFeatures", value)
+                                }}
                                 renderInput={(params) =>
                                     <TextField
                                         {...params}
@@ -331,12 +445,12 @@ export default function BookingForm() {
                             />
                         </FormControl>
 
-                        <Box width="100%" display={selectedUnit ? "grid" : "none"} gridTemplateColumns={"1fr 1fr"} gap="1rem">
+                        <Box width="100%" display="grid" gridTemplateColumns={"1fr 1fr"} gap="1rem">
                             <FormControl sx={{ width: "100%" }}>
                                 <FormLabel>When would you like to start</FormLabel>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
-                                    // label="Basic date picker"
+                                        onChange={(event: any) => setValue("startDate", moment(event.$d).format("YYYY-MM-DD"))}
                                     />
                                 </LocalizationProvider>
                             </FormControl>
@@ -345,6 +459,7 @@ export default function BookingForm() {
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
                                     // label="Basic date picker"
+                                    onChange={(event: any) => setValue("endDate", moment(event.$d).format("YYYY-MM-DD"))}
                                     />
                                 </LocalizationProvider>
                             </FormControl>
@@ -353,36 +468,45 @@ export default function BookingForm() {
                 </form>
             </DialogContent>
             <DialogActions sx={{ padding: "1.5rem", display: "flex" }}>
-            <Button
-                    variant="contained"
-                    type="button"
-                    onClick={() => searchUsers()}
-                >
-                    search
-                </Button>
                 <Button
-                    variant="contained"
+                    variant="outlined"
                     type="button"
-                    onClick={() => setStep((prev) => prev + 1)}
+                    disabled={step === 0}
+                    onClick={() => setStep((prev) => prev - 1)}
                 >
                     Back
                 </Button>
                 <Button
                     variant="contained"
-                    sx={{ml: "auto"}}
-                    type="button"
-                    onClick={() => setStep((prev) => prev + 1)}
+                    sx={{ ml: "auto" }}
+                    type="submit"
+                    form="booking-form"
+                    onClick={() => {
+                        console.log("ERROR", errors)
+
+                        if (step === 0) {
+                            if (watch("user")?._id !=="" && !errors?.user ) {
+                                return setStep((prev) => prev + 1)
+                            }
+                        }
+
+                        if (step === 1) {
+                            if (!errors.unit) {
+                                return setStep((prev) => prev + 1)
+                            }
+                        }
+                    }}
                 >
-                    Next
+                    {step === 2 ? `Submit Booking` :`Next`}
                 </Button>
-                <Button
+                {/* <Button
                     variant="contained"
                     type="submit"
                     form="features-form"
                     disabled={!selectedUnit}
                 >
                     Choose unit
-                </Button>
+                </Button> */}
             </DialogActions>
         </Dialog>
     )

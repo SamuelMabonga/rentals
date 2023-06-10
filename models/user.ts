@@ -1,6 +1,5 @@
 import { Schema, model, models } from "mongoose";
-// import mongoosastic from 'mongoosastic'
-const mongoosastic = require('mongoosastic');
+
 
 const UserShema = new Schema({
   email: {
@@ -46,7 +45,10 @@ const UserShema = new Schema({
   isEmail_verified: { type: Boolean, default: false },
 });
 
-UserShema.plugin(mongoosastic)
+//indexed fields for searching
+UserShema.index({
+  email: "text",
+});
 
 const User = models.User || model("User", UserShema);
 

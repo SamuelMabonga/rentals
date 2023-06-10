@@ -2,6 +2,7 @@ import {
   deleteUser,
   fetchAllUsers,
   fetchSingleUser,
+  searchUser,
   updateUser,
 } from "controllers/user";
 import authenticateUser from "helpers/authenticate_user";
@@ -14,7 +15,7 @@ export default async function handler(
 ) {
   //id for fetching single User
   const {
-    query: { id },
+    query: { id, searchQuery },
   }: any = req;
 
 
@@ -27,6 +28,8 @@ export default async function handler(
     case "GET":
       if (!id) {
         return fetchAllUsers(req, res);
+      } else if (searchQuery) {
+        return searchUser(req, res, searchQuery)
       } else {
         fetchSingleUser(req, res);
       }

@@ -1,12 +1,9 @@
 import { Schema, model, models } from "mongoose";
 
 const TenantShema = new Schema({
-  image: {
-    type: String,
-  },
-  name: {
-    required: true,
-    type: String,
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
   },
   unit: {
     type: Schema.Types.ObjectId,
@@ -17,7 +14,25 @@ const TenantShema = new Schema({
   },
   end_date: {
     type: Date,
+  },
+  additionalFeatures: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "PropertyFeatures"
+    }
+  ],
+  customRent: {
+    type: String
+  },
+  customBillingPeriod: {
+    type: Schema.Types.ObjectId,
+    ref: "BillingPeriods"
+  },
+  nextRentBilling: {
+    type: Date
   }
+},{
+  timestamps: true
 });
 
 const Tenant = models.Tenant || model("Tenant", TenantShema);
