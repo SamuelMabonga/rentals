@@ -1,22 +1,34 @@
 import { Schema, model, models } from "mongoose";
 
 const BookingSchema = new Schema({
-  image: {
+  name: {
     type: String,
   },
-  name: {
-    required: true,
-    type: String,
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
   },
   unit: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: 'Unit',
   },
-  start_date: {
+  additionalFeatures: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'PropertyFeatures',
+    }
+  ],
+  startDate: {
     type: Date,
   },
-  end_date: {
+  endDate: {
     type: Date,
   },
+  status: {
+    type: String
+  },
+}, {
+  timestamps: true
 });
 
 //indexed fields for searching

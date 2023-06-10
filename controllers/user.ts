@@ -92,3 +92,35 @@ export async function deleteUser(req: any, res: any) {
     console.log(error);
   }
 }
+
+
+// @desc    search
+// @route   GET /api/property?searchQuery=searchQuery
+export async function searchUser(req: any, res: any, searchQuery: string) {
+  try {
+    let findParams = searchQuery
+      ? {
+          $text: {
+            $search: searchQuery,
+            $caseSensitive: false,
+            $diacriticSensitive: false,
+          },
+        }
+      : {};
+
+    const users = await User.find({ ...findParams });
+
+    res.status(200).json({
+      success: true,
+      msg: `${searchQuery} searched successfully`,
+      data: users,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: `failed to search ${searchQuery}`,
+      data: error,
+    });
+    console.log(error);
+  }
+}

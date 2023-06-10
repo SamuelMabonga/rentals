@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup"
-import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
+import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, Snackbar, TextField, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
 import FileInput from "Components/FileInput"
 import fetchAProperty from "apis/fetchAProperty"
@@ -26,11 +26,12 @@ export default function UnitForm() {
         openUnitForm: open,
         setOpenUnitForm: setIsOpen,
         unitToEdit: toEdit,
-        setUnitToEdit: setToEdit
+        setUnitToEdit: setToEdit,
+        setSnackbarMessage
     }: any = useContext(CollectionsContext)
 
     const router = useRouter()
-    const {id}: any = router.query
+    const { id }: any = router.query
 
     // SESSION
     const { status, data: session }: any = useSession()
@@ -69,9 +70,11 @@ export default function UnitForm() {
         const data = {
             name: values.name,
             unitType: values.unitType._id,
+            property: property.data._id
         }
 
         console.log(data)
+
 
 
         // // EDIT A PROPERTY
@@ -103,20 +106,31 @@ export default function UnitForm() {
 
         // POST A PROPERTY
         try {
-            const res = await fetch('/api/unit',{
+            const res = await fetch('/api/unit', {
                 method: 'POST',
-                headers:{
-                    'Content-Type':'application/json',
+                headers: {
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${session.accessToken}`,
                 },
-                body: JSON.stringify({...data})
+                body: JSON.stringify({ ...data })
             })
             const response = await res.json();
             console.log(response)
+            setSnackbarMessage({
+                open: true,
+                vertical: 'top',
+                horizontal: 'center',
+                message: "Unit created successfully",
+                icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </Box>
+            })
             setIsLoading(false)
             setIsOpen(false)
             return
-        } catch(error) {
+        } catch (error) {
             setIsLoading(false)
             console.log(error)
         }

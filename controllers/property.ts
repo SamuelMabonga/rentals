@@ -42,7 +42,7 @@ export async function adminFetchAllProperties(req: any, res: any) {
 }
 
 // create a property
-export async function createProperty(req: any, res: any, user: string) {
+export async function createProperty(req: any, res: any, userFetching: string) {
   try {
     const { cover_photo, profile_photo, name, details } = req.body;
     console.log("It does not fail after line 30");
@@ -61,10 +61,11 @@ export async function createProperty(req: any, res: any, user: string) {
       });
     }
 
-    console.log("OWNER HERERE", user);
+    console.log("OWNER HERERE", userFetching);
 
     const property = new Property({
       ...req.body,
+      owner: userFetching
     });
 
     const newProperty = await property.save();
@@ -133,7 +134,7 @@ export async function deleteProperty(req: any, res: any) {
     let property = await Property.findById(req.query.id);
 
     if (!property) {
-      //   return next("property being deleted has not been found");
+      // return next("property being deleted has not been found");
       return "property being deleted has not been found";
     }
 
@@ -154,7 +155,7 @@ export async function deleteProperty(req: any, res: any) {
 }
 
 // @desc    search
-// @route   GET /api/property?searchQuery=searchQuery
+// @route   GET /api/user?searchQuery=searchQuery
 export async function searchProperty(req: any, res: any, searchQuery: string) {
   try {
     let findParams = searchQuery

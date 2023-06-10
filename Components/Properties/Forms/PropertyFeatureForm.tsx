@@ -22,7 +22,8 @@ export default function PropertyFeatureForm() {
         setOpenPropertyFeaturesForm: setIsOpen,
 
         propertyFeatureToEdit: toEdit,
-        setPropertyFeatureToEdit: setToEdit
+        setPropertyFeatureToEdit: setToEdit,
+        setSnackbarMessage
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
@@ -43,16 +44,24 @@ export default function PropertyFeatureForm() {
         resolver: yupResolver(formSchema),
     });
 
+    console.log("To Edit", toEdit)
+
     useEffect(() => {
-        if (toEdit?.name) {
-            setValue("name", toEdit.name)
+        console.log(toEdit)
+        if (toEdit?.feature) {
+            setValue("feature", toEdit.feature)
             setValue("price", toEdit.price)
+            setValue("billingPeriod", toEdit.billingPeriod)
             return
         }
 
-        reset()
+        // reset()
+        setValue("feature", null)
+        setValue("price", "")
+        setValue("billingPeriod", null)
+        return
 
-    }, [toEdit])
+    }, [toEdit?.feature])
 
     async function onSubmit(values: any) {
         setIsLoading(true)
@@ -65,31 +74,46 @@ export default function PropertyFeatureForm() {
 
 
         // // EDIT A PROPERTY FEATURE
-        // if (toEdit?.name) {
-        //     const edited = {
-        //         ...toEdit,
-        //         name: values.name,
-        //         price: values.price
-        //     }
-        //     try {
-        //         const res = await fetch(`/api/propertyFeatures?id=${toEdit._id}`, {
-        //             method: 'PUT',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //                 Authorization: `Bearer ${session.data.accessToken}`,
-        //             },
-        //             body: JSON.stringify({ ...edited })
-        //         })
-        //         const response = await res.json();
-        //         console.log(response)
-        //         setIsLoading(false)
-        //         return
-        //     } catch (error) {
-        //         setIsLoading(false)
-        //         console.log(error)
-        //         return
-        //     }
-        // }
+        if (toEdit?.feature) {
+            const edited = {
+                ...toEdit,
+                feature: values.feature._id,
+                price: values.price,
+                billingPeriod: values.billingPeriod._id
+            }
+            try {
+                const res = await fetch(`/api/propertyFeatures?id=${toEdit._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session.data.accessToken}`,
+                    },
+                    body: JSON.stringify({ ...edited })
+                })
+                const response = await res.json();
+                console.log(response)
+                setIsLoading(false)
+                setToEdit({})
+                reset()
+                setSnackbarMessage({
+                    open: true,
+                    vertical: 'top',
+                    horizontal: 'center',
+                    message: "Property feature edited successfully",
+                    icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </Box>
+                })
+                setIsOpen(false)
+                return
+            } catch (error) {
+                setIsLoading(false)
+                console.log(error)
+                return
+            }
+        }
 
         // // POST A PROPERTY FEATURE
         try {
@@ -104,6 +128,17 @@ export default function PropertyFeatureForm() {
             console.log(response)
             setIsLoading(false)
             setIsOpen(false)
+            setSnackbarMessage({
+                open: true,
+                vertical: 'top',
+                horizontal: 'center',
+                message: "Property feature created successfully",
+                icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </Box>
+            })
         } catch (error) {
             setIsLoading(false)
             console.log(error)
@@ -122,6 +157,7 @@ export default function PropertyFeatureForm() {
                 <IconButton onClick={() => {
                     setToEdit({})
                     setIsOpen(false)
+                    reset()
                 }}>
                     <Box width="1.5rem" height="1.5rem">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -140,6 +176,7 @@ export default function PropertyFeatureForm() {
                         <FormLabel>Feature</FormLabel>
                         <Autocomplete
                             // {...register("feature")}
+                            value={watch("feature")}
                             options={features.data}
                             getOptionLabel={(option: any) => option.name}
                             renderInput={(params) =>
@@ -164,6 +201,7 @@ export default function PropertyFeatureForm() {
                         <FormLabel>Billing Period</FormLabel>
                         <Autocomplete
                             // {...register("features")}
+                            value={watch("billingPeriod")}
                             options={billingPeriods.data}
                             getOptionLabel={(option: any) => option.name}
                             renderInput={(params) =>

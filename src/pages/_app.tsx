@@ -13,6 +13,7 @@ import lightThemeOptions from '@/theme/lightThemeOptions';
 import { SessionProvider, useSession } from 'next-auth/react';
 import { CollectionsContext, CollectionsProvider } from 'context/context';
 import DashboardLayout from 'Components/Dashboard/DashboardLayout';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 
 // const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
                       <Component {...pageProps} />
                     </DashboardLayout>
                   </Hydrate>
+                  <ReactQueryDevtools initialIsOpen={false} />
                 </QueryClientProvider>
               </Auth>
             ) : (

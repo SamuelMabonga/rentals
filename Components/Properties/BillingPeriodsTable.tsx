@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/TableRenderer';
@@ -9,6 +9,8 @@ import { useQuery } from '@tanstack/react-query';
 import fetchFeatures from 'apis/fetchFeatures';
 import { useSession } from 'next-auth/react';
 import fetchBillingPeriods from 'apis/fetchBillingPeriods';
+import { CollectionsContext } from 'context/context';
+import { set } from 'mongoose';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -25,6 +27,8 @@ type Item = {
 }
 
 export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) => {
+    // CONTEXT
+    const {setOpenBillingPeriodsForm, setBillingPeriodToEdit}: any = useContext(CollectionsContext)
     // SESSION
     const { status, data: session }: any = useSession()
     const { data }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
@@ -72,7 +76,13 @@ export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) =
                 header: 'Actions',
                 cell: (row) => (
                     <Box display="flex" gap="1rem" >
-                        <IconButton>
+                        <IconButton
+                            onClick={(event) => {
+                                event.stopPropagation()
+                                setBillingPeriodToEdit(row.row.original)
+                                setOpenBillingPeriodsForm(true)
+                            }}
+                        >
                             <Box width="1.5rem" height="1.5rem">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />

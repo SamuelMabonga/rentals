@@ -13,6 +13,15 @@ const UnitShema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'UnitType',
   },
+  property: {
+    type: Schema.Types.ObjectId,
+    ref: 'Property',
+  },
+  tenant: {
+    type: Schema.Types.ObjectId,
+    ref: "Tenant",
+    default: null
+  },
   status: {
     type: String,
   },

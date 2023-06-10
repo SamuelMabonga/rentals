@@ -1,4 +1,6 @@
-import { Avatar, Box, Button, IconButton, Typography } from "@mui/material"
+import { Avatar, Box, Button, IconButton, Snackbar, Typography } from "@mui/material"
+import ConsecutiveSnackbars from "Components/Common/ConsecutiveSnackbars"
+import RegularSnackbar from "Components/Common/RegularSnackBar"
 // import ImageUploader from "Components/Common/ImageUploader"
 import { useIsomorphicLayoutEffect } from "framer-motion"
 import { signOut, useSession } from "next-auth/react"
@@ -263,6 +265,8 @@ export default function DashboardLayout({ children }: any) {
                         </Box>
                     </Box>
                 </Box>
+                {/* <ConsecutiveSnackbars /> */}
+                <RegularSnackbar />
                 <ImageUploader />
             </main>
         </>

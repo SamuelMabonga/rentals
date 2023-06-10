@@ -18,6 +18,13 @@ const CollectionsProvider = ({children}: any) => {
 
     const [activePropertiesTab, setActivePropertiesTab] = useState("units")
 
+    // SNACKBAR MESSAGE
+    const [snackbarMessage, setSnackbarMessage] = useState({
+        open: false,
+        vertical: 'top',
+        horizontal: 'center',
+      })
+
     // FORMS
     const [showUnitTypeForm, setShowUnitTypeForm] = useState(false)
     
@@ -31,15 +38,19 @@ const CollectionsProvider = ({children}: any) => {
 
     // BILLING PERIODS FORM
     const [openBillingPeriodsForm, setOpenBillingPeriodsForm] = useState(false)
-    const [billingPeriodsToEdit, setBillingPeriodsToEdit] = useState(false)
+    const [billingPeriodToEdit, setBillingPeriodToEdit] = useState(false)
 
     // PROPERTY FEATURES FORM
     const [openPropertyFeaturesForm, setOpenPropertyFeaturesForm] = useState(false)
-    const [propertyFeatureToEdit, setPropertyFeatureToEdit] = useState(false)
+    const [propertyFeatureToEdit, setPropertyFeatureToEdit] = useState({})
 
     // UNIT FORM
     const [openUnitForm, setOpenUnitForm] = useState(false)
     const [unitToEdit, setUnitToEdit] = useState(false)
+
+    // BOOKING FORM
+    const [openBookingForm, setOpenBookingForm] = useState(false)
+    const [bookingToEdit, setBookingToEdit] = useState(false)
 
 
     // IMAGE UPLOADER
@@ -75,8 +86,8 @@ const CollectionsProvider = ({children}: any) => {
             // Billing Periods
             openBillingPeriodsForm,
             setOpenBillingPeriodsForm,
-            billingPeriodsToEdit,
-            setBillingPeriodsToEdit,
+            billingPeriodToEdit,
+            setBillingPeriodToEdit,
 
 
             // Property Features form
@@ -91,8 +102,15 @@ const CollectionsProvider = ({children}: any) => {
             unitToEdit,
             setUnitToEdit,
 
-            
+            // Bookings form
+            openBookingForm, 
+            setOpenBookingForm,
+            bookingToEdit,
+            setBookingToEdit,
 
+            // SNACKBAR MESSAGE
+            snackbarMessage,
+            setSnackbarMessage,
             
             // Image Uploader
             openImageUploader,
