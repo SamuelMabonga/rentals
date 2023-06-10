@@ -1,4 +1,6 @@
 import Booking from "models/booking";
+import Tenant from "models/tenant";
+import Unit from "models/unit";
 
 // get all bookings
 export async function fetchAllBookings(req: any, res: any) {
@@ -6,20 +8,15 @@ export async function fetchAllBookings(req: any, res: any) {
     let bookings = await Booking.find()
       .populate({
         path: "unit",
-        populate: [
-          {path: "unitType"}
-        ]
+        populate: [{ path: "unitType" }],
       })
       .populate({
         path: "user",
       })
       .populate({
         path: "additionalFeatures",
-        populate: [
-          {path: "feature"}
-        ]
-      })
-
+        populate: [{ path: "feature" }],
+      });
 
     res.json({
       success: true,
@@ -35,7 +32,6 @@ export async function fetchAllBookings(req: any, res: any) {
     console.log(error);
   }
 }
-
 
 // create a booking
 export async function createBooking(req: any, res: any) {
@@ -57,7 +53,7 @@ export async function createBooking(req: any, res: any) {
 
     const booking = new Booking({
       ...req.body,
-      status: "Pending"
+      status: "Pending",
     });
 
     const newBooking = await booking.save();
@@ -84,7 +80,19 @@ export async function createBooking(req: any, res: any) {
 //fetch booking by id
 export async function fetchSingleBooking(req: any, res: any) {
   try {
-    let booking = await Booking.findById(req.query.id);
+    let booking = await Booking.findById(req.query.id)
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType" }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
+      
     res.json({
       success: true,
       msg: "booking fetched successfully",
@@ -106,18 +114,30 @@ export async function updateBooking(req: any, res: any) {
     let booking = await Booking.findById(req.query.id);
 
     const data = {
-      ...req.body
+      ...req.body,
     };
     booking = await Booking.findByIdAndUpdate(req.query.id, data, {
       new: true,
-    });
+    })
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType" }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
+
     res.status(200).json({
       success: true,
       msg: "booking updated successfully",
       data: booking,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(400).json({
       success: false,
       msg: "failed to update booking",
@@ -180,5 +200,73 @@ export async function searchBooking(req: any, res: any, searchQuery: string) {
       data: error,
     });
     console.log(error);
+  }
+}
+
+//accept a booking
+export async function acceptBooking(req: any, res: any) {
+  try {
+    //UPDATE booking status to accepted
+    // let booking = await Booking.findById(req.body.id);
+    let booking = await Booking.findByIdAndUpdate(
+      req.body.id,
+      {
+        status: "ACCEPTED",
+      },
+      {
+        new: true,
+      }
+    )
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType" }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
+
+    //CREATE a new tenant
+    const tenant =
+      booking &&
+      (await new Tenant({
+        name: "test",
+        user: booking?.user?._id,
+        unit: booking?.unit?._id,
+        start_date: Date.now(),
+        end_date: Date.now(),
+        additionalFeatures: booking?.additionalFeatures?._id,
+        customRent: req?.body?.customRent ?? null,
+        customBillingPeriod: req?.body?.BillingPeriod,
+        nextRentBilling: Date.now(),
+      }));
+
+    const newTenant = await tenant.save();
+
+    //CREATE add tenant to unit
+    booking &&
+      (await Unit.findByIdAndUpdate(
+        booking?.unit?._id,
+        { tenant: newTenant?._id },
+        {
+          new: true,
+        }
+      ));
+
+    res.status(200).json({
+      success: true,
+      msg: "booking updated successfully",
+      data: booking,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      success: false,
+      msg: "failed to update booking",
+      data: error,
+    });
   }
 }

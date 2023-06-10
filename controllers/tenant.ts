@@ -46,12 +46,7 @@ export async function createTenant(req: any, res: any) {
     return res.json({
       success: true,
       msg: "New tenant created",
-      _id: newTenant?._id,
-      name: newTenant?.name,
-      image: newTenant?.image,
-      unit: newTenant?.unit,
-      entry_date: newTenant?.entry_date,
-      end_date: newTenant?.end_date,
+      data: newTenant
     });
   } catch (error: any) {
     console.log(error);
