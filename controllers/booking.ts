@@ -233,7 +233,6 @@ export async function acceptBooking(req: any, res: any) {
     const tenant =
       booking &&
       (await new Tenant({
-        name: "test",
         user: booking?.user?._id,
         unit: booking?.unit?._id,
         start_date: Date.now(),
