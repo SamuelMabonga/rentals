@@ -3,6 +3,7 @@ import {
   deleteStaff,
   fetchAllStaffs,
   fetchSingleStaff,
+  searchStaff,
   updateStaff,
 } from "controllers/staff";
 import authenticateUser from "helpers/authenticate_user";
@@ -13,18 +14,29 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  authenticateUser(req, res);
+  const {
+    query: { id, searchQuery },
+  }: any = req;
+
+  const decodedToken = authenticateUser(req, res);
 
   connectToMongoDB().catch((err) => res.json(err));
+
+  // USER
+  const { _id, role } = decodedToken.user;
+
   //type of request
   const { method } = req;
   switch (method) {
     case "GET":
-      fetchAllStaffs(req, res);
-      break;
-      // case "GET":
-      //   fetchSingleStaff(req, res);
-      break;
+      if (id) {
+
+        fetchSingleStaff(req, res);
+      } else if (searchQuery) {
+        searchStaff(req, res, searchQuery);
+      } else {
+        fetchAllStaffs(req, res);
+      }
     case "POST":
       createStaff(req, res);
       break;
