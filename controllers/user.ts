@@ -96,7 +96,8 @@ export async function deleteUser(req: any, res: any) {
 
 // @desc    search
 // @route   GET /api/property?searchQuery=searchQuery
-export async function searchUser(req: any, res: any, searchQuery: string) {
+export async function searchUser(req: any, res: any) {
+  let searchQuery = req.query.searchQuery
   try {
     let findParams = searchQuery
       ? {
