@@ -92,7 +92,7 @@ export async function fetchSingleBooking(req: any, res: any) {
         path: "additionalFeatures",
         populate: [{ path: "feature" }],
       });
-      
+
     res.json({
       success: true,
       msg: "booking fetched successfully",
@@ -205,6 +205,16 @@ export async function searchBooking(req: any, res: any, searchQuery: string) {
 
 //accept a booking
 export async function acceptBooking(req: any, res: any) {
+  const { startDate, endDate, customRent, customBillingPeriod } = req.body;
+  let additionalFeatures: any = [];
+
+  function PopulateAdditionalFeatures(booking: any) {
+    booking?.additionalFeatures.forEach((additionalFeature: any) => {
+      additionalFeatures.push(additionalFeature);
+    });
+    return additionalFeatures;
+  }
+
   try {
     //UPDATE booking status to accepted
     // let booking = await Booking.findById(req.body.id);
@@ -235,18 +245,18 @@ export async function acceptBooking(req: any, res: any) {
       (await new Tenant({
         user: booking?.user?._id,
         unit: booking?.unit?._id,
-        start_date: Date.now(),
-        end_date: Date.now(),
-        additionalFeatures: booking?.additionalFeatures?._id,
-        customRent: req?.body?.customRent ?? null,
-        customBillingPeriod: req?.body?.BillingPeriod,
+        start_date: startDate,
+        end_date: endDate,
+        additionalFeatures: PopulateAdditionalFeatures(booking),
+        customRent: customRent ?? null,
+        customBillingPeriod: customBillingPeriod,
         nextRentBilling: Date.now(),
       }));
 
     const newTenant = await tenant.save();
 
     //CREATE add tenant to unit
-    booking &&
+    tenant &&
       (await Unit.findByIdAndUpdate(
         booking?.unit?._id,
         { tenant: newTenant?._id },
