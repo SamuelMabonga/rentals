@@ -1,6 +1,6 @@
 import { Schema, model, models } from "mongoose";
 
-const StaffShema = new Schema({
+const StaffSchema = new Schema({
   image: {
     type: String,
   },
@@ -9,16 +9,22 @@ const StaffShema = new Schema({
     type: String,
   },
   role: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: "StaffRoles",
   },
   start_date: {
     type: Date,
   },
   end_date: {
     type: Date,
-  }
+  },
 });
 
-const Staff = models.Staff || model("Staff", StaffShema);
+//indexed fields for searching
+StaffSchema.index({
+  name: "text",
+});
+
+const Staff = models.Staff || model("Staff", StaffSchema);
 
 export default Staff;

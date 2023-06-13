@@ -135,3 +135,34 @@ export async function deleteStaff(req: any, res: any) {
     console.log(error);
   }
 }
+
+// @desc    search
+// @route   GET /api/staff?searchQuery=searchQuery
+export async function searchStaff(req: any, res: any, searchQuery: string) {
+  try {
+    let findParams = searchQuery
+      ? {
+          $text: {
+            $search: searchQuery,
+            $caseSensitive: false,
+            $diacriticSensitive: false,
+          },
+        }
+      : {};
+
+    const staff = await Staff.find({ ...findParams });
+
+    res.status(200).json({
+      success: true,
+      msg: `${searchQuery} searched successfully`,
+      data: staff,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: `failed to search ${searchQuery}`,
+      data: error,
+    });
+    console.log(error);
+  }
+}
