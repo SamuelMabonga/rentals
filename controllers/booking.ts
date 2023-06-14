@@ -239,6 +239,14 @@ export async function acceptBooking(req: any, res: any) {
         populate: [{ path: "feature" }],
       });
 
+    let BOOKED_UNIT_STATUS = "TAKEN";
+    if (booking && booking?.unit?.status === BOOKED_UNIT_STATUS) {
+      res.status(403).json({
+        success: false,
+        msg: `booking cannot be made. Unit is ${BOOKED_UNIT_STATUS}`,
+      });
+    }
+
     //CREATE a new tenant
     const tenant =
       booking &&
@@ -259,7 +267,7 @@ export async function acceptBooking(req: any, res: any) {
     tenant &&
       (await Unit.findByIdAndUpdate(
         booking?.unit?._id,
-        { tenant: newTenant?._id },
+        { tenant: newTenant?._id, status: "TAKEN" },
         {
           new: true,
         }
