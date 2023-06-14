@@ -239,7 +239,7 @@ export async function acceptBooking(req: any, res: any) {
         populate: [{ path: "feature" }],
       });
 
-    let BOOKED_UNIT_STATUS = "TAKEN";
+    let BOOKED_UNIT_STATUS = "ACCEPTED";
     if (booking && booking?.unit?.status === BOOKED_UNIT_STATUS) {
       res.status(403).json({
         success: false,
