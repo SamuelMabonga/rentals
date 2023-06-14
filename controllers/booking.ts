@@ -267,7 +267,7 @@ export async function acceptBooking(req: any, res: any) {
     tenant &&
       (await Unit.findByIdAndUpdate(
         booking?.unit?._id,
-        { tenant: newTenant?._id, status: "TAKEN" },
+        { tenant: newTenant?._id, status: `${BOOKED_UNIT_STATUS}` },
         {
           new: true,
         }
