@@ -14,8 +14,11 @@ export async function fetchAllUnits(req: any, res: any) {
     let units
 
     unitType !== undefined ?
-      (units = await Unit.find({unitType: unitType}).populate("unitType"))
-      : (units = await Unit.find().populate("unitType"));
+      (units = await Unit.find({unitType: unitType}).populate("unitType").populate("tenant"))
+      : (units = await Unit.find().populate("unitType").populate({
+        path: "tenant",
+        populate: [{ path: "user" }],
+      }));
 
     res.status(200).json({
       success: true,
@@ -79,7 +82,7 @@ export async function createUnit(req: any, res: any) {
 //fetch unit by id
 export async function fetchSingleUnit(req: any, res: any) {
   try {
-    let unit = await Unit.findById(req.params.id);
+    let unit = await Unit.find({_id: req.query.id});
     res.status(200).json({
       success: true,
       msg: "unit fetched successfully",

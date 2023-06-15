@@ -1,3 +1,4 @@
+import { useStaticPicker } from "@mui/x-date-pickers/internals"
 import {createContext, useState} from "react"
 
 const CollectionsContext = createContext({})
@@ -56,6 +57,10 @@ const CollectionsProvider = ({children}: any) => {
     // IMAGE UPLOADER
     const [openImageUploader, setOpenImageUploader] = useState(false)
     const [imageToUpload, setImageToUpload] = useState("https://scaleflex.airstore.io/demo/stephen-walker-unsplash.jpg")
+
+
+    // RENTAL
+    const [ activeRentalTab, setActiveRentalTab ] = useState("bills")
 
     return (
         <CollectionsContext.Provider value={{
@@ -116,7 +121,12 @@ const CollectionsProvider = ({children}: any) => {
             openImageUploader,
             setOpenImageUploader,
             imageToUpload,
-            setImageToUpload
+            setImageToUpload,
+
+
+            // RENTALS
+            activeRentalTab,
+            setActiveRentalTab
         }}>
             {children}
         </CollectionsContext.Provider>

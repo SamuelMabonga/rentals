@@ -8,6 +8,7 @@ import { TableRenderer } from 'Components/TableRenderer';
 import { useSession } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
 import fetchUnits from 'apis/fetchUnits';
+import moment from 'moment';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -64,13 +65,22 @@ export const UnitsTable = <T extends object>({ }: ReactTableProps<T>) => {
         },
         {
             header: 'Tenant',
-            cell: (row: any) => row.renderValue(),
-            accessorKey: 'tenant',
+            cell: (row: any) => row?.renderValue() ?
+                row.renderValue() :
+                <Button variant="outlined" color="primary" size="small" sx={{ fontSize: "0.875rem", lineHeight: "100%" }} >
+                    <Box width="1.5rem" height="1.5rem">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
+                    </svg>
+                    </Box>
+                    Add Tenant
+                </Button>,
+            accessorKey: 'tenant.user.first_name',
         },
         {
             header: 'Date Created',
-            cell: (row: any) => row.renderValue(),
-            accessorKey: 'dateCreated',
+            cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+            accessorKey: 'createdAt',
         },
         {
             header: 'Actions',

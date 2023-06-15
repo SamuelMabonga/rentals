@@ -181,7 +181,6 @@ export default function BookingForm() {
         // }
 
         // POST A PROPERTY
-        console.log("SESSION", session)
         try {
             const res = await fetch('/api/booking', {
                 method: 'POST',

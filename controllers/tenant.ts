@@ -3,7 +3,7 @@ import Tenant from "models/tenant";
 // get all tenants
 export async function fetchAllTenants(req: any, res: any) {
   try {
-    let tenants = await Tenant.find();
+    let tenants = await Tenant.find().populate("user").populate("unit");
     res.status(200).json({
       success: true,
       msg: "tenants fetched successfully",
@@ -13,6 +13,25 @@ export async function fetchAllTenants(req: any, res: any) {
     res.status(400).json({
       success: false,
       msg: "failed to fetch  tenants",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// get user's tenancies
+export async function fetchAllUserTenancies(req: any, res: any, id: string) {
+  try {
+    let tenants = await Tenant.find({user: id}).populate("user").populate("unit");
+    res.status(200).json({
+      success: true,
+      msg: "User's tenancies fetched successfully",
+      data: tenants,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch user's tenancies",
       data: error,
     });
     console.log(error);
@@ -60,7 +79,7 @@ export async function createTenant(req: any, res: any) {
 //fetch tenant by id
 export async function fetchSingleTenant(req: any, res: any) {
   try {
-    let tenant = await Tenant.findById(req.params.id);
+    let tenant = await Tenant.findById(req.query.id).populate("user").populate({path: "unit", populate: [{ path: "property" }],});
     res.status(200).json({
       success: true,
       msg: "tenant fetched successfully",
@@ -72,7 +91,6 @@ export async function fetchSingleTenant(req: any, res: any) {
       msg: "failed to fetch tenant",
       data: error,
     });
-    console.log(error);
   }
 }
 

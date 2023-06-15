@@ -1,32 +1,34 @@
-import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
+import { Avatar, Box, Button, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/TableRenderer';
-import fetchTenants from 'apis/fetchTenants';
-import { useQuery } from '@tanstack/react-query';
-import { useSession } from 'next-auth/react';
+import { CollectionsContext } from 'context/context';
 import moment from 'moment';
 
 interface ReactTableProps<T extends object> {
-    // data: T[];
+    data: T[];
     // columns: ColumnDef<T>[];
 }
 
 type Item = {
     image: string;
     name: string;
-    unit: string;
-    entryDate: string;
-    endDate: string;
+    status: string;
+    tenants: string;
+    dateCreated: string;
     actions: any;
 }
 
-export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
-    const session: any = useSession()
-    const { data }: any = useQuery({ queryKey: ['tenants'], queryFn: () => fetchTenants(session.data.accessToken) })
+export const RentalsTable = <T extends object>({ data }: ReactTableProps<T>) => {
+    // CONTEXT
+    const {
+        setShowPropertyForm,
+        setPropertyToEdit
+    }: any = useContext(CollectionsContext)
+        
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
@@ -52,12 +54,12 @@ export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
                 accessorKey: 'user.first_name',
             },
             {
-                header: 'Unit',
+                header: 'unit',
                 cell: (row) => row.renderValue(),
                 accessorKey: 'unit.name',
             },
             {
-                header: 'Entry Date',
+                header: 'Start Date',
                 cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
                 accessorKey: 'start_date',
             },
@@ -73,6 +75,20 @@ export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
                         <IconButton>
                             <Box width="1.5rem" height="1.5rem">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </Box>
+                        </IconButton>
+
+                        <IconButton onClick={(event) => {
+                            event.stopPropagation()
+                            setPropertyToEdit(row.row.original)
+                            setShowPropertyForm(true)
+                            return
+                        }}>
+                            <Box width="1.5rem" height="1.5rem">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                                 </svg>
                             </Box>
@@ -81,7 +97,8 @@ export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
                         <IconButton>
                             <Box width="1.5rem" height="1.5rem">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                             </Box>
                         </IconButton>
@@ -92,20 +109,11 @@ export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
-    console.log("Data", data)
-
     return (
         <TableRenderer
-            data={data?.data}
-            columns={columns} onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
-            } }        />
-            // <h1>Hwey</h1>
+            data={data}
+            columns={columns}
+            onRowClick={(rowId) => router.push(`/rentals/${rowId}`)}
+        />
     );
 };

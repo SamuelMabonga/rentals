@@ -10,7 +10,7 @@ import fetchBookings from 'apis/fetchBookings';
 import { useSession } from 'next-auth/react';
 import moment from 'moment';
 
-function AlertDialog({ buttonLabel, buttonVariant, buttonColor, title, content, onAgree, agreeing, setAgreeing }: any) {
+function AlertDialog({ buttonLabel, buttonVariant, buttonColor="primary", title, content, onAgree, agreeing, setAgreeing }: any) {
     const [open, setOpen] = useState(false);
 
     const handleClickOpen = (event: any) => {
@@ -35,7 +35,7 @@ function AlertDialog({ buttonLabel, buttonVariant, buttonColor, title, content, 
 
     return (
         <div>
-            <Button variant={buttonVariant} size="small" sx={{ fontSize: "0.875rem" }} onClick={handleClickOpen}>
+            <Button variant={buttonVariant} color={buttonColor} size="small" sx={{ fontSize: "0.875rem" }} onClick={handleClickOpen}>
                 {buttonLabel}
             </Button>
             <Dialog
@@ -55,10 +55,14 @@ function AlertDialog({ buttonLabel, buttonVariant, buttonColor, title, content, 
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
-                    <Button variant="contained" onClick={(event) => {
-                        setAgreeing(true)
-                        onAgree(event)
-                    }} autoFocus>
+                    <Button
+                        variant="contained"
+                        onClick={(event) => {
+                            setAgreeing(true)
+                            onAgree(event)
+                        }} 
+                        autoFocus
+                    >
                         Continue
                     </Button>
                 </DialogActions>
@@ -188,14 +192,19 @@ export const BookingsTable = <T extends object>({ }: ReactTableProps<T>) => {
                                 event.stopPropagation()
                                 setAccepting(true)
                                 try {
-                                    const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/booking?id=${row.row.original._id}`, {
-                                        method: "PUT",
+                                    const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/booking/accept`, {
+                                        method: "POST",
                                         headers: {
                                             Authorization: `Bearer ${session.data.accessToken}`,
                                             'Content-Type': 'application/json',
                                         },
                                         body: JSON.stringify({
-                                            status: "Accepted"
+                                            status: "ACCEPTED",
+                                            id: row.row.original._id,
+                                            startDate: row.row.original.startDate, 
+                                            endDate: row.row.original.endDate, 
+                                            customRent: null, 
+                                            customBillingPeriod: null
                                         })
                                     })
 
@@ -209,7 +218,8 @@ export const BookingsTable = <T extends object>({ }: ReactTableProps<T>) => {
                         />
                         <AlertDialog
                             buttonLabel="Decline"
-                            buttonVariant="contained"
+                            buttonVariant="outlined"
+                            buttonColor="error"
                             title="Are you sure you want to decline this booking?"
                             content="If you decline, the user that created this booking will not become a tenant at your property"
                             onAgree={async (event: any) => {

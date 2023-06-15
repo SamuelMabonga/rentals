@@ -54,7 +54,7 @@ export async function createBooking(req: any, res: any) {
 
     const booking = new Booking({
       ...req.body,
-      status: "Pending",
+      status: "PENDING",
     });
 
     const newBooking = await booking.save();

@@ -15,12 +15,21 @@ export default async function handler(
 ) {
   authUser(req, res);
 
+  const {
+    query: { id: query, searchQuery },
+  }: any = req;
+
   connectToMongoDB().catch((err) => res.json(err));
   //type of request
   const { method } = req;
   switch (method) {
     case "GET":
+
+      if (query) {
+        return fetchSingleTenant(req, res);
+      }
       fetchAllTenants(req, res);
+
       break;
       // case "GET":
       //   fetchSingleTenant(req, res);
