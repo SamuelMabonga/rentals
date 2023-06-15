@@ -82,7 +82,7 @@ export async function createUnit(req: any, res: any) {
 //fetch unit by id
 export async function fetchSingleUnit(req: any, res: any) {
   try {
-    let unit = await Unit.findById(req.params.id);
+    let unit = await Unit.find({_id: req.query.id});
     res.status(200).json({
       success: true,
       msg: "unit fetched successfully",
