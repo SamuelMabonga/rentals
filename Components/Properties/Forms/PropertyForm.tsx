@@ -25,7 +25,7 @@ export default function PropertyForm() {
     }: any = useContext(CollectionsContext)
 
     // fetch property features
-    const { data: features }: any = useQuery({ queryKey: ['propertyFeatures'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
+    // const { data: features }: any = useQuery({ queryKey: ['propertyFeatures'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
 
     const session: any = useSession()
 
