@@ -184,7 +184,7 @@ export default function UnitTypeForm() {
                         <FormLabel>Features</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
-                            options={features.data}
+                            options={features?.data}
                             multiple
                             getOptionLabel={(option: any) => option.feature.name}
                             onChange={(event, value) => setValue("features", value)}

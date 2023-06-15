@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import {
   createProperty,
   deleteProperty,
@@ -23,45 +24,50 @@ export default async function handler(
   }: any = req;
 
   const decodedToken = authenticateUser(req, res);
+  try {
+    await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_SRV || "mongodb://localhost:27017/test_db").then(() => {
+      // USER
+      const { _id, role } = decodedToken.user;
 
-  connectToMongoDB().catch((err) => res.json(err));
-
-  //type of request
-  // console.log(req)
-
-  // USER
-  const { _id, role } = decodedToken.user;
-
-  const { method } = req;
-  switch (method) {
-    case "GET":
-      if (role === "admin") {
-        if (id) {
-          fetchSingleProperty(req, res);
-        } else if (searchQuery) {
-          searchProperty(req, res, searchQuery);
-        }
-        return adminFetchAllProperties(req, res);
-      } else if (id) {
-        fetchSingleProperty(req, res);
-      } else if (searchQuery) {
-        searchProperty(req, res, searchQuery);
-      } else {
-        fetchAllProperties(req, res, _id);
+      const { method } = req;
+      switch (method) {
+        case "GET":
+          if (role === "admin") {
+            if (id) {
+              fetchSingleProperty(req, res);
+            } else if (searchQuery) {
+              searchProperty(req, res, searchQuery);
+            }
+            return adminFetchAllProperties(req, res);
+          } else if (id) {
+            fetchSingleProperty(req, res);
+          } else if (searchQuery) {
+            searchProperty(req, res, searchQuery);
+          } else {
+            fetchAllProperties(req, res, _id);
+          }
+          break;
+        case "POST":
+          createProperty(req, res, _id);
+          break;
+        case "PUT":
+          updateProperty(req, res);
+          break;
+        case "DELETE":
+          deleteProperty(req, res);
+          break;
+        default:
+          //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);
+          res.status(405).end(`Method ${method} not Allowed`);
+          break;
       }
-      break;
-    case "POST":
-      createProperty(req, res, _id);
-      break;
-    case "PUT":
-      updateProperty(req, res);
-      break;
-    case "DELETE":
-      deleteProperty(req, res);
-      break;
-    default:
-      //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);
-      res.status(405).end(`Method ${method} not Allowed`);
-      break;
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      msg: "Database connection failed",
+      data: error,
+    });
   }
+
 }
