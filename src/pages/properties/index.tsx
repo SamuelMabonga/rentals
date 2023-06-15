@@ -50,7 +50,7 @@ export default function Properties({
                 />
                 <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setShowPropertyForm(true)}>Create New</Button>
             </Box>
-            <PropertiesTable data={data.data} />
+            <PropertiesTable data={data?.data} />
             {/* <ImageCropper open={true} /> */}
 
             <PropertyForm />
