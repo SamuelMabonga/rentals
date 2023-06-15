@@ -5,6 +5,10 @@ import { useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/TableRenderer';
+import fetchTenants from 'apis/fetchTenants';
+import { useQuery } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
+import moment from 'moment';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -21,43 +25,9 @@ type Item = {
 }
 
 export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
-    const data = [
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            unit: "string",
-            entryDate: "string",
-            endDate: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            unit: "string",
-            entryDate: "string",
-            endDate: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            unit: "string",
-            entryDate: "string",
-            endDate: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            unit: "string",
-            entryDate: "string",
-            endDate: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            unit: "string",
-            entryDate: "string",
-            endDate: "string",
-        },
-    ]
+    const session: any = useSession()
+    const { data }: any = useQuery({ queryKey: ['tenants'], queryFn: () => fetchTenants(session.data.accessToken) })
+
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -79,22 +49,22 @@ export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
             {
                 header: 'Name',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'name',
+                accessorKey: 'user.first_name',
             },
             {
                 header: 'Unit',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'unit',
+                accessorKey: 'unit.name',
             },
             {
                 header: 'Entry Date',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'entryDate',
+                cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+                accessorKey: 'start_date',
             },
             {
                 header: 'End Date',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'endDate',
+                cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+                accessorKey: 'end_date',
             },
             {
                 header: 'Actions',
@@ -128,11 +98,14 @@ export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
         getCoreRowModel: getCoreRowModel(),
     });
 
+    console.log("Data", data)
+
     return (
         <TableRenderer
-            data={data}
+            data={data?.data}
             columns={columns} onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
             } }        />
+            // <h1>Hwey</h1>
     );
 };

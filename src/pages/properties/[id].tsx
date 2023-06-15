@@ -29,6 +29,7 @@ import UnitForm from "Components/Properties/Forms/UnitForm"
 import fetchUnits from "apis/fetchUnits"
 import BookingForm from "Components/Properties/Forms/BookingForm"
 import fetchBookings from "apis/fetchBookings"
+import fetchTenants from "apis/fetchTenants"
 
 type PageProps = {
     // data: any;
@@ -274,6 +275,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
             await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
             await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
             await queryClient.prefetchQuery(['bookings'], () => fetchBookings(accessToken)),
+            await queryClient.prefetchQuery(['tenants'], () => fetchTenants(accessToken)),
         ])
     
         return {

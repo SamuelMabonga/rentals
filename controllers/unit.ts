@@ -14,8 +14,11 @@ export async function fetchAllUnits(req: any, res: any) {
     let units
 
     unitType !== undefined ?
-      (units = await Unit.find({unitType: unitType}).populate("unitType"))
-      : (units = await Unit.find().populate("unitType"));
+      (units = await Unit.find({unitType: unitType}).populate("unitType").populate("tenant"))
+      : (units = await Unit.find().populate("unitType").populate({
+        path: "tenant",
+        populate: [{ path: "user" }],
+      }));
 
     res.status(200).json({
       success: true,

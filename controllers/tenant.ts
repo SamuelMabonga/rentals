@@ -3,7 +3,7 @@ import Tenant from "models/tenant";
 // get all tenants
 export async function fetchAllTenants(req: any, res: any) {
   try {
-    let tenants = await Tenant.find();
+    let tenants = await Tenant.find().populate("user").populate("unit");
     res.status(200).json({
       success: true,
       msg: "tenants fetched successfully",
