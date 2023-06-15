@@ -12,7 +12,7 @@ export default function authenticateUser(req: NextApiRequest, res: NextApiRespon
 
   // HANDLE PERMISSION CONTROL HERE
   if (!token) {
-    res.status(403).json({
+    return res.status(403).json({
       success: false,
       message: "You do not have access, please login first",
     });
