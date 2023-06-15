@@ -3,7 +3,7 @@ import PropertyFeatures from "models/propertyFeatures";
 // get all features
 export async function fetchAllPropertyFeatures(req: any, res: any) {
   try {
-    let propertyFeature = await PropertyFeatures.find().populate("feature").populate("billingPeriod");
+    let propertyFeature = await PropertyFeatures.find().populate({path: "feature"}).populate({path: "billingPeriod"});
     res.status(200).json({
       success: true,
       msg: "Property features fetched successfully",

@@ -14,8 +14,8 @@ export async function fetchAllUnits(req: any, res: any) {
     let units
 
     unitType !== undefined ?
-      (units = await Unit.find({unitType: unitType}).populate("unitType").populate("tenant"))
-      : (units = await Unit.find().populate("unitType").populate({
+      (units = await Unit.find({unitType: unitType}).populate({path: "unitType"}).populate({path: "tenant"}))
+      : (units = await Unit.find().populate({path: "unitType"}).populate({
         path: "tenant",
         populate: [{ path: "user" }],
       }));
