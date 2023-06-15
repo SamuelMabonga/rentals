@@ -265,7 +265,7 @@ export const BookingsTable = <T extends object>({ }: ReactTableProps<T>) => {
 
     return (
         <TableRenderer
-            data={data.data.map((item: any) => ({
+            data={data?.data?.map((item: any) => ({
                 ...item,
                 createdAt: moment(item.createdAt).format("DD-MM-YYYY")
             }))}
