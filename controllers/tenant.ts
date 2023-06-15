@@ -38,6 +38,30 @@ export async function fetchAllUserTenancies(req: any, res: any, id: string) {
   }
 }
 
+
+// get property's tenants
+export async function fetchAllPropertyTenants(req: any, res: any) {
+  const {
+    query: { property, searchQuery },
+  }: any = req;
+
+  try {
+    let tenants = await Tenant.find({"unit.property._id": property}).populate("user").populate({path: "unit", populate: [{ path: "tenant" }, { path: "property" }],});
+    res.status(200).json({
+      success: true,
+      msg: "Property's tenants fetched successfully",
+      data: tenants,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch property's tenants",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
 // create a tenant
 export async function createTenant(req: any, res: any) {
   try {

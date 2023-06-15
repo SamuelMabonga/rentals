@@ -34,6 +34,41 @@ export async function fetchAllBookings(req: any, res: any) {
   }
 }
 
+// get all Property Bookings
+export async function fetchAllPropertyBookings(req: any, res: any) {
+  const {
+    query: { property, searchQuery },
+  }: any = req;
+
+  try {
+    let bookings = await Booking.find({"unit.property._id": property})
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType" }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
+
+    res.json({
+      success: true,
+      msg: "bookings fetched successfully",
+      data: bookings,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch  bookings",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
 // create a booking
 export async function createBooking(req: any, res: any) {
   try {

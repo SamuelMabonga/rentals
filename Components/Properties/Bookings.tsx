@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import fetchBookings from 'apis/fetchBookings';
 import { useSession } from 'next-auth/react';
 import moment from 'moment';
+import fetchPropertyBookings from 'apis/property/fetchPropertyBookings';
 
 function AlertDialog({ buttonLabel, buttonVariant, buttonColor="primary", title, content, onAgree, agreeing, setAgreeing }: any) {
     const [open, setOpen] = useState(false);
@@ -74,6 +75,7 @@ function AlertDialog({ buttonLabel, buttonVariant, buttonColor="primary", title,
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: string;
 }
 
 type Item = {
@@ -86,49 +88,8 @@ type Item = {
     actions: any;
 }
 
-export const BookingsTable = <T extends object>({ }: ReactTableProps<T>) => {
-    //     const data = [
-    //     {
-    //         image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-    //         name: "string",
-    //         type: "string",
-    //         status: "string",
-    //         tenant: "string",
-    //         dateCreated: "string",
-    //     },
-    //     {
-    //         image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-    //         name: "string",
-    //         type: "string",
-    //         status: "string",
-    //         tenant: "string",
-    //         dateCreated: "string",
-    //     },
-    //     {
-    //         image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-    //         name: "string",
-    //         type: "string",
-    //         status: "string",
-    //         tenant: "string",
-    //         dateCreated: "string",
-    //     },
-    //     {
-    //         image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-    //         name: "string",
-    //         type: "string",
-    //         status: "string",
-    //         tenant: "string",
-    //         dateCreated: "string",
-    //     },
-    //     {
-    //         image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-    //         name: "string",
-    //         type: "string",
-    //         status: "string",
-    //         tenant: "string",
-    //         dateCreated: "string",
-    //     },
-    // ]
+export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>) => {
+
     const router = useRouter()
     const session: any = useSession()
 
@@ -252,16 +213,7 @@ export const BookingsTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
-    const { data }: any = useQuery({ queryKey: ['bookings'], queryFn: () => fetchBookings(session.data.accessToken) })
-
-    console.log("DATA", data)
-
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
+    const { data }: any = useQuery({ queryKey: ['property-bookings', property], queryFn: () => fetchPropertyBookings(session.data.accessToken, property) })
 
     return (
         <TableRenderer

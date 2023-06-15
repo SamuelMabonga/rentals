@@ -70,10 +70,10 @@ function TableSwitch({ activeTab }: any) {
             return <PaymentsTable />
 
         case "messages":
-            return <BookingsTable />
+            // return <BookingsTable />
 
         case "tickets":
-            return <StaffTable />
+            // return <StaffTable />
 
         default:
             return <></>

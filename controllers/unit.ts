@@ -14,8 +14,11 @@ export async function fetchAllUnits(req: any, res: any) {
     let units
 
     unitType !== undefined ?
-      (units = await Unit.find({unitType: unitType}).populate({path: "unitType"}).populate({path: "tenant"}))
-      : (units = await Unit.find().populate({path: "unitType"}).populate({
+      (units = await Unit.find({ unitType: unitType }).populate({ path: "unitType" }).populate({
+        path: "tenant",
+        populate: [{ path: "user" }],
+      }))
+      : (units = await Unit.find().populate({ path: "unitType" }).populate({
         path: "tenant",
         populate: [{ path: "user" }],
       }));
@@ -29,6 +32,33 @@ export async function fetchAllUnits(req: any, res: any) {
     res.status(400).json({
       success: false,
       msg: "failed to fetch  units",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// get all units
+export async function fetchAllPropertyUnits(req: any, res: any) {
+  const {
+    query: { property, searchQuery },
+  }: any = req;
+  
+  try {
+    let units = await Unit.find({ property: property }).populate({ path: "unitType" }).populate({
+      path: "tenant",
+      populate: [{ path: "user" }],
+    })
+
+    res.status(200).json({
+      success: true,
+      msg: "Property units fetched successfully",
+      data: units,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch property units",
       data: error,
     });
     console.log(error);
@@ -82,7 +112,7 @@ export async function createUnit(req: any, res: any) {
 //fetch unit by id
 export async function fetchSingleUnit(req: any, res: any) {
   try {
-    let unit = await Unit.find({_id: req.query.id});
+    let unit = await Unit.find({ _id: req.query.id });
     res.status(200).json({
       success: true,
       msg: "unit fetched successfully",

@@ -9,10 +9,12 @@ import { useSession } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
 import fetchUnits from 'apis/fetchUnits';
 import moment from 'moment';
+import fetchPropertyUnits from 'apis/property/fetchPropertyUnits';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: string;
 }
 
 type Item = {
@@ -25,10 +27,10 @@ type Item = {
     actions: any;
 }
 
-export const UnitsTable = <T extends object>({ }: ReactTableProps<T>) => {
+export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) => {
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data }: any = useQuery({ queryKey: ['units'], queryFn: () => fetchUnits(session.accessToken) })
+    const { data }: any = useQuery({ queryKey: ['property-units', property], queryFn: () => fetchPropertyUnits(session.accessToken, property) })
 
     const columns: any = [
         {

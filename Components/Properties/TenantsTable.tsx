@@ -9,10 +9,12 @@ import fetchTenants from 'apis/fetchTenants';
 import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import moment from 'moment';
+import fetchPropertyTenants from 'apis/property/fetchPropertyTenants';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: string;
 }
 
 type Item = {
@@ -24,9 +26,9 @@ type Item = {
     actions: any;
 }
 
-export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
+export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>) => {
     const session: any = useSession()
-    const { data }: any = useQuery({ queryKey: ['tenants'], queryFn: () => fetchTenants(session.data.accessToken) })
+    const { data }: any = useQuery({ queryKey: ['property-tenants', property], queryFn: () => fetchPropertyTenants(session.data.accessToken, property) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(

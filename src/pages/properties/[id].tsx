@@ -35,16 +35,16 @@ type PageProps = {
     // data: any;
 };
 
-function TableSwitch({ activeTab }: any) {
+function TableSwitch({ activeTab, property }: any) {
     switch (activeTab) {
         case "units":
-            return <UnitsTable />
+            return <UnitsTable property={property}  />
 
         case "tenants":
-            return <TenantsTable />
+            return <TenantsTable property={property} />
 
         case "bookings":
-            return <BookingsTable />
+            return <BookingsTable property={property} />
 
         case "staff":
             return <StaffTable />
@@ -104,6 +104,7 @@ export default function Property({
     console.log(data)
 
     const {
+        _id,
         name,
         details,
         gallery
@@ -215,7 +216,7 @@ export default function Property({
                         Create New
                     </Button>
                 </Box>
-                <TableSwitch activeTab={activeTab} />
+                <TableSwitch activeTab={activeTab} property={_id} />
             </Box>
             <FeaturesForm />
             <BillingPeriodsForm />
