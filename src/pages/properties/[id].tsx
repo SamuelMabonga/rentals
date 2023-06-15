@@ -52,14 +52,8 @@ function TableSwitch({ activeTab }: any) {
         case "unitTypes":
             return <UnitTypesTable />
 
-        case "features":
-            return <FeaturesTable />
-
         case "tickets":
             return <TicketsTable />
-
-        case "billingPeriods":
-            return <BillingPeriodsTable />
 
         case "propertyFeatures":
             return <PropertyFeaturesTable />
@@ -99,11 +93,11 @@ export default function Property({
         setOpenBookingForm,
     }: any = useContext(CollectionsContext)
 
-       // SESSION
-       const { status, data: session }: any = useSession()
+    // SESSION
+    const { status, data: session }: any = useSession()
 
     const router = useRouter()
-    const {id}: any = router.query
+    const { id }: any = router.query
 
     const { data }: any = useQuery({ queryKey: ['property', id], queryFn: () => fetchAProperty(session.accessToken, id) })
 
@@ -172,9 +166,7 @@ export default function Property({
                     <Tab label="Bookings" value="bookings" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Staff" value="staff" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Unit Types" value="unitTypes" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
-                    <Tab label="Features" value="features" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Tickets" value="tickets" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
-                    <Tab label="Billing Periods" value="billingPeriods" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Property Features" value="propertyFeatures" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                 </Tabs>
                 <Box width="100%" display="flex" flexWrap="wrap" gap="1rem">
@@ -214,14 +206,6 @@ export default function Property({
                                 return setOpenBookingForm(true)
                             }
 
-                            if (activeTab === "features") {
-                                return setOpenFeaturesForm(true)
-                            }
-
-                            if (activeTab === "billingPeriods") {
-                                return setOpenBillingPeriodsForm(true)
-                            }
-
                             if (activeTab === "propertyFeatures") {
                                 return setOpenPropertyFeaturesForm(true)
                             }
@@ -231,14 +215,14 @@ export default function Property({
                         Create New
                     </Button>
                 </Box>
-                {/* <TableSwitch activeTab={activeTab} /> */}
+                <TableSwitch activeTab={activeTab} />
             </Box>
-            {/* <FeaturesForm />
+            <FeaturesForm />
             <BillingPeriodsForm />
             <UnitTypeForm />
             <PropertyFeatureForm />
             <UnitForm />
-            <BookingForm /> */}
+            <BookingForm />
         </>
     )
 }
@@ -248,7 +232,7 @@ Property.auth = true
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
 
-    const {query}: any = context
+    const { query }: any = context
     const { id } = query;
 
     if (!session) {
@@ -263,24 +247,21 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // Retrieve the access token from the session
     const accessToken = session?.accessToken;
 
+    // REACT QUERY
+    const queryClient = new QueryClient()
 
-        // REACT QUERY
-        const queryClient = new QueryClient()
+    await Promise.all([
+        await queryClient.prefetchQuery(['property', id], () => fetchAProperty(accessToken, id)),
+        // await queryClient.prefetchQuery(['unitTypes'], () => fetchUnitTypes(accessToken)),
+        // await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
+        // await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
+        // await queryClient.prefetchQuery(['bookings'], () => fetchBookings(accessToken)),
+        // await queryClient.prefetchQuery(['tenants'], () => fetchTenants(accessToken)),
+    ])
 
-        await Promise.all([
-            await queryClient.prefetchQuery(['property', id], () => fetchAProperty(accessToken, id)),
-            // await queryClient.prefetchQuery(['features'], () => fetchFeatures(accessToken)),
-            // await queryClient.prefetchQuery(['billingPeriods'], () => fetchBillingPeriods(accessToken)),
-            // await queryClient.prefetchQuery(['unitTypes'], () => fetchUnitTypes(accessToken)),
-            // await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
-            // await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
-            // await queryClient.prefetchQuery(['bookings'], () => fetchBookings(accessToken)),
-            // await queryClient.prefetchQuery(['tenants'], () => fetchTenants(accessToken)),
-        ])
-    
-        return {
-            props: {
-                dehydratedState: dehydrate(queryClient),
-            },
-        };
+    return {
+        props: {
+            dehydratedState: dehydrate(queryClient),
+        },
+    };
 };

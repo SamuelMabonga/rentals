@@ -5,37 +5,35 @@ import React, { useContext, useState } from "react"
 import { CollectionsContext } from "context/context"
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import { getSession, useSession } from "next-auth/react"
+import ImageCropper from "Components/Common/ImageCropper"
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
 import fetchProperties from "apis/fetchProperties"
+import fetchUserTenancies from "apis/fetchUserTenancies"
+import { RentalsTable } from "Components/Properties/RentalsTable"
+import fetchBillingPeriods from "apis/fetchBillingPeriods"
+import { BillingPeriodsTable } from "Components/Properties/BillingPeriodsTable"
+import BillingPeriodsForm from "Components/Properties/Forms/BillingPeriodsForm"
 
-// type Property = {
-//     // name: string;
-//     // stargazers_count: number;
-// };
 
 type PageProps = {
     // data: any;
 };
 
 
-export default function Properties({
+export default function BillingPeriods({
     // data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     // CONTEXT
     const {
-        setShowPropertyForm,
+        setOpenBillingPeriodsForm
     }: any = useContext(CollectionsContext)
 
     // SESSION
     const { status, data: session }: any = useSession()
 
-    const [openCreateForm, setOpenCreateForm] = useState(false)
-
-    const { data }: any = useQuery({ queryKey: ['properties'], queryFn: () => fetchProperties(session.accessToken) })
-
     return (
         <>
-            <Typography color="black" fontSize="1.5rem" fontWeight="600">My Properties</Typography>
+            <Typography color="black" fontSize="1.5rem" fontWeight="600">Billing Periods</Typography>
             <Box width="100%" display={"flex"} flexDirection={["column", "row"]} gap="1rem">
                 <TextField
                     name="search"
@@ -45,21 +43,21 @@ export default function Properties({
                         width: ["100%", "20rem"]
                     }}
                 />
-                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setShowPropertyForm(true)}>Create New</Button>
+                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenBillingPeriodsForm(true)}>Create New</Button>
             </Box>
-            <PropertiesTable data={data?.data} />
-
-            <PropertyForm />
-            {/* <UnitTypeForm /> */}
-            {/* <ImageUploader /> */}
+            <BillingPeriodsTable />
+            <BillingPeriodsForm />
         </>
     )
 }
 
-Properties.auth = true
+BillingPeriods.auth = true
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
+    // Retrieve the access token from the session
+    const accessToken = session?.accessToken;
+
 
     if (!session) {
         return {
@@ -70,14 +68,10 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
         };
     }
 
-    // Retrieve the access token from the session
-    const accessToken = session?.accessToken;
-
     // REACT QUERY
     const queryClient = new QueryClient()
 
-    await queryClient.prefetchQuery(['properties'], () => fetchProperties(accessToken))
-
+    await queryClient.prefetchQuery(['billingPeriods'], () => fetchBillingPeriods(accessToken))
     return {
         props: {
             dehydratedState: dehydrate(queryClient),

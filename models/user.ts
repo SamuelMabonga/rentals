@@ -43,6 +43,8 @@ const UserShema = new Schema({
     type: String,
   },
   isEmail_verified: { type: Boolean, default: false },
+}, {
+  timestamps: true
 });
 
 //indexed fields for searching
