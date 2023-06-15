@@ -105,7 +105,7 @@ export default function Property({
     const router = useRouter()
     const {id}: any = router.query
 
-    const { data }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
+    const { data }: any = useQuery({ queryKey: ['property', id], queryFn: () => fetchAProperty(session.accessToken, id) })
 
     console.log(data)
 
@@ -231,14 +231,14 @@ export default function Property({
                         Create New
                     </Button>
                 </Box>
-                <TableSwitch activeTab={activeTab} />
+                {/* <TableSwitch activeTab={activeTab} /> */}
             </Box>
-            <FeaturesForm />
+            {/* <FeaturesForm />
             <BillingPeriodsForm />
             <UnitTypeForm />
             <PropertyFeatureForm />
             <UnitForm />
-            <BookingForm />
+            <BookingForm /> */}
         </>
     )
 }
@@ -268,14 +268,14 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
         const queryClient = new QueryClient()
 
         await Promise.all([
-            await queryClient.prefetchQuery(['property'], () => fetchAProperty(accessToken, id)),
-            await queryClient.prefetchQuery(['features'], () => fetchFeatures(accessToken)),
-            await queryClient.prefetchQuery(['billingPeriods'], () => fetchBillingPeriods(accessToken)),
-            await queryClient.prefetchQuery(['unitTypes'], () => fetchUnitTypes(accessToken)),
-            await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
-            await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
-            await queryClient.prefetchQuery(['bookings'], () => fetchBookings(accessToken)),
-            await queryClient.prefetchQuery(['tenants'], () => fetchTenants(accessToken)),
+            await queryClient.prefetchQuery(['property', id], () => fetchAProperty(accessToken, id)),
+            // await queryClient.prefetchQuery(['features'], () => fetchFeatures(accessToken)),
+            // await queryClient.prefetchQuery(['billingPeriods'], () => fetchBillingPeriods(accessToken)),
+            // await queryClient.prefetchQuery(['unitTypes'], () => fetchUnitTypes(accessToken)),
+            // await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
+            // await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
+            // await queryClient.prefetchQuery(['bookings'], () => fetchBookings(accessToken)),
+            // await queryClient.prefetchQuery(['tenants'], () => fetchTenants(accessToken)),
         ])
     
         return {

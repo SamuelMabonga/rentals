@@ -34,9 +34,9 @@ export default async function handler(
         case "GET":
           if (role === "admin") {
             if (id) {
-              fetchSingleProperty(req, res);
+              return fetchSingleProperty(req, res);
             } else if (searchQuery) {
-              searchProperty(req, res, searchQuery);
+              return searchProperty(req, res, searchQuery);
             }
             return adminFetchAllProperties(req, res);
           } else if (id) {
