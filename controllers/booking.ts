@@ -1,6 +1,7 @@
 import Booking from "models/booking";
 import Tenant from "models/tenant";
 import Unit from "models/unit";
+import Fuse from "fuse.js";
 
 // get all bookings
 export async function fetchAllBookings(req: any, res: any) {
@@ -176,22 +177,34 @@ export async function deleteBooking(req: any, res: any) {
 // @route   GET /api/booking?searchQuery=searchQuery
 export async function searchBooking(req: any, res: any, searchQuery: string) {
   try {
-    let findParams = searchQuery
-      ? {
-          $text: {
-            $search: searchQuery,
-            $caseSensitive: false,
-            $diacriticSensitive: false,
-          },
-        }
-      : {};
+    let bookings = await Booking.find()
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType" }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
 
-    const booking = await Booking.find({ ...findParams });
+    const options = {
+      keys: ["user.last_name", "user.first_name", "user.email"],
+      threshold: 0.3,
+    };
+
+    if (searchQuery?.replace(/%/g, "")) {
+      const formatText = searchQuery?.replace(/%/g, "");
+      const fuse = new Fuse(bookings, options);
+      bookings = fuse.search(formatText)?.map(({ item }) => item);
+    }
 
     res.status(200).json({
       success: true,
       msg: `${searchQuery} searched successfully`,
-      data: booking,
+      data: bookings,
     });
   } catch (error) {
     res.status(400).json({
@@ -239,6 +252,14 @@ export async function acceptBooking(req: any, res: any) {
         populate: [{ path: "feature" }],
       });
 
+    let BOOKED_UNIT_STATUS = "ACCEPTED";
+    if (booking && booking?.unit?.status === BOOKED_UNIT_STATUS) {
+      res.status(403).json({
+        success: false,
+        msg: `booking cannot be made. Unit is ${BOOKED_UNIT_STATUS}`,
+      });
+    }
+
     //CREATE a new tenant
     const tenant =
       booking &&
@@ -259,7 +280,7 @@ export async function acceptBooking(req: any, res: any) {
     tenant &&
       (await Unit.findByIdAndUpdate(
         booking?.unit?._id,
-        { tenant: newTenant?._id },
+        { tenant: newTenant?._id, status: `${BOOKED_UNIT_STATUS}` },
         {
           new: true,
         }
