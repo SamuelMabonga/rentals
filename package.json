@@ -33,6 +33,7 @@
     "eslint": "8.39.0",
     "eslint-config-next": "13.4.0",
     "framer-motion": "^10.12.12",
+    "fuse.js": "^6.6.2",
     "gsap": "^3.11.5",
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.4",

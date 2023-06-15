@@ -1,4 +1,5 @@
 import User from "models/user";
+import Fuse from "fuse.js";
 
 // get all users
 export async function fetchAllUsers(req: any, res: any) {
@@ -93,23 +94,22 @@ export async function deleteUser(req: any, res: any) {
   }
 }
 
-
 // @desc    search
 // @route   GET /api/property?searchQuery=searchQuery
 export async function searchUser(req: any, res: any) {
-  let searchQuery = req.query.searchQuery
+  let searchQuery = req.query.searchQuery;
   try {
-    let findParams = searchQuery
-      ? {
-          $text: {
-            $search: searchQuery,
-            $caseSensitive: false,
-            $diacriticSensitive: false,
-          },
-        }
-      : {};
+    let users = await User.find();
+    const options = {
+      keys: ["last_name", "first_name", "email"],
+      threshold: 0.3,
+    };
 
-    const users = await User.find({ ...findParams });
+    if (searchQuery?.replace(/%/g, "")) {
+      const formatText = searchQuery?.replace(/%/g, "");
+      const fuse = new Fuse(users, options);
+      users = fuse.search(formatText)?.map(({ item }) => item);
+    }
 
     res.status(200).json({
       success: true,
