@@ -209,7 +209,7 @@ export default function UnitTypeForm() {
                         <FormLabel>Billing Period</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
-                            options={billingPeriods.data}
+                            options={billingPeriods?.data}
                             getOptionLabel={(option: any) => option.name}
                             onChange={(event, value) => setValue("billingPeriod", value)}
                             renderInput={(params) =>

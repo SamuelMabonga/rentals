@@ -252,11 +252,11 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
 
     await Promise.all([
         await queryClient.prefetchQuery(['property', id], () => fetchAProperty(accessToken, id)),
-        await queryClient.prefetchQuery(['unitTypes'], () => fetchUnitTypes(accessToken)),
-        await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
-        await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
-        await queryClient.prefetchQuery(['bookings'], () => fetchBookings(accessToken)),
-        await queryClient.prefetchQuery(['tenants'], () => fetchTenants(accessToken)),
+        // await queryClient.prefetchQuery(['unitTypes'], () => fetchUnitTypes(accessToken)),
+        // await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
+        // await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
+        // await queryClient.prefetchQuery(['bookings'], () => fetchBookings(accessToken)),
+        // await queryClient.prefetchQuery(['tenants'], () => fetchTenants(accessToken)),
     ])
 
     return {

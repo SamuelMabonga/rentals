@@ -338,7 +338,7 @@ export default function BookingForm() {
                             <FormLabel>Select the unit type to book</FormLabel>
                             <Autocomplete
                                 // {...register("features")}
-                                options={unitTypes.data}
+                                options={unitTypes?.data}
                                 getOptionLabel={(option: any) => option.name}
                                 onChange={async (event, value) => {
                                     setSelectedUnit(null)
@@ -426,7 +426,7 @@ export default function BookingForm() {
                             <Autocomplete
                                 // {...register("features")}
                                 multiple
-                                options={features.data}
+                                options={features?.data}
                                 getOptionLabel={(option: any) => option.feature.name}
                                 onChange={(event, value: any) => {
                                     setSelectedUnit(null)

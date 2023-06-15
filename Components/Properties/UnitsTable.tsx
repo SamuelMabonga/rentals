@@ -30,8 +30,6 @@ export const UnitsTable = <T extends object>({ }: ReactTableProps<T>) => {
     const { status, data: session }: any = useSession()
     const { data }: any = useQuery({ queryKey: ['units'], queryFn: () => fetchUnits(session.accessToken) })
 
-    const router = useRouter()
-
     const columns: any = [
         {
             header: 'Image',
@@ -108,8 +106,9 @@ export const UnitsTable = <T extends object>({ }: ReactTableProps<T>) => {
 
     return (
         <TableRenderer
-            data={data?.data}
-            columns={columns} onRowClick={function (obj: any): void {
+            data={data?.data || []}
+            columns={columns}
+            onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
             }} />
     );

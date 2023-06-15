@@ -36,8 +36,6 @@ export default function UnitForm() {
     // SESSION
     const { status, data: session }: any = useSession()
     const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
-    const { data: features }: any = useQuery({ queryKey: ['propertyFeatures'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
-    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
     const { data: unitTypes }: any = useQuery({ queryKey: ['unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
 
     const [isLoading, setIsLoading] = useState(false)
@@ -175,7 +173,7 @@ export default function UnitForm() {
                         <FormLabel>Unit Type</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
-                            options={unitTypes.data}
+                            options={unitTypes?.data}
                             getOptionLabel={(option: any) => option.name}
                             onChange={(event, value) => setValue("unitType", value)}
                             renderInput={(params) =>

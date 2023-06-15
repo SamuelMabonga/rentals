@@ -177,7 +177,7 @@ export default function PropertyFeatureForm() {
                         <Autocomplete
                             // {...register("feature")}
                             value={watch("feature")}
-                            options={features.data}
+                            options={features?.data}
                             getOptionLabel={(option: any) => option.name}
                             renderInput={(params) =>
                                 <TextField
@@ -202,7 +202,7 @@ export default function PropertyFeatureForm() {
                         <Autocomplete
                             // {...register("features")}
                             value={watch("billingPeriod")}
-                            options={billingPeriods.data}
+                            options={billingPeriods?.data}
                             getOptionLabel={(option: any) => option.name}
                             renderInput={(params) =>
                                 <TextField
