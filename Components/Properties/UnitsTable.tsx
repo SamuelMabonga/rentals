@@ -30,7 +30,7 @@ type Item = {
 export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) => {
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data }: any = useQuery({ queryKey: ['property-units', property], queryFn: () => fetchPropertyUnits(session.accessToken, property) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-units', property], queryFn: () => fetchPropertyUnits(session.accessToken, property) })
 
     const columns: any = [
         {
@@ -112,6 +112,9 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
             columns={columns}
             onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
-            }} />
+            }}
+            loading={isLoading}
+        />
+
     );
 };

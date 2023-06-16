@@ -28,7 +28,7 @@ type Item = {
 
 export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>) => {
     const session: any = useSession()
-    const { data }: any = useQuery({ queryKey: ['property-tenants', property], queryFn: () => fetchPropertyTenants(session.data.accessToken, property) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-tenants', property], queryFn: () => fetchPropertyTenants(session.data.accessToken, property) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
@@ -94,20 +94,15 @@ export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>)
         []
     );
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
-    console.log("Data", data)
-
     return (
         <TableRenderer
             data={data?.data || []}
-            columns={columns} onRowClick={function (obj: any): void {
+            columns={columns}
+            onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
-            } }        />
+            } }
+            loading={isLoading}
+        />
             // <h1>Hwey</h1>
     );
 };

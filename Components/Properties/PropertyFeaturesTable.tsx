@@ -29,7 +29,7 @@ export const PropertyFeaturesTable = <T extends object>({ }: ReactTableProps<T>)
     const {setPropertyFeatureToEdit, setOpenPropertyFeaturesForm}: any = useContext(CollectionsContext)
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data }: any = useQuery({ queryKey: ['propertyFeatures'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-features'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
 
     console.log(data)
     const router = useRouter()
@@ -96,17 +96,14 @@ export const PropertyFeaturesTable = <T extends object>({ }: ReactTableProps<T>)
         []
     );
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
     return (
         <TableRenderer
             data={data?.data}
-            columns={columns} onRowClick={function (obj: any): void {
+            columns={columns}
+            onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
-            }} />
+            }}
+            loading={isLoading}
+        />
     );
 };

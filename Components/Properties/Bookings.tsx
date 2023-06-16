@@ -213,7 +213,7 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
         []
     );
 
-    const { data }: any = useQuery({ queryKey: ['property-bookings', property], queryFn: () => fetchPropertyBookings(session.data.accessToken, property) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', property], queryFn: () => fetchPropertyBookings(session.data.accessToken, property) })
 
     return (
         <TableRenderer
@@ -224,6 +224,8 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
             columns={columns}
             onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
-            }} />
+            }}
+            loading={isLoading}
+            />
     );
 };

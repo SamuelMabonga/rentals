@@ -29,7 +29,7 @@ export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
 
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchUnitTypes(session.accessToken) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
 
 
     const router = useRouter()
@@ -118,6 +118,7 @@ export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
             onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
             } }
+            loading={isLoading}
         />
     );
 };
