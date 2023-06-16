@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Hydrate, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from 'next/app';
 import { CacheProvider, EmotionCache } from '@emotion/react';
-import { ThemeProvider, CssBaseline, createTheme } from '@mui/material';
+import { ThemeProvider, CssBaseline, createTheme, Box } from '@mui/material';
 
 
 
@@ -22,9 +22,11 @@ function Auth({ children }: any) {
   // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
   const { status } = useSession({ required: true })
 
-  if (status === "loading") {
-    return <div>Loading...</div>
-  }
+  // if (status === "loading") {
+  //   return <Box width="100vw" height="100vh">
+  //     Loading...
+  //   </Box>
+  // }
 
   return children
 }

@@ -1,37 +1,11 @@
 import { Avatar, Box, Button, Card, IconButton, Tab, Tabs, TextField, Typography } from "@mui/material"
-import DashboardLayout from "Components/Dashboard/DashboardLayout"
 import React, { useContext, useEffect, useState } from "react"
-import Image from "next/image"
-import { UnitsTable } from "Components/Properties/UnitsTable"
-import { TenantsTable } from "Components/Properties/TenantsTable"
-import { BookingsTable } from "Components/Properties/Bookings"
-import { StaffTable } from "Components/Properties/StaffTable"
-import { UnitTypesTable } from "Components/Properties/UnitTypesTable"
-import { FeaturesTable } from "Components/Properties/FeaturesTable"
-import { TicketsTable } from "Components/Properties/TicketsTable"
 import { CollectionsContext } from "context/context"
 import { GetServerSideProps, InferGetServerSidePropsType } from "next"
 import { getSession, useSession } from "next-auth/react"
-import FeaturesForm from "Components/Properties/Forms/FeaturesForm"
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
-import fetchAProperty from "apis/fetchAProperty"
 import { useRouter } from "next/router"
-import fetchFeatures from "apis/fetchFeatures"
-import { BillingPeriodsTable } from "Components/Properties/BillingPeriodsTable"
-import BillingPeriodsForm from "Components/Properties/Forms/BillingPeriodsForm"
-import fetchBillingPeriods from "apis/fetchBillingPeriods"
-import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
-import fetchUnitTypes from "apis/fetchUnitTypes"
-import PropertyFeatureForm from "Components/Properties/Forms/PropertyFeatureForm"
-import { PropertyFeaturesTable } from "Components/Properties/PropertyFeaturesTable"
-import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
-import UnitForm from "Components/Properties/Forms/UnitForm"
-import fetchUnits from "apis/fetchUnits"
-import BookingForm from "Components/Properties/Forms/BookingForm"
-import fetchBookings from "apis/fetchBookings"
-import fetchTenants from "apis/fetchTenants"
 import fetchARental from "apis/fetchARental"
-import fetchAUnit from "apis/fetchAUnit"
 import { BillsTable } from "Components/Properties/BillsTable"
 import { PaymentsTable } from "Components/Properties/PaymentsTable"
 
@@ -108,19 +82,19 @@ export default function Property({
 
     return (
         <>
-            <Box display="flex" width="100%" justifyContent="space-between">
+            <Box display="flex" flexDirection={["column", "row"]} gap="1rem" width="100%" justifyContent="space-between">
                 <Box>
                     <Typography fontSize="1.5rem" fontWeight="600" color="primary.dark">{`${unit?.name}`}</Typography>
                     <Typography fontWeight="600" color="grey">{`${unit?.property?.name}`}</Typography>
                 </Box>
 
-                <Box display="flex" flexDirection="row" gap="1rem">
-                    <Button variant="contained" sx={{ height: "fit-content" }}>Renew your tenancy</Button>
-                    <Button variant="outlined" sx={{ height: "fit-content" }} color="error" >Terminate tenancy</Button>
+                <Box display="flex"  flexDirection={["column", "row"]} gap="1rem">
+                    <Button variant="contained" sx={{ height: "fit-content", padding: "1rem" }}>Renew your tenancy</Button>
+                    <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem" }} color="error" >Terminate tenancy</Button>
                 </Box>
             </Box>
 
-            <Box width="100%" display="flex" gap="1rem">
+            <Box width="100%" display="grid" gridTemplateColumns={["1fr", "1fr 1fr", ]} gap="1rem">
                 <DetailsCard />
                 <DetailsCard />
                 <DetailsCard />
