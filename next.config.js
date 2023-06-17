@@ -1,4 +1,14 @@
 /** @type {import('next').NextConfig} */
+const cron = require('node-cron')
+
+// 0 8 * * * - everyday at 8am
+cron.schedule("* * * * *", function() {
+  fetch(`http://localhost:3000/api/bills/cron`)
+})
+// cron.schedule('* * * * *', function () {
+//   console.log('Say scheduled hello')
+// });
+
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
