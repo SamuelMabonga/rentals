@@ -17,7 +17,7 @@ export default async function handler(
 ) {
 
   const {
-    query: { property, searchQuery },
+    query: { id, searchQuery },
   }: any = req;
 
   const decodedToken = authenticateUser(req, res); 

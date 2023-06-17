@@ -41,11 +41,11 @@ export async function fetchAllUnits(req: any, res: any) {
 // get all units
 export async function fetchAllPropertyUnits(req: any, res: any) {
   const {
-    query: { property, searchQuery },
+    query: { id, searchQuery },
   }: any = req;
   
   try {
-    let units = await Unit.find({ property: property }).populate({ path: "unitType" }).populate({
+    let units = await Unit.find({ property: id }).populate({ path: "unitType" }).populate({
       path: "tenant",
       populate: [{ path: "user" }],
     })
