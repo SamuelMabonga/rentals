@@ -3,7 +3,27 @@ import Ticket from "models/ticket";
 // get all Tickets
 export async function fetchAllTickets(req: any, res: any) {
   try {
-    let ticket = await Ticket.find();
+    let ticket = await Ticket.find().populate({ path: "unit" });
+    res.status(200).json({
+      success: true,
+      msg: "tickets fetched successfully",
+      data: Ticket,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch  tickets",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// get unit Tickets
+export async function fetchUnitTickets(req: any, res: any) {
+  let unitId = req.body.unitId;
+  try {
+    let ticket = await Ticket.find({ unit: unitId }).populate({ path: "unit" });
     res.status(200).json({
       success: true,
       msg: "tickets fetched successfully",
@@ -63,7 +83,9 @@ export async function createTicket(req: any, res: any) {
 //fetch Ticket by id
 export async function fetchSingleTicket(req: any, res: any) {
   try {
-    let ticket = await Ticket.findById(req.params.id);
+    let ticket = await Ticket.findById(req.params.id).populate({
+      path: "unit",
+    });
     res.status(200).json({
       success: true,
       msg: "ticket fetched successfully",

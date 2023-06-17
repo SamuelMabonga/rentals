@@ -1,9 +1,12 @@
 import {
-  createPropertyFeature,
-  deletePropertyFeature,
-  fetchAllPropertyFeatures,
-  updatePropertyFeature,
-} from "controllers/propertyFeatures";
+  createStaff,
+  deleteStaff,
+  fetchAllStaffs,
+  fetchAllStaffsByRoles,
+  fetchSingleStaff,
+  searchStaff,
+  updateStaff,
+} from "controllers/staff";
 import authenticateUser from "helpers/authenticate_user";
 import { connectToMongoDB } from "lib/mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -12,27 +15,36 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  authenticateUser(req, res);
+  const {
+    query: { id, searchQuery },
+  }: any = req;
+
+  const decodedToken = authenticateUser(req, res);
 
   connectToMongoDB().catch((err) => res.json(err));
+
+  // USER
+  const { _id, role } = decodedToken.user;
 
   //type of request
   const { method } = req;
   switch (method) {
     case "GET":
-      fetchAllPropertyFeatures(req, res);
-      break;
-      // case "GET":
-      //   fetchSingleFeature(req, res);
-      break;
+      if (id) {
+        fetchSingleStaff(req, res);
+      } else if (searchQuery) {
+        searchStaff(req, res, searchQuery);
+      } else {
+        fetchAllStaffsByRoles(req, res);
+      }
     case "POST":
-      createPropertyFeature(req, res);
+      createStaff(req, res);
       break;
     case "PUT":
-      updatePropertyFeature(req, res);
+      updateStaff(req, res);
       break;
     case "DELETE":
-      deletePropertyFeature(req, res);
+      deleteStaff(req, res);
       break;
     default:
       //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);

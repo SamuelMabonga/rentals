@@ -19,6 +19,26 @@ export async function fetchAllStaffRoles(req: any, res: any) {
   }
 }
 
+// get all Staff Roles by role id
+export async function fetchRoleAllStaffRoles(req: any, res: any) {
+  let roleId = req.query.roleId;
+  try {
+    let staffRole = await StaffRoles.find({ role: roleId });
+    res.status(200).json({
+      success: true,
+      msg: "Staff Roles fetched successfully",
+      data: staffRole,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch Staff Roles",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
 // create a staff Role
 export async function createStaffRole(req: any, res: any) {
   try {
@@ -108,7 +128,6 @@ export async function deleteStaffRole(req: any, res: any) {
     let staffRole = await StaffRoles.findById(req.params.id);
 
     if (!staffRole) {
-
       return "Staff role being deleted has not been found";
     }
 

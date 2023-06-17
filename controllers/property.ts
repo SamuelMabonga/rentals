@@ -2,9 +2,10 @@ import Property from "models/property";
 
 // get all properties
 //none admin fetch properties
-export async function fetchAllProperties(req: any, res: any, userId: string) {
+export async function fetchOwnerProperties(req: any, res: any ) {
+  let ownerId = req.query.ownerId
   try {
-    let properties = await Property.find({ owner: `${userId}` });
+    let properties = await Property.find({ owner: `${ownerId}` });
 
     res.status(200).json({
       success: true,
@@ -22,7 +23,7 @@ export async function fetchAllProperties(req: any, res: any, userId: string) {
 }
 
 // get admin all properties
-export async function adminFetchAllProperties(req: any, res: any) {
+export async function fetchAllProperties(req: any, res: any) {
   try {
     let properties = await Property.find();
 
