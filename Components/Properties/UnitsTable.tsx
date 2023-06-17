@@ -30,7 +30,11 @@ type Item = {
 export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) => {
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-units', property], queryFn: () => fetchPropertyUnits(session.accessToken, property) })
+    const { data, isLoading }: any = useQuery({
+        queryKey: ['property-units', property],
+        queryFn: () => fetchPropertyUnits(session?.accessToken, property),
+        enabled: !!session?.accessToken && !!property
+    })
 
     const columns: any = [
         {
