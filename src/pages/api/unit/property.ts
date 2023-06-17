@@ -26,17 +26,19 @@ export default async function handler(
   try {
     // await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_SRV || "mongodb://localhost:27017/test_db").then(() => {
 
-    await connectToMongoDB().catch((err) => res.json(err));
-    // USER
+    // await connectToMongoDB().catch((err) => res.json(err));
+
+    const { connection } = await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_SRV || "mongodb://localhost:27017/test_db");
+
+    if (connection.readyState === 1) {
+          // USER
     const { _id, role } = decodedToken.user;
 
     const { method } = req;
     switch (method) {
       case "GET":
-        //   if (property) {
-        //     return fetchSingleUnit(req, res)
-        //   }
         fetchAllPropertyUnits(req, res);
+        // fetchAllUnits(req, res)
         break;
         // case "GET":
         //   fetchSingleUnit(req, res);
@@ -55,6 +57,8 @@ export default async function handler(
         res.status(405).end(`Method ${method} not Allowed`);
         break;
     }
+    }
+
     // })
   } catch (error) {
     res.status(500).json({

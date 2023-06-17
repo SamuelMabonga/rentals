@@ -1,5 +1,6 @@
 import Unit from "models/unit";
 import Tenant from "models/tenant";
+import UnitType from "models/unit_type";
 
 // get all units
 export async function fetchAllUnits(req: any, res: any) {
@@ -48,7 +49,7 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
   console.log("PROPERTY ", id)
   
   try {
-    let units = await Unit.find({ property: id })
+    let units = await Unit.find()
       .populate({ path: "unitType" })
       .populate({
         path: "tenant",

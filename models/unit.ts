@@ -1,4 +1,7 @@
 import { Schema, model, models } from "mongoose";
+import UnitType from "./unit_type";
+import Property from "./property";
+import Tenant from "./tenant";
 
 const UnitSchema = new Schema({
   image: {
@@ -11,15 +14,15 @@ const UnitSchema = new Schema({
   },
   unitType: {
     type: Schema.Types.ObjectId,
-    ref: 'UnitType',
+    ref: UnitType,
   },
   property: {
     type: Schema.Types.ObjectId,
-    ref: 'Property',
+    ref: Property,
   },
   tenant: {
     type: Schema.Types.ObjectId,
-    ref: "Tenant",
+    ref: Tenant,
     default: null
   },
   status: {
