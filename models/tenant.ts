@@ -1,6 +1,6 @@
 import { Schema, model, models } from "mongoose";
 
-const TenantShema = new Schema({
+const TenantSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: "User"
@@ -35,6 +35,6 @@ const TenantShema = new Schema({
   timestamps: true
 });
 
-const Tenant = models.Tenant || model("Tenant", TenantShema);
+const Tenant = models.Tenant || model("Tenant", TenantSchema);
 
 export default Tenant;

@@ -1,4 +1,5 @@
 import Unit from "models/unit";
+import Tenant from "models/tenant";
 
 // get all units
 export async function fetchAllUnits(req: any, res: any) {
@@ -43,19 +44,24 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
   const {
     query: { id, searchQuery },
   }: any = req;
+
+  console.log("PROPERTY ", id)
   
   try {
-    let units = await Unit.find({ property: id }).populate({ path: "unitType" }).populate({
-      path: "tenant",
-      populate: [{ path: "user" }],
-    })
-
+    let units = await Unit.find({ property: id })
+      .populate({ path: "unitType" })
+      .populate({
+        path: "tenant",
+        populate: [{ path: "user" }],
+      })
+      
     res.status(200).json({
       success: true,
       msg: "Property units fetched successfully",
       data: units,
     });
   } catch (error) {
+    console.log("ERROR MSG", error)
     res.status(400).json({
       success: false,
       msg: "Failed to fetch property units",
