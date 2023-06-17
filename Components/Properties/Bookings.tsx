@@ -217,10 +217,7 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
 
     return (
         <TableRenderer
-            data={data?.data?.map((item: any) => ({
-                ...item,
-                createdAt: moment(item.createdAt).format("DD-MM-YYYY")
-            })) || []}
+            data={data?.data || []}
             columns={columns}
             onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');

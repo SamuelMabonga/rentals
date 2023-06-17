@@ -5,7 +5,8 @@ import FileInput from "Components/FileInput"
 import fetchAProperty from "apis/fetchAProperty"
 import fetchBillingPeriods from "apis/fetchBillingPeriods"
 import fetchFeatures from "apis/fetchFeatures"
-import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
+import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
+// import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
 import { CollectionsContext } from "context/context"
 import { fetchAllBillingPeriods } from "controllers/billingPeriods"
 import { useSession } from "next-auth/react"
@@ -19,7 +20,7 @@ const formSchema = yup.object().shape({
     // description: yup.string().required("Description is required"),
 })
 
-export default function UnitTypeForm() {
+export default function UnitTypeForm({property, features, billingPeriods}: any) {
     // CONTEXT
     const {
         showUnitTypeForm: open,
@@ -34,9 +35,9 @@ export default function UnitTypeForm() {
 
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
-    const { data: features }: any = useQuery({ queryKey: ['propertyFeatures'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
-    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
+    // const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
+    // const { data: features }: any = useQuery({ queryKey: ['propertyFeatures', property], queryFn: () => fetchPropertyFeatures(session.accessToken, property) })
+    // const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -70,7 +71,7 @@ export default function UnitTypeForm() {
             details: values.description,
             features: values.features.map((item: any) => item._id),
             billingPeriod: values.billingPeriod._id,
-            property: property.data._id
+            property: property
         }
 
         console.log(data)
@@ -105,7 +106,7 @@ export default function UnitTypeForm() {
 
         // POST A PROPERTY
         try {
-            const res = await fetch('/api/unitType',{
+            const res = await fetch('/api/unitTypes',{
                 method: 'POST',
                 headers:{
                     'Content-Type':'application/json',
@@ -184,7 +185,7 @@ export default function UnitTypeForm() {
                         <FormLabel>Features</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
-                            options={features?.data}
+                            options={features?.data || []}
                             multiple
                             getOptionLabel={(option: any) => option.feature.name}
                             onChange={(event, value) => setValue("features", value)}
@@ -209,7 +210,7 @@ export default function UnitTypeForm() {
                         <FormLabel>Billing Period</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
-                            options={billingPeriods?.data}
+                            options={billingPeriods?.data  || []}
                             getOptionLabel={(option: any) => option.name}
                             onChange={(event, value) => setValue("billingPeriod", value)}
                             renderInput={(params) =>

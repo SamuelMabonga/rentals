@@ -8,6 +8,7 @@ import { useRouter } from "next/router"
 import fetchARental from "apis/fetchARental"
 import { BillsTable } from "Components/Properties/BillsTable"
 import { PaymentsTable } from "Components/Properties/PaymentsTable"
+import PaymentsForm from "Components/Properties/Forms/PaymentsForm"
 
 type PageProps = {
     // data: any;
@@ -148,12 +149,7 @@ export default function Property({
                 </Box>
                 <TableSwitch activeTab={activeTab} />
             </Box>
-            {/* <FeaturesForm />
-            <BillingPeriodsForm />
-            <UnitTypeForm />
-            <PropertyFeatureForm />
-            <UnitForm />
-            <BookingForm /> */}
+            <PaymentsForm />
         </>
     )
 }

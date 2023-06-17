@@ -8,10 +8,12 @@ import { TableRenderer } from 'Components/TableRenderer';
 import { useQuery } from '@tanstack/react-query';
 import fetchUnitTypes from 'apis/fetchUnitTypes';
 import { useSession } from 'next-auth/react';
+import fetchPropertyUnitTypes from 'apis/property/fetchPropertyUnitTypes';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: string;
 }
 
 type Item = {
@@ -24,12 +26,12 @@ type Item = {
     actions: any;
 }
 
-export const UnitTypesTable = <T extends object>({ }: ReactTableProps<T>) => {
+export const UnitTypesTable = <T extends object>({ property }: ReactTableProps<T>) => {
     const [openForm, setOpenForm] = useState(false)
 
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-unitTypes', property], queryFn: () => fetchPropertyUnitTypes(session.accessToken, property) })
 
 
     const router = useRouter()

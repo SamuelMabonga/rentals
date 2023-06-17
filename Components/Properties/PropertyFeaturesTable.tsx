@@ -8,12 +8,14 @@ import { TableRenderer } from 'Components/TableRenderer';
 import { useQuery } from '@tanstack/react-query';
 import fetchFeatures from 'apis/fetchFeatures';
 import { useSession } from 'next-auth/react';
-import fetchPropertyFeatures from 'apis/fetchPropertyFeatures';
+// import fetchPropertyFeatures from 'apis/fetchPropertyFeatures';
 import { CollectionsContext } from 'context/context';
+import fetchPropertyFeatures from 'apis/property/fetchPropertyFeatures';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: string;
 }
 
 type Item = {
@@ -25,11 +27,11 @@ type Item = {
     actions: any;
 }
 
-export const PropertyFeaturesTable = <T extends object>({ }: ReactTableProps<T>) => {
+export const PropertyFeaturesTable = <T extends object>({ property }: ReactTableProps<T>) => {
     const {setPropertyFeatureToEdit, setOpenPropertyFeaturesForm}: any = useContext(CollectionsContext)
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-features'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-features', property], queryFn: () => fetchPropertyFeatures(session.accessToken, property) })
 
     console.log(data)
     const router = useRouter()

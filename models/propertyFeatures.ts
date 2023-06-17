@@ -11,7 +11,11 @@ const PropertyFeaturesSchema = new Schema({
   billingPeriod: {
     type: Schema.Types.ObjectId,
     ref: 'BillingPeriods',
-  }
+  },
+  property: {
+    type: Schema.Types.ObjectId,
+    ref: 'Property',
+  },
 }, {
   timestamps: true
 });
