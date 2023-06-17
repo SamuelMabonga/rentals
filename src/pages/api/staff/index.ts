@@ -30,7 +30,6 @@ export default async function handler(
   switch (method) {
     case "GET":
       if (id) {
-
         fetchSingleStaff(req, res);
       } else if (searchQuery) {
         searchStaff(req, res, searchQuery);

@@ -20,6 +20,25 @@ export async function fetchAllUsers(req: any, res: any) {
   }
 }
 
+export async function fetchVerifiedUsers(req: any, res: any) {
+  let verifiedStatus = req.query.verifiedStatus;
+  try {
+    let users = await User.find({ verified: verifiedStatus });
+    res.status(200).json({
+      success: true,
+      msg: "users fetched successfully",
+      data: users,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch  users",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
 //fetch User by id
 export async function fetchSingleUser(req: any, res: any) {
   try {
