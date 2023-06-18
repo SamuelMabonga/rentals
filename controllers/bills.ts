@@ -57,13 +57,19 @@ export async function createBill(req: any, res: any) {
         propertyFeature: additionalFeatures,
       });
       newBill = await bill.save();
+      console.log("newBill", newBill);
+      return res.json({
+        success: true,
+        msg: "New bill created",
+        data: newBill,
+      });
+    }else{
+      return res.json({
+        success: true,
+        msg: "No overdue bills",
+        data: newBill,
+      });
     }
-
-    return res.json({
-      success: true,
-      msg: "New bill created",
-      data: newBill,
-    });
   } catch (error: any) {
     console.log(error);
     return res.status(500).json({
