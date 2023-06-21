@@ -2,6 +2,7 @@ import Booking from "models/booking";
 import Tenant from "models/tenant";
 import Unit from "models/unit";
 import Fuse from "fuse.js";
+import { createBill } from "./bills";
 
 // get all bookings
 export async function fetchAllBookings(req: any, res: any) {
@@ -41,7 +42,7 @@ export async function fetchAllPropertyBookings(req: any, res: any) {
   }: any = req;
 
   try {
-    let bookings = await Booking.find({"unit.property._id": property})
+    let bookings = await Booking.find({ "unit.property._id": property })
       .populate({
         path: "unit",
         populate: [{ path: "unitType" }],
@@ -253,7 +254,7 @@ export async function searchBooking(req: any, res: any, searchQuery: string) {
 
 //accept a booking
 export async function acceptBooking(req: any, res: any) {
-  const { startDate, endDate, customRent, customBillingPeriod } = req.body;
+  const { id } = req.body;
   let additionalFeatures: any = [];
 
   function PopulateAdditionalFeatures(booking: any) {
@@ -267,7 +268,7 @@ export async function acceptBooking(req: any, res: any) {
     //UPDATE booking status to accepted
     // let booking = await Booking.findById(req.body.id);
     let booking = await Booking.findByIdAndUpdate(
-      req.body.id,
+      id,
       {
         status: "ACCEPTED",
       },
@@ -301,34 +302,22 @@ export async function acceptBooking(req: any, res: any) {
       (await new Tenant({
         user: booking?.user?._id,
         unit: booking?.unit?._id,
-        start_date: startDate,
-        end_date: endDate,
+        start_date: booking?.start_date,
+        end_date: booking?.end_date,
         additionalFeatures: PopulateAdditionalFeatures(booking),
-        customRent: customRent ?? null,
-        customBillingPeriod: customBillingPeriod,
+        customRent: booking?.customRent ?? null,
+        customBillingPeriod: booking?.customBillingPeriod,
         nextRentBilling: Date.now(),
-        status: "PENDING"
+        status: "PENDING",
       }));
 
-    const newTenant = await tenant.save();
-
-    //CREATE add tenant to unit
-    tenant &&
-      (await Unit.findByIdAndUpdate(
-        booking?.unit?._id,
-        { tenant: newTenant?._id, status: `${BOOKED_UNIT_STATUS}` },
-        {
-          new: true,
-        }
-      ));
-
-      //genrate bills
-      // Create bill 
-      
+    //genrate bills
+    // Create bill
+    createBill(req, res, tenant?._id, booking?.customRent);
 
     res.status(200).json({
       success: true,
-      msg: "booking updated successfully",
+      msg: "booking successfully accepted",
       data: booking,
     });
   } catch (error) {

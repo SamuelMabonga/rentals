@@ -130,10 +130,10 @@ export async function fetchSingleTenant(req: any, res: any) {
 //update a tenant
 export async function updateTenant(req: any, res: any) {
   try {
-    let tenant = await Tenant.findById(req.params.id);
+    let tenant: any = await Tenant?.findById(req.params.id);
 
     const data = {
-      name: req.body.name || tenant.name,
+      name: req.body.name || tenant?.name,
       image: req.body.image || tenant.image,
       unit: req.body.unit || tenant.unit,
       entry_date: req.body.entry_date || tenant.entry_date,
@@ -159,7 +159,7 @@ export async function updateTenant(req: any, res: any) {
 //delete a tenant
 export async function deleteTenant(req: any, res: any) {
   try {
-    let tenant = await Tenant.findById(req.params.id);
+    let tenant: any = await Tenant.findById(req.params.id);
 
     if (!tenant) {
       //   return next("tenant being deleted has not been found");

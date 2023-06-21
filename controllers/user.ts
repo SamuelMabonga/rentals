@@ -61,7 +61,7 @@ export async function fetchSingleUser(req: any, res: any) {
 //update a User
 export async function updateUser(req: any, res: any) {
   try {
-    let user = await User.findById(req.params.id);
+    let user:any = await User.findById(req.params.id);
 
     const data = {
       first_name: req.body.first_name || user.first_name,
@@ -90,7 +90,7 @@ export async function updateUser(req: any, res: any) {
 //delete a User
 export async function deleteUser(req: any, res: any) {
   try {
-    let user = await User.findById(req.params.id);
+    let user:any = await User.findById(req.params.id);
 
     if (!user) {
       //   return next("User being deleted has not been found");

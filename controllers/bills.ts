@@ -29,61 +29,99 @@ export async function fetchAllBills(req: any, res: any) {
 }
 
 // create a bill
-export async function createBill(req: any, res: any) {
+// used for generating intial bills and called under accept
+export async function createBill(
+  req: any,
+  res: any,
+  tenantId: any,
+  customRent: any
+) {
   try {
-    const { tenantId, rentAmount } = req.body;
+    // const { tenantId, customRent } = req.body;/
 
-    const tenant = await Tenant.findById(tenantId).populate(
-      "additionalFeatures"
-    );
+    const tenant = await Tenant.findById(tenantId)
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "billingPeriod" }],
+      })
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType", populate: [{ path: "billingPeriod" }] }],
+      })
+      .populate("customBillingPeriod");
 
     if (!tenant) {
       return res.status(404).json({ error: "Tenant not found" });
     }
 
-    const additionalFeatures: any = tenant.additionalFeatures.map(
-      (feature: any) => feature._id
-    ); // Extract the feature IDs from the populated additionalFeatures array
+    // const additionalFeatures: any = tenant.additionalFeatures.map(
+    //   (feature: any) => feature._id
+    // ); // Extract the feature IDs from the populated additionalFeatures array
 
     const currentDate = new Date();
     const payDate = new Date(tenant?.end_date);
 
     // Check if the tenant's end_date is past the current date
-    if (tenant.end_date < currentDate) {
-      
-      // Create a rent bill
-      const rentBill = new Bills({
-        startDate: tenant.start_date,
-        endDate: tenant.end_date,
-        tenant: tenantId,
-        type: "Rent", // Set the bill type as 'Rent'
-        propertyFeature: null, // No specific property feature for rent bill, so set it to null
-        amount: rentAmount, // TODO  ?? set default rent to unit type rent 
-        pay_by: payDate?.setDate(payDate.getDate() + 7),  // set dedault pay date to 7 days 
-      });
 
-      await rentBill.save();
-    }
+    // TODO: add try catch
+    // Create a rent bill
+try {
+  
+  const rentBill = new Bills({
+    startDate: tenant.start_date,
+    endDate: tenant?.customBillingPeriod?.time
+      ? moment(tenant?.start_date).add(
+          tenant?.customBillingPeriod?.time,
+          "ms"
+        )
+      : moment(tenant?.start_date).add(
+          tenant?.unit?.unitType?.billingPeriod?.time,
+          "ms"
+        ),
+    tenant: tenantId,
+    type: "Rent", // Set the bill type as 'Rent'
+    propertyFeature: null, // No specific property feature for rent bill, so set it to null
+    amount: customRent ?? tenant?.unit?.unitType?.price,
+    pay_by: tenant?.customBillingPeriod?.time
+      ? moment(tenant?.start_date).add(
+          tenant?.customBillingPeriod?.time + 604800000,
+          "ms"
+        )
+      : moment(tenant?.start_date).add(
+          tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+          "ms"
+        ), // set dedault pay date to 7 days
+  });
+
+  await rentBill.save();
+} catch (error) {
+  console.log("BILLING ERROR MESSAGE", error)
+}
 
     // Iterate through each additional feature ID
-    for (const featureId of additionalFeatures) {
-      const propertyFeature = await PropertyFeatures.findById(featureId); // Fetch the property feature information based on the ID
-
-      if (!propertyFeature) {
-        console.log(`Property feature ID ${featureId} does not exist`);
-        // Handle the case when the property feature ID doesn't exist
-        continue; // Move to the next iteration
-      }
+    for (const feature of tenant?.additionalFeatures) {
+      // const propertyFeature = await PropertyFeatures.findById(featureId); // Fetch the property feature information based on the ID
 
       // Create a new bill for each feature
       const bill = new Bills({
         startDate: tenant.start_date,
-        endDate: tenant.end_date,
+        endDate: moment(tenant?.start_date).add(
+          tenant?.unit?.unitType?.billingPeriod?.time,
+          "ms"
+        ),
         tenant: tenantId,
         type: "Feature", // set bill type to 'Feature'
-        propertyFeature: featureId,
-        amount: propertyFeature.price, // Set the bill amount as the price from the property feature
-        pay_by: payDate?.setDate(payDate.getDate() + 7),  // set dedault pay date to 7 days 
+        propertyFeature: feature?._id,
+        amount: feature?.price, // Set the bill amount as the price from the property feature
+        pay_by: tenant?.customBillingPeriod?.time
+          ? moment(tenant?.start_date).add(
+              tenant?.customBillingPeriod?.time + 604800000,
+              "ms"
+            )
+          : moment(tenant?.start_date).add(
+              tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+              "ms"
+            ), // set dedault pay date to 7 days
       });
 
       await bill.save();
