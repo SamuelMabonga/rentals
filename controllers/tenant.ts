@@ -22,7 +22,9 @@ export async function fetchAllTenants(req: any, res: any) {
 // get user's tenancies
 export async function fetchAllUserTenancies(req: any, res: any, id: string) {
   try {
-    let tenants = await Tenant.find({user: id}).populate("user").populate("unit");
+    let tenants = await Tenant.find({ user: id })
+      .populate("user")
+      .populate("unit");
     res.status(200).json({
       success: true,
       msg: "User's tenancies fetched successfully",
@@ -38,7 +40,6 @@ export async function fetchAllUserTenancies(req: any, res: any, id: string) {
   }
 }
 
-
 // get property's tenants
 export async function fetchAllPropertyTenants(req: any, res: any) {
   const {
@@ -46,7 +47,12 @@ export async function fetchAllPropertyTenants(req: any, res: any) {
   }: any = req;
 
   try {
-    let tenants = await Tenant.find({"unit.property._id": property}).populate("user").populate({path: "unit", populate: [{ path: "tenant" }, { path: "property" }],});
+    let tenants = await Tenant.find({ "unit.property._id": property })
+      .populate("user")
+      .populate({
+        path: "unit",
+        populate: [{ path: "tenant" }, { path: "property" }],
+      });
     res.status(200).json({
       success: true,
       msg: "Property's tenants fetched successfully",
@@ -65,23 +71,24 @@ export async function fetchAllPropertyTenants(req: any, res: any) {
 // create a tenant
 export async function createTenant(req: any, res: any) {
   try {
-    const requiredFields = ["name"];
+    // const requiredFields = ["name"];
 
-    const includesAllFields = requiredFields.every((field) => {
-      return !!req.body[field];
-    });
-    console.log("required fields is", includesAllFields);
+    // const includesAllFields = requiredFields.every((field) => {
+    //   return !!req.body[field];
+    // });
+    // console.log("required fields is", includesAllFields);
 
-    if (!includesAllFields) {
-      return res.status(400).json({
-        success: false,
-        msg: "Please supply all required fields",
-        requiredFields,
-      });
-    }
+    // if (!includesAllFields) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     msg: "Please supply all required fields",
+    //     requiredFields,
+    //   });
+    // }
 
     const tenant = new Tenant({
       ...req.body,
+      status: "PENDING",
     });
 
     const newTenant = await tenant.save();
@@ -89,7 +96,7 @@ export async function createTenant(req: any, res: any) {
     return res.json({
       success: true,
       msg: "New tenant created",
-      data: newTenant
+      data: newTenant,
     });
   } catch (error: any) {
     console.log(error);
@@ -103,7 +110,9 @@ export async function createTenant(req: any, res: any) {
 //fetch tenant by id
 export async function fetchSingleTenant(req: any, res: any) {
   try {
-    let tenant = await Tenant.findById(req.query.id).populate("user").populate({path: "unit", populate: [{ path: "property" }],});
+    let tenant = await Tenant.findById(req.query.id)
+      .populate("user")
+      .populate({ path: "unit", populate: [{ path: "property" }] });
     res.status(200).json({
       success: true,
       msg: "tenant fetched successfully",

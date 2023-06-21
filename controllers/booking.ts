@@ -307,6 +307,7 @@ export async function acceptBooking(req: any, res: any) {
         customRent: customRent ?? null,
         customBillingPeriod: customBillingPeriod,
         nextRentBilling: Date.now(),
+        status: "PENDING"
       }));
 
     const newTenant = await tenant.save();
@@ -320,6 +321,10 @@ export async function acceptBooking(req: any, res: any) {
           new: true,
         }
       ));
+
+      //genrate bills
+      // Create bill 
+      
 
     res.status(200).json({
       success: true,

@@ -4,17 +4,14 @@ import Unit from "models/unit";
 import Fuse from "fuse.js";
 import Bills from "models/bills";
 import moment from "moment";
+import PropertyFeatures from "models/propertyFeatures";
 
 // get all bills
 export async function fetchAllBills(req: any, res: any) {
   try {
-    let bills = await Bills.find()
-      .populate({
-        path: "tenant",
-      })
-      .populate({
-        path: "propertyFeatures",
-      });
+    let bills = await Bills.find().populate({
+      path: "tenant",
+    });
 
     res.json({
       success: true,
@@ -34,43 +31,69 @@ export async function fetchAllBills(req: any, res: any) {
 // create a bill
 export async function createBill(req: any, res: any) {
   try {
-    let tenantId = req.body.tenantId;
+    const { tenantId, rentAmount } = req.body;
 
-    let tenant = await Tenant.findById(tenantId)
-      .populate("user")
-      .populate({ path: "unit", populate: [{ path: "property" }] });
+    const tenant = await Tenant.findById(tenantId).populate(
+      "additionalFeatures"
+    );
 
-    const { _id, end_date, start_date, customRent, additionalFeatures } =
-      tenant && tenant;
-    let endDate = tenant && tenant?.end_date;
-    let currentDate = moment();
-    let bill;
-    let newBill;
-
-    if (moment(endDate).isAfter(currentDate)) {
-      bill = new Bills({
-        amount: customRent,
-        startDate: start_date,
-        endDate: end_date,
-        tenant: _id,
-        type: "rent",
-        propertyFeature: additionalFeatures,
-      });
-      newBill = await bill.save();
+    if (!tenant) {
+      return res.status(404).json({ error: "Tenant not found" });
     }
 
-    return res.json({
-      success: true,
-      msg: "New bill created",
-      data: newBill,
-    });
-  } catch (error: any) {
-    console.log(error);
-    return res.status(500).json({
-      msg: error.message,
-      success: false,
-      error,
-    });
+    const additionalFeatures: any = tenant.additionalFeatures.map(
+      (feature: any) => feature._id
+    ); // Extract the feature IDs from the populated additionalFeatures array
+
+    const currentDate = new Date();
+    const payDate = new Date(tenant?.end_date);
+
+    // Check if the tenant's end_date is past the current date
+    if (tenant.end_date < currentDate) {
+      
+      // Create a rent bill
+      const rentBill = new Bills({
+        startDate: tenant.start_date,
+        endDate: tenant.end_date,
+        tenant: tenantId,
+        type: "Rent", // Set the bill type as 'Rent'
+        propertyFeature: null, // No specific property feature for rent bill, so set it to null
+        amount: rentAmount, // TODO  ?? set default rent to unit type rent 
+        pay_by: payDate?.setDate(payDate.getDate() + 7),  // set dedault pay date to 7 days 
+      });
+
+      await rentBill.save();
+    }
+
+    // Iterate through each additional feature ID
+    for (const featureId of additionalFeatures) {
+      const propertyFeature = await PropertyFeatures.findById(featureId); // Fetch the property feature information based on the ID
+
+      if (!propertyFeature) {
+        console.log(`Property feature ID ${featureId} does not exist`);
+        // Handle the case when the property feature ID doesn't exist
+        continue; // Move to the next iteration
+      }
+
+      // Create a new bill for each feature
+      const bill = new Bills({
+        startDate: tenant.start_date,
+        endDate: tenant.end_date,
+        tenant: tenantId,
+        type: "Feature", // set bill type to 'Feature'
+        propertyFeature: featureId,
+        amount: propertyFeature.price, // Set the bill amount as the price from the property feature
+        pay_by: payDate?.setDate(payDate.getDate() + 7),  // set dedault pay date to 7 days 
+      });
+
+      await bill.save();
+    }
+
+    // Return a success response
+    res.status(200).json({ message: "Bills created successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
   }
 }
 
