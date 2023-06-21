@@ -20,7 +20,7 @@ const formSchema = yup.object().shape({
     // description: yup.string().required("Description is required"),
 })
 
-export default function UnitForm() {
+export default function UnitForm({property, unitTypes}: any) {
     // CONTEXT
     const {
         openUnitForm: open,
@@ -35,8 +35,8 @@ export default function UnitForm() {
 
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
-    const { data: unitTypes }: any = useQuery({ queryKey: ['unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
+    // const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
+    // const { data: unitTypes }: any = useQuery({ queryKey: ['unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -68,12 +68,8 @@ export default function UnitForm() {
         const data = {
             name: values.name,
             unitType: values.unitType._id,
-            property: property.data._id
+            property: property
         }
-
-        console.log(data)
-
-
 
         // // EDIT A PROPERTY
         // if (toEdit?.name) {
@@ -173,7 +169,7 @@ export default function UnitForm() {
                         <FormLabel>Unit Type</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
-                            options={unitTypes?.data}
+                            options={unitTypes?.data || []}
                             getOptionLabel={(option: any) => option.name}
                             onChange={(event, value) => setValue("unitType", value)}
                             renderInput={(params) =>

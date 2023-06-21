@@ -1,5 +1,4 @@
 import { Avatar, Box, Button, IconButton, Tab, Tabs, TextField, Typography } from "@mui/material"
-import DashboardLayout from "Components/Dashboard/DashboardLayout"
 import React, { useContext, useState } from "react"
 import Image from "next/image"
 import { UnitsTable } from "Components/Properties/UnitsTable"
@@ -7,29 +6,21 @@ import { TenantsTable } from "Components/Properties/TenantsTable"
 import { BookingsTable } from "Components/Properties/Bookings"
 import { StaffTable } from "Components/Properties/StaffTable"
 import { UnitTypesTable } from "Components/Properties/UnitTypesTable"
-import { FeaturesTable } from "Components/Properties/FeaturesTable"
 import { TicketsTable } from "Components/Properties/TicketsTable"
 import { CollectionsContext } from "context/context"
 import { GetServerSideProps, InferGetServerSidePropsType } from "next"
 import { getSession, useSession } from "next-auth/react"
-import FeaturesForm from "Components/Properties/Forms/FeaturesForm"
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
 import fetchAProperty from "apis/fetchAProperty"
 import { useRouter } from "next/router"
-import fetchFeatures from "apis/fetchFeatures"
-import { BillingPeriodsTable } from "Components/Properties/BillingPeriodsTable"
-import BillingPeriodsForm from "Components/Properties/Forms/BillingPeriodsForm"
 import fetchBillingPeriods from "apis/fetchBillingPeriods"
 import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
-import fetchUnitTypes from "apis/fetchUnitTypes"
 import PropertyFeatureForm from "Components/Properties/Forms/PropertyFeatureForm"
 import { PropertyFeaturesTable } from "Components/Properties/PropertyFeaturesTable"
-import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
 import UnitForm from "Components/Properties/Forms/UnitForm"
-import fetchUnits from "apis/fetchUnits"
 import BookingForm from "Components/Properties/Forms/BookingForm"
-import fetchBookings from "apis/fetchBookings"
-import fetchTenants from "apis/fetchTenants"
+import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
+import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 
 type PageProps = {
     // data: any;
@@ -50,13 +41,13 @@ function TableSwitch({ activeTab, property }: any) {
             return <StaffTable />
 
         case "unitTypes":
-            return <UnitTypesTable />
+            return <UnitTypesTable property={property} />
 
         case "tickets":
             return <TicketsTable />
 
         case "propertyFeatures":
-            return <PropertyFeaturesTable />
+            return <PropertyFeaturesTable property={property} />
 
         default:
             return <></>
@@ -99,7 +90,12 @@ export default function Property({
     const router = useRouter()
     const { id }: any = router.query
 
+    const property = id
+
     const { data }: any = useQuery({ queryKey: ['property', id], queryFn: () => fetchAProperty(session.accessToken, id) })
+    const { data: features }: any = useQuery({ queryKey: ['property-features', id], queryFn: () => fetchPropertyFeatures(session.accessToken, property) })
+    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
+    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', id], queryFn: () => fetchPropertyUnitTypes(session.accessToken, property) })
 
     console.log(data)
 
@@ -218,12 +214,12 @@ export default function Property({
                 </Box>
                 <TableSwitch activeTab={activeTab} property={_id} />
             </Box>
-            <FeaturesForm />
-            <BillingPeriodsForm />
-            <UnitTypeForm />
-            <PropertyFeatureForm />
-            <UnitForm />
-            <BookingForm />
+            {/* <FeaturesForm />
+            <BillingPeriodsForm /> */}
+            <UnitTypeForm property={_id} features={features} billingPeriods={billingPeriods} />
+            <PropertyFeatureForm property={_id} />
+            <UnitForm property={_id} unitTypes={unitTypes} />
+            <BookingForm property={_id} unitTypes={unitTypes} features={features} />
         </>
     )
 }

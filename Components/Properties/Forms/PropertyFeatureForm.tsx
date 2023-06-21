@@ -15,7 +15,7 @@ const formSchema = yup.object().shape({
     // price: yup.string().required("Price is required"),
 })
 
-export default function PropertyFeatureForm() {
+export default function PropertyFeatureForm({property}: any) {
     // CONTEXT
     const {
         openPropertyFeaturesForm: open,
@@ -69,7 +69,8 @@ export default function PropertyFeatureForm() {
         const data = {
             feature: values.feature._id,
             price: values.price,
-            billingPeriod: values.billingPeriod._id
+            billingPeriod: values.billingPeriod._id,
+            property: property
         }
 
 
@@ -120,7 +121,8 @@ export default function PropertyFeatureForm() {
             const res = await fetch('/api/propertyFeatures', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.data.accessToken}`,
                 },
                 body: JSON.stringify({ ...data })
             })

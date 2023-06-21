@@ -73,7 +73,11 @@ const formSchema = yup.object().shape({
     endDate: yup.string().required("Required")
 })
 
-export default function BookingForm() {
+export default function BookingForm({
+    property,
+    unitTypes,
+    features
+}: any) {
     // CONTEXT
     const {
         openBookingForm: open,
@@ -84,10 +88,6 @@ export default function BookingForm() {
 
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
-
-    // fetch data
-    const { data: unitTypes }: any = useQuery({ queryKey: ['unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
-    const { data: features }: any = useQuery({ queryKey: ['propertyFeatures'], queryFn: () => fetchPropertyFeatures(session.accessToken) })
 
     const session: any = useSession()
 

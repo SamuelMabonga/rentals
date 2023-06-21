@@ -45,7 +45,7 @@ export async function fetchUnitTypesByUnit(req: any, res: any) {
 
 // get all unit_types by unit
 export async function fetchPropertyUnitTypes(req: any, res: any) {
-  let propertyId = req.query.propertyId;
+  let propertyId = req.query.id;
   try {
     let unit_types = await UnitType.find({ property: propertyId })
       .populate("billingPeriod")

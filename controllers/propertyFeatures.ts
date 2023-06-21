@@ -65,6 +65,33 @@ export async function fetchAllPropertyFeaturesByFeature(req: any, res: any) {
 }
 
 //fetch property feature by billing periods
+export async function fetchAllPropertyFeaturesByProperty(
+  req: any,
+  res: any
+) {
+  let property = req.query.id;
+  try {
+    let propertyFeature = await PropertyFeatures.find({
+      property: property,
+    })
+      .populate({ path: "feature" })
+      .populate({ path: "billingPeriod" });
+    res.status(200).json({
+      success: true,
+      msg: "Property features fetched successfully",
+      data: propertyFeature,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch property features",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+//fetch property feature by billing periods
 export async function fetchAllPropertyFeaturesByBillingPeriods(
   req: any,
   res: any
@@ -119,10 +146,10 @@ export async function createPropertyFeature(req: any, res: any) {
       success: true,
       msg: "New property feature created",
       _id: newPropertyFeature?._id,
-      name: newPropertyFeature?.name,
-      image: newPropertyFeature?.image,
-      rate: newPropertyFeature?.rate,
-      price: newPropertyFeature?.price,
+      // name: newPropertyFeature?.name,
+      // image: newPropertyFeature?.image,
+      // rate: newPropertyFeature?.rate,
+      // price: newPropertyFeature?.price,
     });
   } catch (error: any) {
     console.log(error);
