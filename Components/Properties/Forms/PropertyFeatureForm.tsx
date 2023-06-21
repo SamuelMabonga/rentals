@@ -44,10 +44,7 @@ export default function PropertyFeatureForm({property}: any) {
         resolver: yupResolver(formSchema),
     });
 
-    console.log("To Edit", toEdit)
-
     useEffect(() => {
-        console.log(toEdit)
         if (toEdit?.feature) {
             setValue("feature", toEdit.feature)
             setValue("price", toEdit.price)
@@ -91,8 +88,8 @@ export default function PropertyFeatureForm({property}: any) {
                     },
                     body: JSON.stringify({ ...edited })
                 })
-                const response = await res.json();
-                console.log(response)
+                await res.json();
+
                 setIsLoading(false)
                 setToEdit({})
                 reset()
@@ -111,7 +108,7 @@ export default function PropertyFeatureForm({property}: any) {
                 return
             } catch (error) {
                 setIsLoading(false)
-                console.log(error)
+                alert("Error")
                 return
             }
         }
@@ -126,8 +123,8 @@ export default function PropertyFeatureForm({property}: any) {
                 },
                 body: JSON.stringify({ ...data })
             })
-            const response = await res.json();
-            console.log(response)
+            await res.json();
+
             setIsLoading(false)
             setIsOpen(false)
             setSnackbarMessage({
@@ -143,7 +140,7 @@ export default function PropertyFeatureForm({property}: any) {
             })
         } catch (error) {
             setIsLoading(false)
-            console.log(error)
+            alert("Error")
         }
     }
 

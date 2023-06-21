@@ -97,8 +97,6 @@ export default function Property({
     const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
     const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', id], queryFn: () => fetchPropertyUnitTypes(session.accessToken, property) })
 
-    console.log(data)
-
     const {
         _id,
         name,

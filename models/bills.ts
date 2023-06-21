@@ -13,10 +13,16 @@ const BillsShema = new Schema({
   },
   type: {
     type: String, // Rent / Feature
+    default: "RENT",
+    enum: [
+      "RENT",
+      "FEATURE",
+    ]
   },
   propertyFeature: {
     type: Schema.Types.ObjectId,
     ref: 'PropertyFeatures',
+    default: null
   },
   amount: {
     type: String

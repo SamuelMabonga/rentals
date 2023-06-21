@@ -74,6 +74,79 @@ export async function createBill(req: any, res: any) {
   }
 }
 
+// create a bill
+export async function createBills(req: any, res: any) {
+  try {
+
+    let tenants = await Tenant.find()
+      .populate("user")
+      .populate("customBillingPeriod")
+      .populate({path: "additionalFeatures", populate: [{path: "billingPeriod"}]})
+      .populate({ path: "unit", populate: [{ path: "unitType", populate: [{path: "billingPeriod"}] }] })
+
+    for (const tenant of tenants) {
+      const {
+        _id,
+        customRent,
+        additionalFeatures,
+        unit,
+        customBillingPeriod,
+      } = tenant && tenant;
+
+      try {
+        let latestRent: any = await Bills.find({tenant: _id, type: "RENT"}).sort({createdAt: -1}).limit(1)
+
+        if (moment().isAfter(latestRent.endDate)) {
+          let newRent = new Bills({
+            amount: !customRent ? unit.unitType.price : customRent,
+            startDate: moment(),
+            endDate: !customBillingPeriod ? moment(unit.unitType.billingPeriod.time, "ms").add() : moment().add(customBillingPeriod.time, "ms"),
+            tenant: _id,
+            type: "RENT",
+          });
+
+          await newRent.save();
+        }
+      } catch (error) {
+        console.log("Failed to create rent bill")
+        console.log(error)
+      }
+
+
+      for (const feature of additionalFeatures) {
+        try {
+          let latestBill: any = await Bills.find({tenant: _id, type: "FEATURE", propertyFeature: feature._id}).sort({createdAt: -1}).limit(1)
+
+          if (moment().isAfter(latestBill.endDate)) {
+            let newBill = new Bills({
+              amount: feature.price,
+              startDate: moment(),
+              endDate: moment().add(feature.billingPeriod.time, "ms"),
+              tenant: _id,
+              type: "FEATURE",
+              propertyFeature: feature._id,
+            });
+  
+            await newBill.save();
+          }
+
+        } catch(error) {
+          console.log(error)
+        }
+      }
+
+    }
+
+  } catch (error: any) {
+    console.log(error);
+    return res.status(500).json({
+      msg: error.message,
+      success: false,
+      error,
+    });
+  }
+}
+
 //fetch bill by id
 export async function fetchSinglebill(req: any, res: any) {
   try {

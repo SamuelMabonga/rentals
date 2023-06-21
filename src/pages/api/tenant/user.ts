@@ -26,8 +26,6 @@ export default async function handler(
     query: { id: query, searchQuery },
   }: any = req;
 
-  console.log("QUERRY--", query )
-
   //type of request
   const { method } = req;
   switch (method) {

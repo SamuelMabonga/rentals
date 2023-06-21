@@ -1,13 +1,15 @@
 import { Schema, model, models } from "mongoose";
+import User from "./user";
+import Unit from "./unit";
 
-const TenantSchema = new Schema({
+const TenantSchema: any = new Schema({
   user: {
     type: Schema.Types.ObjectId,
-    ref: "User"
+    ref: User
   },
   unit: {
     type: Schema.Types.ObjectId,
-    ref: "Unit"
+    ref: Unit
   },
   start_date: {
     type: Date,

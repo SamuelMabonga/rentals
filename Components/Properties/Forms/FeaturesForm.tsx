@@ -91,7 +91,8 @@ export default function FeaturesForm() {
             const res = await fetch('/api/feature', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.data.accessToken}`,
                 },
                 body: JSON.stringify({ ...data })
             })

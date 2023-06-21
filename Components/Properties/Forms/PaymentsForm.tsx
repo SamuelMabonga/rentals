@@ -43,8 +43,8 @@ export default function PaymentsForm({ property }: any) {
 
     return (
         <Dialog
-            // open={open}
-            open={true}
+            open={open}
+            // open={true}
             fullWidth
             maxWidth="sm"
         >

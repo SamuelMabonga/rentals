@@ -46,7 +46,7 @@ export default function Rentals({
                 />
                 <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setShowPropertyForm(true)}>Create New</Button>
             </Box>
-            <RentalsTable data={data.data} />
+            <RentalsTable data={data?.data} />
             <PropertyForm />
         </>
     )

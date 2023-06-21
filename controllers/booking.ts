@@ -1,7 +1,9 @@
 import Booking from "models/booking";
 import Tenant from "models/tenant";
 import Unit from "models/unit";
+import Bills from "models/bills";
 import Fuse from "fuse.js";
+import moment from "moment";
 
 // get all bookings
 export async function fetchAllBookings(req: any, res: any) {
@@ -306,10 +308,11 @@ export async function acceptBooking(req: any, res: any) {
         additionalFeatures: PopulateAdditionalFeatures(booking),
         customRent: customRent ?? null,
         customBillingPeriod: customBillingPeriod,
-        nextRentBilling: Date.now(),
+        nextRentBilling: !customBillingPeriod ? moment().add() : moment().add(),
       }));
 
     const newTenant = await tenant.save();
+
 
     //CREATE add tenant to unit
     tenant &&

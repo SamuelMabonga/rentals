@@ -5,6 +5,9 @@ const BillingPeriodsSchema = new Schema({
         required: true,
         type: String,
     },
+    time: {
+        type: Number
+    }
 }, {
     timestamps: true
 });

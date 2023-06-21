@@ -22,7 +22,7 @@ export async function fetchAllTenants(req: any, res: any) {
 // get user's tenancies
 export async function fetchAllUserTenancies(req: any, res: any, id: string) {
   try {
-    let tenants = await Tenant.find({user: id}).populate("user").populate("unit");
+    let tenants = await Tenant.find({user: id}).populate("user").populate({path: "unit", populate: [{path: "unitType"}]});
     res.status(200).json({
       success: true,
       msg: "User's tenancies fetched successfully",

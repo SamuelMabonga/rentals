@@ -51,10 +51,10 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
   try {
     let units = await Unit.find()
       .populate({ path: "unitType" })
-      .populate({
-        path: "tenant",
-        populate: [{ path: "user" }],
-      })
+      // .populate({
+      //   path: "tenant",
+      //   populate: [{ path: "user" }],
+      // })
       
     res.status(200).json({
       success: true,

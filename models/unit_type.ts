@@ -13,7 +13,8 @@ const UnitTypeShema = new Schema(
       type: String,
     },
     billingPeriod: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "BillingPeriods",
     },
     units: [
       {
