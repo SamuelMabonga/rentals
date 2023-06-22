@@ -11,10 +11,10 @@ const TenantSchema: any = new Schema({
     type: Schema.Types.ObjectId,
     ref: Unit
   },
-  start_date: {
+  startDate: {
     type: Date,
   },
-  end_date: {
+  endDate: {
     type: Date,
   },
   additionalFeatures: [

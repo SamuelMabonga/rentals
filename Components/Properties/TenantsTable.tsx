@@ -61,12 +61,12 @@ export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>)
             {
                 header: 'Entry Date',
                 cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
-                accessorKey: 'start_date',
+                accessorKey: 'startDate',
             },
             {
                 header: 'End Date',
                 cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
-                accessorKey: 'end_date',
+                accessorKey: 'endDate',
             },
             {
                 header: 'Actions',

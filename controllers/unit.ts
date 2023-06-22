@@ -72,7 +72,6 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
       msg: "Failed to fetch property units",
       data: error,
     });
-    console.log(error);
   }
 }
 

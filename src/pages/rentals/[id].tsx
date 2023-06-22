@@ -6,9 +6,9 @@ import { getSession, useSession } from "next-auth/react"
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
 import { useRouter } from "next/router"
 import fetchARental from "apis/fetchARental"
-import { BillsTable } from "Components/Properties/BillsTable"
 import { PaymentsTable } from "Components/Properties/PaymentsTable"
 import PaymentsForm from "Components/Properties/Forms/PaymentsForm"
+import { BillsTable } from "Components/Tenants/BillsTable"
 
 type PageProps = {
     // data: any;
@@ -36,10 +36,10 @@ function DetailsCard() {
     )
 }
 
-function TableSwitch({ activeTab }: any) {
+function TableSwitch({ activeTab, tenant }: any) {
     switch (activeTab) {
         case "bills":
-            return <BillsTable />
+            return <BillsTable tenant={tenant} />
 
         case "payments":
             return <PaymentsTable />
@@ -76,6 +76,8 @@ export default function Property({
     const { id }: any = router.query
 
     const { data }: any = useQuery({ queryKey: ['rental'], queryFn: () => fetchARental(session.accessToken, id) })
+
+    console.log("TENANT DATA", data)
 
     const {
         unit
@@ -147,7 +149,7 @@ export default function Property({
                         Create New
                     </Button>
                 </Box>
-                <TableSwitch activeTab={activeTab} />
+                <TableSwitch activeTab={activeTab} tenant={data?.data?._id} />
             </Box>
             <PaymentsForm />
         </>

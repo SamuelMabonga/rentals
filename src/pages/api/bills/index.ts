@@ -42,9 +42,9 @@ export default async function handler(
               fetchAllBills(req, res);
             }
             break;
-          case "POST":
-            createBill(req, res);
-            break;
+          // case "POST":
+          //   createBill(req, res);
+          //   break;
           case "PUT":
             updatebill(req, res);
             break;
