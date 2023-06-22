@@ -1,9 +1,10 @@
 import { Schema, model, models } from "mongoose";
 
-const BillingPeriodsSchema = new Schema({
+const BillingPeriodsSchema = new Schema(
+  {
     name: {
-        required: true,
-        type: String,
+      required: true,
+      type: String,
     },
     time: {
         type: Number
@@ -12,6 +13,7 @@ const BillingPeriodsSchema = new Schema({
     timestamps: true
 });
 
-const BillingPeriods = models.BillingPeriods || model("BillingPeriods", BillingPeriodsSchema);
+const BillingPeriods =
+  models.BillingPeriods || model("BillingPeriods", BillingPeriodsSchema);
 
 export default BillingPeriods;

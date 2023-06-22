@@ -1,8 +1,9 @@
 import Booking from "models/booking";
 import Tenant from "models/tenant";
 import Unit from "models/unit";
-import Bills from "models/bills";
 import Fuse from "fuse.js";
+import { createBill } from "./bills";
+import Bills from "models/bills";
 import moment from "moment";
 
 // get all bookings
@@ -43,7 +44,7 @@ export async function fetchAllPropertyBookings(req: any, res: any) {
   }: any = req;
 
   try {
-    let bookings = await Booking.find({"unit.property._id": property})
+    let bookings = await Booking.find({ "unit.property._id": property })
       .populate({
         path: "unit",
         populate: [{ path: "unitType" }],
@@ -255,7 +256,7 @@ export async function searchBooking(req: any, res: any, searchQuery: string) {
 
 //accept a booking
 export async function acceptBooking(req: any, res: any) {
-  const { startDate, endDate, customRent, customBillingPeriod } = req.body;
+  const { id } = req.body;
   let additionalFeatures: any = [];
 
   function PopulateAdditionalFeatures(booking: any) {
@@ -269,7 +270,7 @@ export async function acceptBooking(req: any, res: any) {
     //UPDATE booking status to accepted
     // let booking = await Booking.findById(req.body.id);
     let booking = await Booking.findByIdAndUpdate(
-      req.body.id,
+      id,
       {
         status: "ACCEPTED",
       },
@@ -279,7 +280,7 @@ export async function acceptBooking(req: any, res: any) {
     )
       .populate({
         path: "unit",
-        populate: [{ path: "unitType" }],
+        populate: [{ path: "unitType", populate: [{ path: "billingPeriod" }] }],
       })
       .populate({
         path: "user",
@@ -297,36 +298,122 @@ export async function acceptBooking(req: any, res: any) {
       });
     }
 
-    //CREATE a new tenant
-    const tenant =
-      booking &&
-      (await new Tenant({
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        msg: "Booking not found",
+      });
+    }
+
+    try {
+      //CREATE a new tenant
+      const tenantObj = new Tenant({
         user: booking?.user?._id,
         unit: booking?.unit?._id,
-        start_date: startDate,
-        end_date: endDate,
+        start_date: booking?.start_date,
+        end_date: booking?.end_date,
         additionalFeatures: PopulateAdditionalFeatures(booking),
-        customRent: customRent ?? null,
-        customBillingPeriod: customBillingPeriod,
-        nextRentBilling: !customBillingPeriod ? moment().add() : moment().add(),
-      }));
+        customRent: booking?.customRent ?? null,
+        customBillingPeriod: booking?.customBillingPeriod,
+        nextRentBilling: Date.now(),
+        status: "PENDING",
+      });
 
-    const newTenant = await tenant.save();
+      const newTenant = await tenantObj.save();
+
+      //genrate bills
+      // Create bill 
+      if (!newTenant._id) {
+        return res.status(404).json({ error: "Tenant not created" });
+      }
+
+      // Create a rent bill
+      try {
+        const tenant = await Tenant.findById(newTenant._id)
+          .populate({
+            path: "additionalFeatures",
+            populate: [{ path: "billingPeriod" }],
+          })
+          .populate({
+            path: "unit",
+            populate: [{ path: "unitType", populate: [{ path: "billingPeriod" }] }],
+          })
+          .populate("customBillingPeriod")
+
+        const rentBill = new Bills({
+          startDate: tenant.start_date,
+          endDate: tenant?.customBillingPeriod?.time
+            ? moment(tenant?.start_date).add(
+              tenant?.customBillingPeriod?.time,
+              "ms"
+            )
+            : moment(tenant?.start_date).add(
+              tenant?.unit?.unitType?.billingPeriod?.time,
+              "ms"
+            ),
+          tenant: tenant._id,
+          type: "Rent", // Set the bill type as 'Rent'
+          propertyFeature: null, // No specific property feature for rent bill, so set it to null
+          amount: tenant?.unit?.unitType?.price,
+          pay_by: tenant?.customBillingPeriod?.time
+            ? moment(tenant?.start_date).add(
+              tenant?.customBillingPeriod?.time + 604800000,
+              "ms"
+            )
+            : moment(tenant?.start_date).add(
+              tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+              "ms"
+            ), // set dedault pay date to 7 days
+        });
+
+        await rentBill.save();
 
 
-    //CREATE add tenant to unit
-    tenant &&
-      (await Unit.findByIdAndUpdate(
-        booking?.unit?._id,
-        { tenant: newTenant?._id, status: `${BOOKED_UNIT_STATUS}` },
-        {
-          new: true,
+        // Iterate through each additional feature ID
+        for (const feature of tenant?.additionalFeatures) {
+
+          // Create a new bill for each feature
+          const bill = new Bills({
+            startDate: tenant.start_date,
+            endDate: moment(tenant?.start_date).add(
+              tenant?.unit?.unitType?.billingPeriod?.time,
+              "ms"
+            ),
+            tenant: tenant._id,
+            type: "Feature", // set bill type to 'Feature'
+            propertyFeature: feature?._id,
+            amount: feature?.price, // Set the bill amount as the price from the property feature
+            pay_by: tenant?.customBillingPeriod?.time
+              ? moment(tenant?.start_date).add(
+                tenant?.customBillingPeriod?.time + 604800000,
+                "ms"
+              )
+              : moment(tenant?.start_date).add(
+                tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+                "ms"
+              ), // set dedault pay date to 7 days
+          });
+
+          await bill.save();
         }
-      ));
+      } catch (error) {
+        console.log("CREATE RENT ERROR", error);
+        return res.status(400).json({ error: "Failed to create rent bill" });
+      }
+
+
+      // Return a success response
+      res.status(200).json({ message: "Bills created successfully" });
+
+    } catch (error) {
+      console.log(error)
+      res.status(400).json({ error: "Failed to create bills" });
+    }
+
 
     res.status(200).json({
       success: true,
-      msg: "booking updated successfully",
+      msg: "booking successfully accepted",
       data: booking,
     });
   } catch (error) {

@@ -32,7 +32,17 @@ const TenantSchema: any = new Schema({
   },
   nextRentBilling: {
     type: Date
-  }
+  },
+  status: {
+    type: String,
+    required: true,
+    default: "PENDING",
+    enum: [
+      "PENDING",
+      "ACTIVE",
+      "INACTIVE"
+    ]
+  },
 },{
   timestamps: true
 });

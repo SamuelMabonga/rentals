@@ -1,4 +1,5 @@
 import { Schema, model, models } from "mongoose";
+import BillingPeriods from "./billingPeriod";
 
 const UnitTypeShema = new Schema(
   {
@@ -14,7 +15,7 @@ const UnitTypeShema = new Schema(
     },
     billingPeriod: {
       type: Schema.Types.ObjectId,
-      ref: "BillingPeriods",
+      ref:  BillingPeriods
     },
     units: [
       {

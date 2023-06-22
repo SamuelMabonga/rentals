@@ -9,7 +9,7 @@ const BillsShema = new Schema({
   },
   tenant: {
     type: Schema.Types.ObjectId,
-    ref: 'Tenant',
+    ref: "Tenant",
   },
   type: {
     type: String, // Rent / Feature
@@ -21,12 +21,14 @@ const BillsShema = new Schema({
   },
   propertyFeature: {
     type: Schema.Types.ObjectId,
-    ref: 'PropertyFeatures',
-    default: null
+    ref: "PropertyFeatures",
   },
   amount: {
-    type: String
-  }
+    type: String,
+  },
+  pay_by: {
+    type: Date,
+  },
 });
 
 const Bills = models.Bills || model("Bills", BillsShema);

@@ -33,6 +33,13 @@ const BookingSchema = new Schema({
       "REJECTED"
     ]
   },
+  customRent: {
+    type: String
+  },
+  customBillingPeriod: {
+    type: Schema.Types.ObjectId,
+    ref: "BillingPeriods"
+  },
 }, {
   timestamps: true
 });
