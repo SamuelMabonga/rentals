@@ -16,14 +16,18 @@ export async function fetchAllUnits(req: any, res: any) {
     let units
 
     unitType !== undefined ?
-      (units = await Unit.find({ unitType: unitType }).populate({ path: "unitType" }).populate({
-        path: "tenant",
-        populate: [{ path: "user" }],
-      }))
-      : (units = await Unit.find().populate({ path: "unitType" }).populate({
-        path: "tenant",
-        populate: [{ path: "user" }],
-      }));
+      (units = await Unit.find({ unitType: unitType }).populate({ path: "unitType" })
+        // .populate({
+        //   path: "tenant",
+        //   populate: [{ path: "user" }],
+        // })
+      )
+      : (units = await Unit.find().populate({ path: "unitType" })
+        // .populate({
+        //   path: "tenant",
+        //   populate: [{ path: "user" }],
+        // })
+      );
 
     res.status(200).json({
       success: true,
@@ -47,15 +51,15 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
   }: any = req;
 
   console.log("PROPERTY ", id)
-  
+
   try {
     let units = await Unit.find()
       .populate({ path: "unitType" })
-      .populate({
-        path: "tenant",
-        populate: [{ path: "user" }],
-      })
-      
+    // .populate({
+    //   path: "tenant",
+    //   populate: [{ path: "user" }],
+    // })
+
     res.status(200).json({
       success: true,
       msg: "Property units fetched successfully",
