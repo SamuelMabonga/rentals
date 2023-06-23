@@ -41,7 +41,7 @@ export async function fetchAllTenantBills(req: any, res: any) {
       .populate({
         path: "propertyFeature",
         populate: [{ path: "feature" }],
-      })
+      });
 
     res.json({
       success: true,
@@ -96,36 +96,35 @@ export async function createBill(
     // TODO: add try catch
     // Create a rent bill
     try {
-
       const rentBill = new Bills({
         startDate: tenant?.startDate,
         endDate: tenant?.customBillingPeriod?.time
           ? moment(tenant?.startDate).add(
-            tenant?.customBillingPeriod?.time,
-            "ms"
-          )
+              tenant?.customBillingPeriod?.time,
+              "ms"
+            )
           : moment(tenant?.startDate).add(
-            tenant?.unit?.unitType?.billingPeriod?.time,
-            "ms"
-          ),
+              tenant?.unit?.unitType?.billingPeriod?.time,
+              "ms"
+            ),
         tenant: tenantId,
         type: "Rent", // Set the bill type as 'Rent'
         propertyFeature: null, // No specific property feature for rent bill, so set it to null
         amount: customRent ?? tenant?.unit?.unitType?.price,
         pay_by: tenant?.customBillingPeriod?.time
           ? moment(tenant?.start_date).add(
-            tenant?.customBillingPeriod?.time + 604800000,
-            "ms"
-          )
+              tenant?.customBillingPeriod?.time + 604800000,
+              "ms"
+            )
           : moment(tenant?.start_date).add(
-            tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
-            "ms"
-          ), // set dedault pay date to 7 days
+              tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+              "ms"
+            ), // set dedault pay date to 7 days
       });
 
       await rentBill.save();
     } catch (error) {
-      console.log("BILLING ERROR MESSAGE", error)
+      console.log("BILLING ERROR MESSAGE", error);
     }
 
     // Iterate through each additional feature ID
@@ -145,13 +144,13 @@ export async function createBill(
         amount: feature?.price, // Set the bill amount as the price from the property feature
         pay_by: tenant?.customBillingPeriod?.time
           ? moment(tenant?.startDate).add(
-            tenant?.customBillingPeriod?.time + 604800000,
-            "ms"
-          )
+              tenant?.customBillingPeriod?.time + 604800000,
+              "ms"
+            )
           : moment(tenant?.startDate).add(
-            tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
-            "ms"
-          ), // set dedault pay date to 7 days
+              tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+              "ms"
+            ), // set dedault pay date to 7 days
       });
 
       await bill.save();
@@ -165,15 +164,21 @@ export async function createBill(
   }
 }
 
+// cron billls
 // create a bill
-export async function createBills(req: any, res: any) {
+export async function createCronBills(req: any, res: any) {
   try {
-
     let tenants = await Tenant.find()
       .populate("user")
       .populate("customBillingPeriod")
-      .populate({ path: "additionalFeatures", populate: [{ path: "billingPeriod" }] })
-      .populate({ path: "unit", populate: [{ path: "unitType", populate: [{ path: "billingPeriod" }] }] })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "billingPeriod" }],
+      })
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType", populate: [{ path: "billingPeriod" }] }],
+      });
 
     for (const tenant of tenants) {
       const {
@@ -182,16 +187,28 @@ export async function createBills(req: any, res: any) {
         additionalFeatures,
         unit,
         customBillingPeriod,
+        endDate,
+        startDate,
       } = tenant && tenant;
 
       try {
-        let latestRent: any = await Bills.find({ tenant: _id, type: "RENT" }).sort({ createdAt: -1 }).limit(1)
+        let latestRent: any = await Bills.find({ tenant: _id, type: "RENT" })
+          .sort({ createdAt: -1 })
+          .limit(1);
 
-        if (moment().isAfter(latestRent.endDate)) {
-          let newRent = new Bills({
+        let currentDate = new Date();
+        let latestEndDate = new Date(`${latestRent[0]?.endDate}`);
+
+        if (latestRent && currentDate > latestEndDate) {
+          const newRent = new Bills({
             amount: !customRent ? unit.unitType.price : customRent,
-            startDate: moment(),
-            endDate: !customBillingPeriod ? moment(unit.unitType.billingPeriod.time, "ms").add() : moment().add(customBillingPeriod.time, "ms"),
+            startDate: startDate,
+            endDate: !customBillingPeriod
+              ? moment(tenant?.startDate).add(
+                  unit?.unitType?.billingPeriod?.time,
+                  "ms"
+                )
+              : moment(startDate).add(customBillingPeriod?.time, "ms"),
             tenant: _id,
             type: "RENT",
           });
@@ -199,20 +216,31 @@ export async function createBills(req: any, res: any) {
           await newRent.save();
         }
       } catch (error) {
-        console.log("Failed to create rent bill")
-        console.log(error)
+        console.log("Failed to create rent bill");
+        console.log(error);
       }
-
 
       for (const feature of additionalFeatures) {
         try {
-          let latestBill: any = await Bills.find({ tenant: _id, type: "FEATURE", propertyFeature: feature._id }).sort({ createdAt: -1 }).limit(1)
+          let latestBill: any = await Bills.find({
+            tenant: _id,
+            type: "FEATURE",
+            propertyFeature: feature._id,
+          })
+            .sort({ createdAt: -1 })
+            .limit(1);
 
-          if (moment().isAfter(latestBill.endDate)) {
+          let currentDate = new Date();
+          let latestEndDate = new Date(`${latestBill[0]?.endDate}`);
+
+          if (latestBill && currentDate > latestEndDate) {
             let newBill = new Bills({
               amount: feature.price,
-              startDate: moment(),
-              endDate: moment().add(feature.billingPeriod.time, "ms"),
+              startDate: startDate,
+              endDate: moment(startDate).add(
+                feature?.billingPeriod?.time,
+                "ms"
+              ),
               tenant: _id,
               type: "FEATURE",
               propertyFeature: feature._id,
@@ -220,14 +248,12 @@ export async function createBills(req: any, res: any) {
 
             await newBill.save();
           }
-
         } catch (error) {
-          console.log(error)
+          console.log(error);
         }
       }
-
-    }
-
+    } // Return a success response
+    res.status(200).json({ message: "Bills created successfully" });
   } catch (error: any) {
     console.log(error);
     return res.status(500).json({
