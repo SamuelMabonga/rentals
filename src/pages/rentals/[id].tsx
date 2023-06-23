@@ -93,6 +93,7 @@ export default function Property({
         setOpenPropertyFeaturesForm,
         setOpenUnitForm,
         setOpenBookingForm,
+        paymentConfig
     }: any = useContext(CollectionsContext)
 
     // SESSION
@@ -111,7 +112,8 @@ export default function Property({
     } = data?.data || {}
 
 
-    const handleFlutterPayment = useFlutterwave(config);
+    // const handleFlutterPayment = useFlutterwave(config);
+    const handleFlutterPayment = useFlutterwave(paymentConfig);
 
     function openFlutterwave() {
         handleFlutterPayment({

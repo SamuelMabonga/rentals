@@ -6,6 +6,7 @@ import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { useQuery } from "@tanstack/react-query";
 import fetchBills from "apis/tenant/fetchBills";
 import { set } from "mongoose";
+import moment from "moment";
 
 
 export default function PaymentsForm({ tenant }: any) {
@@ -25,21 +26,14 @@ export default function PaymentsForm({ tenant }: any) {
 
     const { data, isLoading }: any = useQuery({ queryKey: ['tenant-bills', tenant, token], queryFn: () => fetchBills(token, tenant) })
 
-    // const [bills, setBills] = useState([])
-    // useEffect(() => {
-    //     if (data?.data?.length > 0) {
-    //         return setBills(data.data)
-    //     }
+    const [selectedBills, setSelectedBills] = useState<any>([])
 
-    //     setBills([])
-    // }, [data])
 
-    
     // FLUTTERWAVE CONFIG
     const config: any = {
         public_key: process.env.NEXT_PUBLIC_FW_PUBLIC_KEY,
         tx_ref: Date.now(),
-        amount: 100,
+        amount: selectedBills.reduce((partialSum: any, a: any) => partialSum + +a.amount, 0),
         currency: 'UGX',
         payment_options: 'card,mobilemoney,ussd',
         customer: {
@@ -89,7 +83,7 @@ export default function PaymentsForm({ tenant }: any) {
                             <Typography>Total</Typography>
                         </Box>
 
-                        <Typography fontWeight="600" ml="auto">UGX 100,000</Typography>
+                        <Typography fontWeight="600" ml="auto">UGX {selectedBills.reduce((partialSum: any, a: any) => partialSum + +a.amount, 0)}</Typography>
                     </Box>
 
                     <Box display="flex" flexDirection="column" gap="0.5rem">
@@ -105,22 +99,25 @@ export default function PaymentsForm({ tenant }: any) {
                                         gap="0.5rem"
                                         padding="0.75rem"
                                         border="1px solid"
-                                        // borderColor={selectedUnit?._id === item._id ? "primary.main" : "lightgrey"}
-                                        // bgcolor={selectedUnit?._id === item._id ? "primary.light" : "transparent"}
+                                        borderColor={selectedBills?.find((item: any) => item._id === bill._id) ? "primary.main" : "lightgrey"}
+                                        bgcolor={selectedBills?.find((item: any) => item._id === bill._id) ? "primary.light" : "transparent"}
                                         borderRadius="0.5rem"
                                         sx={{ cursor: "pointer" }}
-                                        // onClick={() => {
-                                        //     setSelectedUnit(item)
-                                        //     setValue("unit", item)
-                                        // }}
+                                        onClick={() => {
+                                            if (selectedBills?.find((item: any) => item._id === bill._id)) {
+                                                return setSelectedBills((prev: any) => prev.filter((item: any) => item._id !== bill._id))
+                                            }
+                                            setSelectedBills((prev: any) => [...prev, bill])
+                                        }}
                                     >
                                         <Box>
-                                            <Typography>RENT</Typography>
+                                            <Typography>{bill.type === "RENT" ? "Rent" : bill.propertyFeature.feature.name}</Typography>
+                                            <Typography fontSize={"0.875rem"} color="grey">{`${moment(bill.startDate).format("DD-MM-YY")} - ${moment(bill.endDate).format("DD-MM-YY")}`}</Typography>
                                             {/* <Chip size="small" label={!item?.tenant ? "Vacant" : "Occupied"} /> */}
                                         </Box>
 
                                         <Box
-                                            // display={selectedUnit?._id === item._id ? "flex" : "none"}
+                                            display={selectedBills?.find((item: any) => item._id === bill._id) ? "flex" : "none"}
                                             ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6" style={{ color: "inherit" }}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
