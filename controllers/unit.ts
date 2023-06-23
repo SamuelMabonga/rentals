@@ -146,9 +146,9 @@ export async function updateUnit(req: any, res: any) {
     const data = {
       name: req.body.name || unit.name,
       image: req.body.image || unit.image,
-      tenant: req.body.tenant || unit.tenant,
-      unit_type: req.body.unit_type || unit.unit_type,
-      unit_status: req.body.unit_status || unit.unit_status,
+      // tenant: req.body.tenant || unit.tenant,
+      unitType: req.body.unitType || unit.unitType,
+      status: req.body.status || unit.status,
     };
     unit = await Unit.findByIdAndUpdate(req.params.id, data, {
       new: true,
