@@ -98,13 +98,13 @@ export async function createBill(
     try {
 
       const rentBill = new Bills({
-        startDate: tenant.start_date,
+        startDate: tenant?.startDate,
         endDate: tenant?.customBillingPeriod?.time
-          ? moment(tenant?.start_date).add(
+          ? moment(tenant?.startDate).add(
             tenant?.customBillingPeriod?.time,
             "ms"
           )
-          : moment(tenant?.start_date).add(
+          : moment(tenant?.startDate).add(
             tenant?.unit?.unitType?.billingPeriod?.time,
             "ms"
           ),
@@ -134,8 +134,8 @@ export async function createBill(
 
       // Create a new bill for each feature
       const bill = new Bills({
-        startDate: tenant.start_date,
-        endDate: moment(tenant?.start_date).add(
+        startDate: tenant?.startDate,
+        endDate: moment(tenant?.startDate).add(
           tenant?.unit?.unitType?.billingPeriod?.time,
           "ms"
         ),
@@ -144,11 +144,11 @@ export async function createBill(
         propertyFeature: feature?._id,
         amount: feature?.price, // Set the bill amount as the price from the property feature
         pay_by: tenant?.customBillingPeriod?.time
-          ? moment(tenant?.start_date).add(
+          ? moment(tenant?.startDate).add(
             tenant?.customBillingPeriod?.time + 604800000,
             "ms"
           )
-          : moment(tenant?.start_date).add(
+          : moment(tenant?.startDate).add(
             tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
             "ms"
           ), // set dedault pay date to 7 days
