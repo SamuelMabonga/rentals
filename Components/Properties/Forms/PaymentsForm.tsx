@@ -6,6 +6,7 @@ import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { useQuery } from "@tanstack/react-query";
 import fetchBills from "apis/tenant/fetchBills";
 import { set } from "mongoose";
+import moment from "moment";
 
 
 export default function PaymentsForm({ tenant }: any) {
@@ -25,21 +26,15 @@ export default function PaymentsForm({ tenant }: any) {
 
     const { data, isLoading }: any = useQuery({ queryKey: ['tenant-bills', tenant, token], queryFn: () => fetchBills(token, tenant) })
 
-    // const [bills, setBills] = useState([])
-    // useEffect(() => {
-    //     if (data?.data?.length > 0) {
-    //         return setBills(data.data)
-    //     }
+    const [selectedBills, setSelectedBills] = useState<any>([])
+    const [amount, setAmount] = useState<any>(0)
 
-    //     setBills([])
-    // }, [data])
 
-    
     // FLUTTERWAVE CONFIG
     const config: any = {
         public_key: process.env.NEXT_PUBLIC_FW_PUBLIC_KEY,
         tx_ref: Date.now(),
-        amount: 100,
+        amount: amount,
         currency: 'UGX',
         payment_options: 'card,mobilemoney,ussd',
         customer: {
@@ -55,6 +50,10 @@ export default function PaymentsForm({ tenant }: any) {
     };
 
     const handleFlutterPayment = useFlutterwave(config);
+
+    useEffect(() => {
+        setAmount(selectedBills.reduce((acc: any, curr: any) => acc + +curr.amount, 0))
+    }, [selectedBills])
 
     return (
         <Dialog
@@ -81,15 +80,15 @@ export default function PaymentsForm({ tenant }: any) {
                 <Box width="100%" display="flex" flexDirection="column" gap="1rem">
                     <Box borderRadius="0.5rem" p="1rem" border="1px solid" borderColor="primary.main" display="flex" gap="0.5rem">
                         <Box display="flex" gap="0.5rem">
-                            <Box width="1.5rem" height="1.5rem">
+                            <Box width="2rem" height="2rem">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
                                 </svg>
                             </Box>
-                            <Typography>Total</Typography>
+                            <Typography fontSize="1.5rem">Total</Typography>
                         </Box>
 
-                        <Typography fontWeight="600" ml="auto">UGX 100,000</Typography>
+                        <Typography fontSize="1.5rem" fontWeight="600" ml="auto">UGX {selectedBills.reduce((partialSum: any, a: any) => partialSum + +a.amount, 0)}</Typography>
                     </Box>
 
                     <Box display="flex" flexDirection="column" gap="0.5rem">
@@ -105,22 +104,25 @@ export default function PaymentsForm({ tenant }: any) {
                                         gap="0.5rem"
                                         padding="0.75rem"
                                         border="1px solid"
-                                        // borderColor={selectedUnit?._id === item._id ? "primary.main" : "lightgrey"}
-                                        // bgcolor={selectedUnit?._id === item._id ? "primary.light" : "transparent"}
+                                        borderColor={selectedBills?.find((item: any) => item._id === bill._id) ? "primary.main" : "lightgrey"}
+                                        bgcolor={selectedBills?.find((item: any) => item._id === bill._id) ? "primary.light" : "transparent"}
                                         borderRadius="0.5rem"
                                         sx={{ cursor: "pointer" }}
-                                        // onClick={() => {
-                                        //     setSelectedUnit(item)
-                                        //     setValue("unit", item)
-                                        // }}
+                                        onClick={() => {
+                                            if (selectedBills?.find((item: any) => item._id === bill._id)) {
+                                                return setSelectedBills((prev: any) => prev.filter((item: any) => item._id !== bill._id))
+                                            }
+                                            setSelectedBills((prev: any) => [...prev, bill])
+                                        }}
                                     >
                                         <Box>
-                                            <Typography>RENT</Typography>
+                                            <Typography>{bill.type === "RENT" ? "Rent" : bill.propertyFeature.feature.name}</Typography>
+                                            <Typography fontSize={"0.875rem"} color="grey">{`${moment(bill.startDate).format("DD-MM-YY")} - ${moment(bill.endDate).format("DD-MM-YY")}`}</Typography>
                                             {/* <Chip size="small" label={!item?.tenant ? "Vacant" : "Occupied"} /> */}
                                         </Box>
 
                                         <Box
-                                            // display={selectedUnit?._id === item._id ? "flex" : "none"}
+                                            display={selectedBills?.find((item: any) => item._id === bill._id) ? "flex" : "none"}
                                             ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6" style={{ color: "inherit" }}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

@@ -84,17 +84,23 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                             size="small"
                             sx={{ fontSize: "0.875rem" }}
                             onClick={async (event) => {
+                                console.log(row?.row?.original)
                                 event.preventDefault()
                                 event.stopPropagation()
                                 await setPaymentConfig({
-                                    tx_ref: row?.row?.original?.id,
+                                    tx_ref: row?.row?.original?._id,
                                     amount: +row?.row?.original?.amount,
                                     currency: "UGX",
                                     payment_options: "card,mobilemoney,ussd",
+                                    // customer: {
+                                    //     email: user?.email,
+                                    //     phonenumber: user?.phoneNumber,
+                                    //     name: user?.first_name
+                                    // },
                                     customer: {
-                                        email: user?.email,
-                                        phonenumber: user?.phoneNumber,
-                                        name: user?.first_name
+                                        email: "samuel@gmail.com",
+                                        phonenumber: "0785663783",
+                                        name: "Mabonga Samuel"
                                     },
                                     customizations: {
                                         title: "Rent Payment",
