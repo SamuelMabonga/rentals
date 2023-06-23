@@ -62,6 +62,30 @@ const CollectionsProvider = ({children}: any) => {
     // RENTAL
     const [ activeRentalTab, setActiveRentalTab ] = useState("bills")
 
+
+    // REQUEST EXTENSION
+    const [ openRequestExtension, setOpenRequestExtension ] = useState(false)
+
+    // PAYMENT CONFIG
+    const [paymentConfig, setPaymentConfig] = useState({
+            logo: "",
+            tx_ref: "",
+            amount: 0,
+            title: "",
+            description: "",
+            currency: "UGX",
+            // payment_options: "card,mobilemoneyuganda",
+            customer: {
+                email: "",
+                phonenumber: "",
+                name: ""
+            },
+    })
+
+    // PAYMENT FORM
+    const [openPaymentForm, setOpenPaymentForm] = useState(false)
+
+
     return (
         <CollectionsContext.Provider value={{
             collections,
@@ -126,7 +150,20 @@ const CollectionsProvider = ({children}: any) => {
 
             // RENTALS
             activeRentalTab,
-            setActiveRentalTab
+            setActiveRentalTab,
+
+            // REQUEST EXTENSION
+            openRequestExtension,
+            setOpenRequestExtension,
+
+            // PAYMENT CONFIG
+            paymentConfig,
+            setPaymentConfig,
+
+            // PAYMENT FORM
+            openPaymentForm,
+            setOpenPaymentForm,
+
         }}>
             {children}
         </CollectionsContext.Provider>

@@ -5,10 +5,6 @@ export default function authenticateUser(req: NextApiRequest, res: NextApiRespon
   const token: any = req.headers.authorization?.replace("Bearer ", "");
 
   const decodedToken: any = jwt.verify(token, "your-secret-key");
-  // const token = await getToken({ req })
-
-  // console.log("Token --", token)
-  console.log("Token decoded --", decodedToken);
 
   // HANDLE PERMISSION CONTROL HERE
   if (!token) {

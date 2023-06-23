@@ -9,6 +9,10 @@ import fetchARental from "apis/fetchARental"
 import { PaymentsTable } from "Components/Properties/PaymentsTable"
 import PaymentsForm from "Components/Properties/Forms/PaymentsForm"
 import { BillsTable } from "Components/Tenants/BillsTable"
+import RequestExtension from "Components/Tenants/Forms/RequestExtension"
+import { closePaymentModal, useFlutterwave } from "flutterwave-react-v3"
+import moment from "moment"
+import fetchBills from "apis/tenant/fetchBills"
 
 type PageProps = {
     // data: any;
@@ -36,19 +40,40 @@ function DetailsCard() {
     )
 }
 
-function TableSwitch({ activeTab, tenant }: any) {
+
+// FLUTTERWAVE CONFIG
+const config: any = {
+    public_key: process.env.NEXT_PUBLIC_FW_PUBLIC_KEY,
+    tx_ref: moment(),
+    amount: 100,
+    currency: 'UGX',
+    payment_options: 'card,mobilemoney,ussd',
+    customer: {
+        email: "samuel@gmail.com",
+        phone_number: '070********',
+        name: `Mabonga Samuel`,
+    },
+    customizations: {
+        title: 'Rent It',
+        description: 'Payment for your bills',
+        logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
+    },
+};
+
+
+function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
     switch (activeTab) {
         case "bills":
-            return <BillsTable tenant={tenant} />
+            return <BillsTable tenant={tenant} openFlutterwave={openFlutterwave} />
 
         case "payments":
             return <PaymentsTable />
 
         case "messages":
-            // return <BookingsTable />
+        // return <BookingsTable />
 
         case "tickets":
-            // return <StaffTable />
+        // return <StaffTable />
 
         default:
             return <></>
@@ -62,6 +87,7 @@ export default function Property({
         activeRentalTab: activeTab,
         setActiveRentalTab: setActiveTab,
         setShowUnitTypeForm,
+        setOpenPaymentForm,
         setOpenFeaturesForm,
         setOpenBillingPeriodsForm,
         setOpenPropertyFeaturesForm,
@@ -72,16 +98,30 @@ export default function Property({
     // SESSION
     const { status, data: session }: any = useSession()
 
+    const token = session?.accessToken
+
     const router = useRouter()
     const { id }: any = router.query
 
-    const { data }: any = useQuery({ queryKey: ['rental'], queryFn: () => fetchARental(session.accessToken, id) })
-
-    console.log("TENANT DATA", data)
+    const { data }: any = useQuery({ queryKey: ['rental', id, token], queryFn: () => fetchARental(token, id) })
 
     const {
-        unit
-    } = data.data
+        unit,
+        _id
+    } = data?.data || {}
+
+
+    const handleFlutterPayment = useFlutterwave(config);
+
+    function openFlutterwave() {
+        handleFlutterPayment({
+            callback: (response: any) => {
+                console.log(response);
+                closePaymentModal() // this will close the modal programmatically
+            },
+            onClose: () => { },
+        });
+    }
 
     return (
         <>
@@ -91,13 +131,13 @@ export default function Property({
                     <Typography fontWeight="600" color="grey">{`${unit?.property?.name}`}</Typography>
                 </Box>
 
-                <Box display="flex"  flexDirection={["column", "row"]} gap="1rem">
+                <Box display="flex" flexDirection={["column", "row"]} gap="1rem">
                     <Button variant="contained" sx={{ height: "fit-content", padding: "1rem" }}>Renew your tenancy</Button>
                     <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem" }} color="error" >Terminate tenancy</Button>
                 </Box>
             </Box>
 
-            <Box width="100%" display="grid" gridTemplateColumns={["1fr", "1fr 1fr", ]} gap="1rem">
+            <Box width="100%" display="grid" gridTemplateColumns={["1fr", "1fr 1fr",]} gap="1rem">
                 <DetailsCard />
                 <DetailsCard />
                 <DetailsCard />
@@ -130,7 +170,7 @@ export default function Property({
                         sx={{ ml: ["auto"] }}
                         onClick={() => {
                             if (activeTab === "bills") {
-                                return setShowUnitTypeForm(true)
+                                return setOpenPaymentForm(true)
                             }
 
                             if (activeTab === "payments") {
@@ -149,9 +189,10 @@ export default function Property({
                         Create New
                     </Button>
                 </Box>
-                <TableSwitch activeTab={activeTab} tenant={data?.data?._id} />
+                <TableSwitch activeTab={activeTab} tenant={_id} openFlutterwave={openFlutterwave} />
             </Box>
-            <PaymentsForm />
+            <PaymentsForm tenant={id} />
+            <RequestExtension tenant={id} />
         </>
     )
 }
@@ -179,7 +220,8 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     const queryClient = new QueryClient()
 
     await Promise.all([
-        await queryClient.prefetchQuery(['rental'], () => fetchARental(accessToken, id)),
+        await queryClient.prefetchQuery(['rental', id], () => fetchARental(accessToken, id)),
+        // await queryClient.prefetchQuery(['tenant-bills', id], () => fetchBills(accessToken, id)),
     ])
 
     return {

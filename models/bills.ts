@@ -1,4 +1,6 @@
 import { Schema, model, models } from "mongoose";
+import Tenant from "./tenant";
+import PropertyFeatures from "./propertyFeatures";
 
 const BillsShema = new Schema({
   startDate: {
@@ -9,7 +11,7 @@ const BillsShema = new Schema({
   },
   tenant: {
     type: Schema.Types.ObjectId,
-    ref: "Tenant",
+    ref: Tenant,
   },
   type: {
     type: String, // Rent / Feature
@@ -21,7 +23,7 @@ const BillsShema = new Schema({
   },
   propertyFeature: {
     type: Schema.Types.ObjectId,
-    ref: "PropertyFeatures",
+    ref: PropertyFeatures,
   },
   amount: {
     type: String,
