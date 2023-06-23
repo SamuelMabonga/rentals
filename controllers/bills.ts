@@ -168,7 +168,7 @@ export async function createBill(
 // create a bill
 export async function createCronBills(req: any, res: any) {
   try {
-    let tenants = await Tenant.find()
+    let tenants = await Tenant.find({ status: "ACTIVE" })
       .populate("user")
       .populate("customBillingPeriod")
       .populate({
