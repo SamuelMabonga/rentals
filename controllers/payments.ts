@@ -91,28 +91,61 @@ export async function updatePayments(req: any, res: any) {
   }
 }
 
-//delete a Payments
-export async function deletePayment(req: any, res: any) {
+export async function flutterwaveWebhook(req: any, res: any) {
+  // If you specified a secret hash, check for the signature
+  const secretHash = process.env.NEXT_PUBLIC_FW_HASH;
+  const signature = req.headers["verif-hash"];
+  if (!signature || (signature !== secretHash)) {
+    // This request isn't from Flutterwave; discard
+    res.status(401).end();
+  }
+
+  const payload = req.body;
+
   try {
-    let payment = await Payments.findById(req.params.id);
-
-    if (payment) {
-      //   return next("Payments being deleted has not been found");
-      return "Payment being deleted has not been found";
-    }
-
-    await Payments.deleteOne(payment);
-
-    res.json({
-      success: true,
-      msg: "Payment deleted successfully",
+    let payment = await Payments.findById(payload.data.tx_ref).populate({
+      path: "bills",
     });
+
+    const data = {
+      ...payment,
+      status: payment.data.status.toUpperCase(),
+    };
+
+    await Payments.findByIdAndUpdate(payload.data.tx_ref, data, {
+      new: true,
+    });
+    
   } catch (error) {
     res.status(400).json({
       success: false,
-      msg: "failed to delete Payments",
+      msg: "Failed to update payment",
       data: error,
     });
-    console.log(error);
+  }}
+
+  //delete a Payments
+  export async function deletePayment(req: any, res: any) {
+    try {
+      let payment = await Payments.findById(req.params.id);
+
+      if (payment) {
+        //   return next("Payments being deleted has not been found");
+        return "Payment being deleted has not been found";
+      }
+
+      await Payments.deleteOne(payment);
+
+      res.json({
+        success: true,
+        msg: "Payment deleted successfully",
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        msg: "failed to delete Payments",
+        data: error,
+      });
+      console.log(error);
+    }
   }
-}

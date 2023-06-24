@@ -1,6 +1,7 @@
 import { Menu } from "@mui/icons-material"
 import { Avatar, Box, Button, IconButton, Snackbar, Typography } from "@mui/material"
 import ConsecutiveSnackbars from "Components/Common/ConsecutiveSnackbars"
+import LoadingBackdrop from "Components/Common/LoadingBackdrop"
 import MobileDrawer from "Components/Common/MobileDrawer"
 import NavItem from "Components/Common/NavItem"
 import RegularSnackbar from "Components/Common/RegularSnackBar"
@@ -295,6 +296,7 @@ export default function DashboardLayout({ children }: any) {
                 {/* <ConsecutiveSnackbars /> */}
                 <RegularSnackbar />
                 <ImageUploader />
+                <LoadingBackdrop />
 
                 {/* PRELOADER */}
                 <MBox
