@@ -18,7 +18,7 @@ export default function BillingPeriodsForm() {
         openBillingPeriodsForm: open,
         setOpenBillingPeriodsForm: setIsOpen,
         billingPeriodsToEdit: toEdit,
-        setBillingPeriodsToEdit: setToEdit,
+        setBillingPeriodToEdit: setToEdit,
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
 
@@ -58,14 +58,15 @@ export default function BillingPeriodsForm() {
 
 
         // EDIT A PROPERTY
-        if (toEdit?.name) {
+      if (toEdit?.feature) {
             const edited = {
                 ...toEdit,
-                name: values.name,
-                price: values.price
+                feature: values.feature._id,
+                price: values.price,
+                billingPeriod: values.billingPeriod._id
             }
             try {
-                const res = await fetch(`/api/billingPeriods?id=${toEdit._id}`, {
+                const res = await fetch(`/api/propertyFeatures?id=${toEdit._id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -73,14 +74,27 @@ export default function BillingPeriodsForm() {
                     },
                     body: JSON.stringify({ ...edited })
                 })
-                const response = await res.json();
-                console.log(response)
+                await res.json();
+
                 setIsLoading(false)
+                setToEdit({})
+                reset()
+                setSnackbarMessage({
+                    open: true,
+                    vertical: 'top',
+                    horizontal: 'center',
+                    message: "Property feature edited successfully",
+                    icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </Box>
+                })
                 setIsOpen(false)
                 return
             } catch (error) {
                 setIsLoading(false)
-                console.log(error)
+                alert("Error")
                 return
             }
         }
@@ -128,6 +142,7 @@ export default function BillingPeriodsForm() {
                 <IconButton onClick={() => {
                     setToEdit({})
                     setIsOpen(false)
+                    reset()
                 }}>
                     <Box width="1.5rem" height="1.5rem">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
