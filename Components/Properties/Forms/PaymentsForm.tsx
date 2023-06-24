@@ -89,6 +89,7 @@ export default function PaymentsForm({ tenant }: any) {
             return
         }
 
+        console.log("Opening flutterwave")
         setOpenLoadingBackdrop(false)
         setIsOpen(false)
 
