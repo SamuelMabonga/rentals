@@ -21,8 +21,7 @@ export default async function handler(
   try {
     await mongoose
       .connect(
-        process.env.NEXT_PUBLIC_MONGODB_SRV ||
-          "mongodb://localhost:27017/test_db"
+        process.env.NEXT_PUBLIC_MONGODB_SRV || "mongodb://localhost:27017/test_db"
       )
       .then(() => {
         // USER

@@ -18,7 +18,9 @@ export default function PaymentsForm({ tenant }: any) {
         propertyFeatureToEdit: toEdit,
         setPropertyFeatureToEdit: setToEdit,
 
-        setSnackbarMessage
+        setSnackbarMessage,
+
+        setOpenLoadingBackdrop,
     }: any = useContext(CollectionsContext)
 
     const { data: user }: any = useSession()
@@ -28,12 +30,13 @@ export default function PaymentsForm({ tenant }: any) {
 
     const [selectedBills, setSelectedBills] = useState<any>([])
     const [amount, setAmount] = useState<any>(0)
+    const [tx_ref, setTx_ref] = useState<any>("")
 
 
     // FLUTTERWAVE CONFIG
     const config: any = {
         public_key: process.env.NEXT_PUBLIC_FW_PUBLIC_KEY,
-        tx_ref: Date.now(),
+        tx_ref: tx_ref,
         amount: amount,
         currency: 'UGX',
         payment_options: 'card,mobilemoney,ussd',
@@ -55,10 +58,52 @@ export default function PaymentsForm({ tenant }: any) {
         setAmount(selectedBills.reduce((acc: any, curr: any) => acc + +curr.amount, 0))
     }, [selectedBills])
 
+    async function createPayment() {
+        const payment = {
+            amount: amount,
+            bills: selectedBills.map((item: any) => item._id),
+            tenant: tenant,
+        }
+
+        // POST A PROPERTY
+        try {
+            const res = await fetch('/api/payments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(payment)
+            })
+            const response = await res.json();
+
+            setTx_ref(response.data._id)
+        } catch (error) {
+            // setIsLoading(false)
+            console.log(error)
+        }
+    }
+
+    useEffect(() => { 
+        if (!tx_ref) {
+            return
+        }
+
+        setOpenLoadingBackdrop(false)
+        setIsOpen(false)
+
+        handleFlutterPayment({
+            callback: (response) => {
+                console.log(response);
+                closePaymentModal() // this will close the modal programmatically
+            },
+            onClose: () => { },
+        });
+     }, [tx_ref])
+
     return (
         <Dialog
             open={open}
-            // open={true}
             fullWidth
             maxWidth="sm"
         >
@@ -116,9 +161,8 @@ export default function PaymentsForm({ tenant }: any) {
                                         }}
                                     >
                                         <Box>
-                                            <Typography>{bill.type === "RENT" ? "Rent" : bill.propertyFeature.feature.name}</Typography>
+                                            <Typography fontWeight="500">{bill.type === "RENT" ? "Rent" : bill.propertyFeature.feature.name}</Typography>
                                             <Typography fontSize={"0.875rem"} color="grey">{`${moment(bill.startDate).format("DD-MM-YY")} - ${moment(bill.endDate).format("DD-MM-YY")}`}</Typography>
-                                            {/* <Chip size="small" label={!item?.tenant ? "Vacant" : "Occupied"} /> */}
                                         </Box>
 
                                         <Box
@@ -140,13 +184,18 @@ export default function PaymentsForm({ tenant }: any) {
                 <Button
                     variant="contained"
                     onClick={() => {
-                        handleFlutterPayment({
-                            callback: (response) => {
-                                console.log(response);
-                                closePaymentModal() // this will close the modal programmatically
-                            },
-                            onClose: () => { },
-                        });
+                        // handleFlutterPayment({
+                        //     callback: (response) => {
+                        //         console.log(response);
+                        //         closePaymentModal() // this will close the modal programmatically
+                        //     },
+                        //     onClose: () => { },
+                        // });
+
+                        setIsOpen(false)
+                        setOpenLoadingBackdrop(true)
+
+                        createPayment()
                     }}
                 >
                     Pay

@@ -86,6 +86,9 @@ const CollectionsProvider = ({children}: any) => {
     const [openPaymentForm, setOpenPaymentForm] = useState(false)
 
 
+    // LOADING BACKDROP
+    const [ openLoadingBackdrop, setOpenLoadingBackdrop] = useState(false)
+
     return (
         <CollectionsContext.Provider value={{
             collections,
@@ -163,6 +166,11 @@ const CollectionsProvider = ({children}: any) => {
             // PAYMENT FORM
             openPaymentForm,
             setOpenPaymentForm,
+
+
+            // LOADING BACKDROP
+            openLoadingBackdrop,
+            setOpenLoadingBackdrop,
 
         }}>
             {children}
