@@ -53,14 +53,16 @@ const options: NextAuthOptions = {
       return token;
     },
     session: async ({ session, token }:any) => {
+
       if (token && token.user) {
         const accessToken = jwt.sign(
           { user: token.user },
           'your-secret-key',
-          { expiresIn: '1h' }
+          { expiresIn: '1d' }
         );
         session.accessToken = accessToken;
         session.user = token.user as IUser;
+        console.log(accessToken)
       }
       return session;
     },

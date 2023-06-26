@@ -1,24 +1,54 @@
 import { Schema, model, models } from "mongoose";
 
-const BookingShema = new Schema({
-  image: {
+const BookingSchema = new Schema({
+  name: {
     type: String,
   },
-  name: {
-    required: true,
-    type: String,
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
   },
   unit: {
+    type: Schema.Types.ObjectId,
+    ref: 'Unit',
+  },
+  additionalFeatures: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'PropertyFeatures',
+    }
+  ],
+  startDate: {
+    type: Date,
+  },
+  endDate: {
+    type: Date,
+  },
+  status: {
     type: String,
+    default: "PENDING",
+    enum: [
+      "PENDING",
+      "ACCEPTED",
+      "REJECTED"
+    ]
   },
-  start_date: {
-    type: Date,
+  customRent: {
+    type: String
   },
-  end_date: {
-    type: Date,
-  }
+  customBillingPeriod: {
+    type: Schema.Types.ObjectId,
+    ref: "BillingPeriods"
+  },
+}, {
+  timestamps: true
 });
 
-const Booking = models.Booking || model("Booking", BookingShema);
+//indexed fields for searching
+BookingSchema.index({
+  name: "text",
+});
+
+const Booking = models.Booking || model("Booking", BookingSchema);
 
 export default Booking;

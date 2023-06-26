@@ -1,14 +1,81 @@
-import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
+import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Icon, IconButton, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/TableRenderer';
+import { useQuery } from '@tanstack/react-query';
+import fetchBookings from 'apis/fetchBookings';
+import { useSession } from 'next-auth/react';
+import moment from 'moment';
+import fetchPropertyBookings from 'apis/property/fetchPropertyBookings';
+
+function AlertDialog({ buttonLabel, buttonVariant, buttonColor="primary", title, content, onAgree, agreeing, setAgreeing }: any) {
+    const [open, setOpen] = useState(false);
+
+    const handleClickOpen = (event: any) => {
+        event.stopPropagation()
+        setOpen(true);
+    };
+
+    const handleClose = (event: any) => {
+        event.stopPropagation()
+        setOpen(false);
+    };
+
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (agreeing) {
+            return setLoading(true)
+        }
+
+        return setLoading(false)
+    }, [agreeing])
+
+    return (
+        <div>
+            <Button variant={buttonVariant} color={buttonColor} size="small" sx={{ fontSize: "0.875rem" }} onClick={handleClickOpen}>
+                {buttonLabel}
+            </Button>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <LinearProgress sx={{display: loading ? "flex" : "none"}} />
+                <DialogTitle id="alert-dialog-title">
+                    {title}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                       {content}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        onClick={(event) => {
+                            setAgreeing(true)
+                            onAgree(event)
+                        }} 
+                        autoFocus
+                    >
+                        Continue
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
+    );
+}
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: string;
 }
 
 type Item = {
@@ -21,50 +88,14 @@ type Item = {
     actions: any;
 }
 
-export const BookingsTable = <T extends object>({ }: ReactTableProps<T>) => {
-    const data = [
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        type: "string",
-        status: "string",
-        tenant: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        type: "string",
-        status: "string",
-        tenant: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        type: "string",
-        status: "string",
-        tenant: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        type: "string",
-        status: "string",
-        tenant: "string",
-        dateCreated: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        type: "string",
-        status: "string",
-        tenant: "string",
-        dateCreated: "string",
-    },
-]
+export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>) => {
+
     const router = useRouter()
+    const session: any = useSession()
+
+    const [declining, setDeclining] = useState(false)
+    const [accepting, setAccepting] = useState(false)
+
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
             {
@@ -83,49 +114,98 @@ export const BookingsTable = <T extends object>({ }: ReactTableProps<T>) => {
                 },
             },
             {
-                header: 'Name',
+                header: 'First Name',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'name',
+                accessorKey: "user.first_name",
             },
             {
-                header: 'Type',
-                cell: (row) => <Chip label={row.row.original.status} color="primary" size="small" />,
-                accessorKey: 'type',
+                header: 'Last Name',
+                cell: (row) => row.renderValue(),
+                accessorKey: "user.last_name",
+            },
+            {
+                header: 'Unit',
+                cell: (row) => row.renderValue(),
+                accessorKey: 'unit.name',
             },
             {
                 header: 'Status',
-                cell: (row) => row.renderValue(),
+                cell: (row) => <Chip label={row.row.original.status} color="primary" size="small" />,
                 accessorKey: 'status',
             },
             {
-                header: 'Tenant',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'tenant',
-            },
-            {
                 header: 'Date Created',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'dateCreated',
+                cell: (row: any) => row.renderValue(),
+                accessorKey: 'createdAt',
             },
             {
                 header: 'Actions',
-                cell: (row) => (
+                cell: (row: any) => (
                     <Box display="flex" gap="1rem" >
-                        <IconButton>
-                            <Box width="1.5rem" height="1.5rem">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                </svg>
-                            </Box>
-                        </IconButton>
+                        <AlertDialog
+                            buttonLabel="Accept"
+                            buttonVariant="contained"
+                            title="Are you sure you want to accept this booking?"
+                            content="If you accept, the user that created this booking will become a tenant at your property"
+                            setAgreeing={setAccepting}
+                            agreeing={accepting}
+                            onAgree={async (event: any) => {
+                                event.stopPropagation()
+                                setAccepting(true)
+                                try {
+                                    const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/booking/accept`, {
+                                        method: "POST",
+                                        headers: {
+                                            Authorization: `Bearer ${session.data.accessToken}`,
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            status: "ACCEPTED",
+                                            id: row.row.original._id,
+                                            startDate: row.row.original.startDate, 
+                                            endDate: row.row.original.endDate, 
+                                            customRent: null, 
+                                            customBillingPeriod: null
+                                        })
+                                    })
 
-                        <IconButton>
-                            <Box width="1.5rem" height="1.5rem">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                            </Box>
-                        </IconButton>
+                                    console.log("RES", await res.json())
+                                    setAccepting(false)
+                                } catch (error) {
+                                    setAccepting(false)
+                                    alert("Failed to accept")
+                                }
+                            }}
+                        />
+                        <AlertDialog
+                            buttonLabel="Decline"
+                            buttonVariant="outlined"
+                            buttonColor="error"
+                            title="Are you sure you want to decline this booking?"
+                            content="If you decline, the user that created this booking will not become a tenant at your property"
+                            onAgree={async (event: any) => {
+                                event.stopPropagation()
+                                setDeclining(true)
+                                try {
+                                    const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/booking?id=${row.row.original._id}`, {
+                                        method: "PUT",
+                                        headers: {
+                                            Authorization: `Bearer ${session.data.accessToken}`,
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            status: "Rejected"
+                                        })
+                                    })
+
+                                    console.log("RES", await res.json())
+                                    setDeclining(false)
+                                } catch (error) {
+                                    setDeclining(false)
+                                    alert("Failed to accept")
+                                }
+                            }}
+                        />
                     </Box>
                 ),
             },
@@ -133,18 +213,16 @@ export const BookingsTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', property], queryFn: () => fetchPropertyBookings(session.data.accessToken, property) })
 
     return (
         <TableRenderer
-            data={data}
+            data={data?.data || []}
             columns={columns}
             onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
-            } }        />
+            }}
+            loading={isLoading}
+            />
     );
 };

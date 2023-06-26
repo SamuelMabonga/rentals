@@ -1,9 +1,34 @@
 import Unit from "models/unit";
+import Tenant from "models/tenant";
+import UnitType from "models/unit_type";
 
 // get all units
 export async function fetchAllUnits(req: any, res: any) {
   try {
-    let units = await Unit.find();
+    const {
+      unitType
+    } = req.query
+    // let units = await Unit.find().populate("unitType");
+
+
+    console.log("UNIT TYPE", unitType)
+
+    let units
+
+    unitType !== undefined ?
+      (units = await Unit.find({ unitType: unitType }).populate({ path: "unitType" })
+        // .populate({
+        //   path: "tenant",
+        //   populate: [{ path: "user" }],
+        // })
+      )
+      : (units = await Unit.find().populate({ path: "unitType" })
+        // .populate({
+        //   path: "tenant",
+        //   populate: [{ path: "user" }],
+        // })
+      );
+
     res.status(200).json({
       success: true,
       msg: "units fetched successfully",
@@ -16,6 +41,37 @@ export async function fetchAllUnits(req: any, res: any) {
       data: error,
     });
     console.log(error);
+  }
+}
+
+// get all units
+export async function fetchAllPropertyUnits(req: any, res: any) {
+  const {
+    query: { id, searchQuery },
+  }: any = req;
+
+  console.log("PROPERTY ", id)
+
+  try {
+    let units = await Unit.find()
+      .populate({ path: "unitType" })
+    // .populate({
+    //   path: "tenant",
+    //   populate: [{ path: "user" }],
+    // })
+
+    res.status(200).json({
+      success: true,
+      msg: "Property units fetched successfully",
+      data: units,
+    });
+  } catch (error) {
+    console.log("ERROR MSG", error)
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch property units",
+      data: error,
+    });
   }
 }
 
@@ -39,6 +95,7 @@ export async function createUnit(req: any, res: any) {
 
     const unit = new Unit({
       ...req.body,
+      status: "Vacant"
     });
 
     const newUnit = await unit.save();
@@ -65,7 +122,7 @@ export async function createUnit(req: any, res: any) {
 //fetch unit by id
 export async function fetchSingleUnit(req: any, res: any) {
   try {
-    let unit = await Unit.findById(req.params.id);
+    let unit = await Unit.find({ _id: req.query.id });
     res.status(200).json({
       success: true,
       msg: "unit fetched successfully",
@@ -89,9 +146,9 @@ export async function updateUnit(req: any, res: any) {
     const data = {
       name: req.body.name || unit.name,
       image: req.body.image || unit.image,
-      tenant: req.body.tenant || unit.tenant,
-      unit_type: req.body.unit_type || unit.unit_type,
-      unit_status: req.body.unit_status || unit.unit_status,
+      // tenant: req.body.tenant || unit.tenant,
+      unitType: req.body.unitType || unit.unitType,
+      status: req.body.status || unit.status,
     };
     unit = await Unit.findByIdAndUpdate(req.params.id, data, {
       new: true,

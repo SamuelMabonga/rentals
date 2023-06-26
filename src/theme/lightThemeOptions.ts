@@ -96,7 +96,7 @@ const lightThemeOptions: ThemeOptions = {
           }
         },
       ]
-    }
+    },
   }
 };
 

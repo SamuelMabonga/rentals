@@ -1,10 +1,13 @@
 import {
-    createStaff,
-    deleteStaff,
-    fetchAllStaffs,
-    fetchSingleStaff,
-    updateStaff,
-  } from "controllers/staff";
+    createUnitType,
+    deleteUnitType,
+    fetchAllUnitTypes,
+    fetchPropertyUnitTypes,
+    fetchSingleUnitType,
+    fetchUnitTypesByUnit,
+    updateUnitType,
+  } from "controllers/unit_type";
+  import authenticateUser from "helpers/authenticate_user";
   import { connectToMongoDB } from "lib/mongodb";
   import { NextApiRequest, NextApiResponse } from "next";
   
@@ -12,25 +15,26 @@ import {
     req: NextApiRequest,
     res: NextApiResponse
   ) {
-    connectToMongoDB().catch((err) => res.json(err));
+    authenticateUser(req, res);
   
+    connectToMongoDB().catch((err) => res.json(err));
     //type of request
     const { method } = req;
     switch (method) {
       case "GET":
-        fetchAllStaffs(req, res);
+        fetchPropertyUnitTypes(req, res);
         break;
         // case "GET":
-        //   fetchSingleStaff(req, res);
+        //   fetchSingleUnitType(req, res);
         break;
       case "POST":
-        createStaff(req, res);
+        createUnitType(req, res);
         break;
       case "PUT":
-        updateStaff(req, res);
+        updateUnitType(req, res);
         break;
       case "DELETE":
-        deleteStaff(req, res);
+        deleteUnitType(req, res);
         break;
       default:
         //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);

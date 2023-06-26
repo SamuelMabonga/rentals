@@ -3,8 +3,10 @@ import {
     deleteUnitType,
     fetchAllUnitTypes,
     fetchSingleUnitType,
+    fetchUnitTypesByUnit,
     updateUnitType,
   } from "controllers/unit_type";
+  import authenticateUser from "helpers/authenticate_user";
   import { connectToMongoDB } from "lib/mongodb";
   import { NextApiRequest, NextApiResponse } from "next";
   
@@ -12,13 +14,14 @@ import {
     req: NextApiRequest,
     res: NextApiResponse
   ) {
-    connectToMongoDB().catch((err) => res.json(err));
+    authenticateUser(req, res);
   
+    connectToMongoDB().catch((err) => res.json(err));
     //type of request
     const { method } = req;
     switch (method) {
       case "GET":
-        fetchAllUnitTypes(req, res);
+        fetchUnitTypesByUnit(req, res);
         break;
         // case "GET":
         //   fetchSingleUnitType(req, res);

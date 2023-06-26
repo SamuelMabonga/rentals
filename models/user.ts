@@ -1,5 +1,6 @@
 import { Schema, model, models } from "mongoose";
 
+
 const UserShema = new Schema({
   email: {
     type: String,
@@ -38,6 +39,19 @@ const UserShema = new Schema({
   verified: {
     type: String,
   },
+  role: {
+    type: String,
+  },
+  isEmail_verified: { type: Boolean, default: false },
+}, {
+  timestamps: true
+});
+
+//indexed fields for searching
+UserShema.index({
+  email: "text",
+  first_name: 'text',
+  last_name: 'text'
 });
 
 const User = models.User || model("User", UserShema);

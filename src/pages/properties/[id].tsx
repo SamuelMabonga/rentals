@@ -1,5 +1,4 @@
 import { Avatar, Box, Button, IconButton, Tab, Tabs, TextField, Typography } from "@mui/material"
-import DashboardLayout from "Components/Dashboard/DashboardLayout"
 import React, { useContext, useState } from "react"
 import Image from "next/image"
 import { UnitsTable } from "Components/Properties/UnitsTable"
@@ -7,39 +6,48 @@ import { TenantsTable } from "Components/Properties/TenantsTable"
 import { BookingsTable } from "Components/Properties/Bookings"
 import { StaffTable } from "Components/Properties/StaffTable"
 import { UnitTypesTable } from "Components/Properties/UnitTypesTable"
-import { FeaturesTable } from "Components/Properties/FeaturesTable"
 import { TicketsTable } from "Components/Properties/TicketsTable"
 import { CollectionsContext } from "context/context"
-import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
 import { GetServerSideProps, InferGetServerSidePropsType } from "next"
-import { getSession } from "next-auth/react"
+import { getSession, useSession } from "next-auth/react"
+import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
+import fetchAProperty from "apis/fetchAProperty"
+import { useRouter } from "next/router"
+import fetchBillingPeriods from "apis/fetchBillingPeriods"
+import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
+import PropertyFeatureForm from "Components/Properties/Forms/PropertyFeatureForm"
+import { PropertyFeaturesTable } from "Components/Properties/PropertyFeaturesTable"
+import UnitForm from "Components/Properties/Forms/UnitForm"
+import BookingForm from "Components/Properties/Forms/BookingForm"
+import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
+import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 
 type PageProps = {
-    data: any;
+    // data: any;
 };
 
-function TableSwitch({ activeTab }: any) {
+function TableSwitch({ activeTab, property }: any) {
     switch (activeTab) {
         case "units":
-            return <UnitsTable />
+            return <UnitsTable property={property}  />
 
         case "tenants":
-            return <TenantsTable />
+            return <TenantsTable property={property} />
 
         case "bookings":
-            return <BookingsTable />
+            return <BookingsTable property={property} />
 
         case "staff":
             return <StaffTable />
 
         case "unitTypes":
-            return <UnitTypesTable />
-
-        case "features":
-            return <FeaturesTable />
+            return <UnitTypesTable property={property} />
 
         case "tickets":
             return <TicketsTable />
+
+        case "propertyFeatures":
+            return <PropertyFeaturesTable property={property} />
 
         default:
             return <></>
@@ -63,17 +71,34 @@ function Detail() {
 }
 
 export default function Property({
-    data,
+    // data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const {
         activePropertiesTab: activeTab,
         setActivePropertiesTab: setActiveTab,
-        setShowUnitTypeForm
+        setShowUnitTypeForm,
+        setOpenFeaturesForm,
+        setOpenBillingPeriodsForm,
+        setOpenPropertyFeaturesForm,
+        setOpenUnitForm,
+        setOpenBookingForm,
     }: any = useContext(CollectionsContext)
 
-    console.log(data)
+    // SESSION
+    const { status, data: session }: any = useSession()
+
+    const router = useRouter()
+    const { id }: any = router.query
+
+    const property = id
+
+    const { data }: any = useQuery({ queryKey: ['property', id], queryFn: () => fetchAProperty(session.accessToken, id) })
+    const { data: features }: any = useQuery({ queryKey: ['property-features', id], queryFn: () => fetchPropertyFeatures(session.accessToken, property) })
+    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
+    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', id], queryFn: () => fetchPropertyUnitTypes(session.accessToken, property) })
 
     const {
+        _id,
         name,
         details,
         gallery
@@ -120,11 +145,6 @@ export default function Property({
                     <Detail />
                     <Detail />
                 </Box>
-                <Typography color="grey">
-                    This cabin comes with Smart Home System and beautiful viking style. You can see sunrise in the morning with City View from full Glass Window.
-                    This unit is surrounded by business district of West Surabaya that offers you the city life as well as wide range of culinary.
-                    This apartment equipped with Washing Machine, Electric Stove, Microwave, Refrigerator, Cutlery.
-                </Typography>
                 <Button variant="outlined" sx={{ width: "fit-content" }}>View full profile</Button>
             </Box>
 
@@ -141,8 +161,8 @@ export default function Property({
                     <Tab label="Bookings" value="bookings" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Staff" value="staff" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Unit Types" value="unitTypes" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
-                    <Tab label="Features" value="features" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Tickets" value="tickets" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
+                    <Tab label="Property Features" value="propertyFeatures" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                 </Tabs>
                 <Box width="100%" display="flex" flexWrap="wrap" gap="1rem">
                     <TextField
@@ -162,7 +182,7 @@ export default function Property({
                             }
 
                             if (activeTab === "units") {
-                                return setShowUnitTypeForm(true)
+                                return setOpenUnitForm(true)
                             }
 
                             if (activeTab === "tenants") {
@@ -178,11 +198,11 @@ export default function Property({
                             }
 
                             if (activeTab === "bookings") {
-                                return setShowUnitTypeForm(true)
+                                return setOpenBookingForm(true)
                             }
 
-                            if (activeTab === "features") {
-                                return setShowUnitTypeForm(true)
+                            if (activeTab === "propertyFeatures") {
+                                return setOpenPropertyFeaturesForm(true)
                             }
 
                         }}
@@ -190,9 +210,14 @@ export default function Property({
                         Create New
                     </Button>
                 </Box>
-                <TableSwitch activeTab={activeTab} />
+                <TableSwitch activeTab={activeTab} property={_id} />
             </Box>
-            <UnitTypeForm />
+            {/* <FeaturesForm />
+            <BillingPeriodsForm /> */}
+            <UnitTypeForm property={_id} features={features} billingPeriods={billingPeriods} />
+            <PropertyFeatureForm property={_id} />
+            <UnitForm property={_id} unitTypes={unitTypes} />
+            <BookingForm property={_id} unitTypes={unitTypes} features={features} />
         </>
     )
 }
@@ -202,10 +227,8 @@ Property.auth = true
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
 
-    const {query}: any = context
+    const { query }: any = context
     const { id } = query;
-
-    console.log("Get server props", id)
 
     if (!session) {
         return {
@@ -219,19 +242,21 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // Retrieve the access token from the session
     const accessToken = session?.accessToken;
 
-    // Make the API request with the access token included in the headers
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/property?id=${id}`, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-        },
-        method: "GET"
-    });
+    // REACT QUERY
+    const queryClient = new QueryClient()
 
-    const data = await response.json();
+    await Promise.all([
+        await queryClient.prefetchQuery(['property', id], () => fetchAProperty(accessToken, id)),
+        // await queryClient.prefetchQuery(['unitTypes'], () => fetchUnitTypes(accessToken)),
+        // await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
+        // await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
+        // await queryClient.prefetchQuery(['bookings'], () => fetchBookings(accessToken)),
+        // await queryClient.prefetchQuery(['tenants'], () => fetchTenants(accessToken)),
+    ])
 
     return {
         props: {
-            data,
+            dehydratedState: dehydrate(queryClient),
         },
     };
 };

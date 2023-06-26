@@ -1,10 +1,13 @@
 import {
-    createFeature,
-    deleteFeature,
-    fetchAllFeatures,
-    fetchSingleFeature,
-    updateFeature,
-  } from "controllers/feature";
+    createPropertyFeature,
+    deletePropertyFeature,
+    fetchAllPropertyFeatures,
+    fetchAllPropertyFeaturesByBillingPeriods,
+    fetchAllPropertyFeaturesByFeature,
+    fetchSinglePropertyFeature,
+    updatePropertyFeature,
+  } from "controllers/propertyFeatures";
+  import authenticateUser from "helpers/authenticate_user";
   import { connectToMongoDB } from "lib/mongodb";
   import { NextApiRequest, NextApiResponse } from "next";
   
@@ -12,25 +15,35 @@ import {
     req: NextApiRequest,
     res: NextApiResponse
   ) {
+    const {
+      query: { id, searchQuery },
+    }: any = req;
+  
+    authenticateUser(req, res);
+  
     connectToMongoDB().catch((err) => res.json(err));
   
     //type of request
     const { method } = req;
     switch (method) {
       case "GET":
-        fetchAllFeatures(req, res);
+        if (id) {
+          fetchSinglePropertyFeature(req, res);
+        } else {
+          fetchAllPropertyFeaturesByBillingPeriods(req, res);
+        }
         break;
         // case "GET":
         //   fetchSingleFeature(req, res);
         break;
       case "POST":
-        createFeature(req, res);
+        createPropertyFeature(req, res);
         break;
       case "PUT":
-        updateFeature(req, res);
+        updatePropertyFeature(req, res);
         break;
       case "DELETE":
-        deleteFeature(req, res);
+        deletePropertyFeature(req, res);
         break;
       default:
         //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);

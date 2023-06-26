@@ -1,30 +1,37 @@
 import { Schema, model, models } from "mongoose";
+import UnitType from "./unit_type";
+import Property from "./property";
+import Tenant from "./tenant";
 
-const UnitShema = new Schema({
+const UnitSchema = new Schema({
   image: {
     type: String,
   },
   name: {
     required: true,
     type: String,
+    unique: true
   },
-  tenant: {
+  unitType: {
+    type: Schema.Types.ObjectId,
+    ref: UnitType,
+  },
+  property: {
+    type: Schema.Types.ObjectId,
+    ref: Property,
+  },
+  // tenant: {
+  //   type: Schema.Types.ObjectId,
+  //   ref: Tenant,
+  //   default: null
+  // },
+  status: {
     type: String,
   },
-  unit_type: {
-    type: String,
-  },
-  unit_status: {
-    type: String,
-  },
-  created_at: {
-    type: Date,
-  },
-  expires_at: {
-    type: Date,
-  },
+}, {
+  timestamps: true
 });
 
-const Unit = models.Unit || model("Unit", UnitShema);
+const Unit = models.Unit || model("Unit", UnitSchema);
 
 export default Unit;

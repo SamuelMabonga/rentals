@@ -5,6 +5,7 @@ import React, { useState } from 'react'
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
+import { useRouter } from 'next/router';
 
 
 const formSchema = yup.object().shape({
@@ -17,6 +18,7 @@ const formSchema = yup.object().shape({
 })
 
 export default function Signup() {
+    const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
 
     const { handleSubmit, register, formState: { errors } } = useForm({
@@ -47,16 +49,15 @@ export default function Signup() {
         }
 
         try {
-            const res = await fetch('/api/auth/signup',{
+            const res: any = await fetch('/api/auth/signup',{
                 method: 'POST',
                 headers:{
                     'Content-Type':'application/json'
                 },
                 body: JSON.stringify({...data})
             })
-            const response = await res.json();
-            console.log(response)
-            setIsLoading(false)
+            await res.json()
+            return router.push("/verify-email")
         } catch(error) {
             setIsLoading(false)
             console.log(error)
@@ -88,14 +89,14 @@ export default function Signup() {
                         sx={{
                             bgcolor: "white",
                             width: ["90vw", "30rem"],
-                            padding: "1rem",
+                            // padding: "1rem",
                             display: "flex",
-                            gap: "2rem",
                             flexDirection: "column",
                             my: "auto"
                         }}
                     >
-                        {/* <LinearProgress sx={{display: isLoading ? "flex" : "none"}} /> */}
+                        <LinearProgress sx={{display: isLoading ? "flex" : "none"}} />
+                        <Box display="flex" flexDirection="column" gap="2rem" padding={["1rem", "1.5rem"]}>
                         <Typography color="primary.dark" mx="auto">Rentals</Typography>
                         <Box display="flex" flexDirection="column">
                         <Typography color="primary.dark" mx="auto" fontSize="1.5rem" fontWeight="600">Sign Up</Typography>
@@ -173,9 +174,11 @@ export default function Signup() {
                                 </FormControl>
                             </Box>
                         </form>
-                        <Button disabled={isLoading} variant="contained" sx={{ padding: "1rem" }} type="submit" form="signup-form">Login</Button>
+                        <Button disabled={isLoading} variant="contained" sx={{ padding: "1rem" }} type="submit" form="signup-form">Sign Up</Button>
                         <Divider orientation="horizontal" />
                         <Link href="/" style={{ marginRight: "auto", marginLeft: "auto" }}><Typography>Don't have an account?</Typography></Link>
+                        </Box>
+                        
                     </Card>
                 </Box>
             </main>

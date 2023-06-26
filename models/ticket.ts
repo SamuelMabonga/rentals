@@ -5,8 +5,8 @@ const TicketShema = new Schema({
     type: String,
   },
   unit: {
-    required: true,
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: 'Unit',
   },
   message: {
     type: String,

@@ -1,35 +1,50 @@
 import BUIDING_TYPES from "constants";
 import { Schema, model, models } from "mongoose";
 
-const propertyShema = new Schema({
-  name: {
-    type: String,
-    required: true,
+const propertySchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    cover_photo: {
+      type: String,
+    },
+    profile_photo: {
+      type: String,
+    },
+    details: {
+      type: String,
+    },
+    price: {
+      type: String,
+    },
+    gallery: {
+      type: Array,
+    },
+    building_type: {
+      type: String,
+      // enum:  // BUIDING_TYPES
+    },
+    number_of_units: {
+      type: String,
+    },
   },
-  cover_photo: {
-    type: String,
-  },
-  profile_photo: {
-    type: String,
-  },
-  details: {
-    type: String,
-  },
-  price: {
-    type: String,
-  },
-  gallery: {
-    type: Array,
-  },
-  building_type: {
-    type: String,
-    // enum:  // BUIDING_TYPES
-  },
-  number_of_units: {
-    type: String,
-  },
+  {
+    timestamps: true,
+  }
+);
+//indexed fields for searching
+propertySchema.index({
+  name: "text",
 });
 
-const Property = models.Property || model("Property", propertyShema);
+const Property = models.Property || model("Property", propertySchema);
 
 export default Property;

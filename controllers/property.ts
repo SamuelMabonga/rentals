@@ -1,9 +1,32 @@
 import Property from "models/property";
 
 // get all properties
+//none admin fetch properties
+export async function fetchOwnerProperties(req: any, res: any ) {
+  let ownerId = req.query.ownerId
+  try {
+    let properties = await Property.find({ owner: `${ownerId}` });
+
+    res.status(200).json({
+      success: true,
+      msg: "properties fetched successfully",
+      data: properties,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch  properties",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// get admin all properties
 export async function fetchAllProperties(req: any, res: any) {
   try {
     let properties = await Property.find();
+
     res.status(200).json({
       success: true,
       msg: "properties fetched successfully",
@@ -20,7 +43,7 @@ export async function fetchAllProperties(req: any, res: any) {
 }
 
 // create a property
-export async function createProperty(req: any, res: any) {
+export async function createProperty(req: any, res: any, userFetching: string) {
   try {
     const { cover_photo, profile_photo, name, details } = req.body;
     console.log("It does not fail after line 30");
@@ -39,8 +62,11 @@ export async function createProperty(req: any, res: any) {
       });
     }
 
+    console.log("OWNER HERERE", userFetching);
+
     const property = new Property({
       ...req.body,
+      owner: userFetching
     });
 
     const newProperty = await property.save();
@@ -48,12 +74,7 @@ export async function createProperty(req: any, res: any) {
     return res.json({
       success: true,
       msg: "New property created",
-      _id: newProperty?._id,
-      name: newProperty?.name,
-      details: newProperty?.details,
-      price: newProperty?.price,
-      building_type: newProperty?.building_type,
-      number_of_units: newProperty?.number_of_units,
+      data: newProperty,
     });
   } catch (error: any) {
     console.log(error);
@@ -67,14 +88,14 @@ export async function createProperty(req: any, res: any) {
 //fetch property by id
 export async function fetchSingleProperty(req: any, res: any) {
   try {
-    let property = await Property.findById(req.query.id);
-    res.status(200).json({
+    let property = await Property.findById(req.query.id)
+    res.json({
       success: true,
       msg: "property fetched successfully",
       data: property,
     });
   } catch (error) {
-    res.status(400).json({
+    res.json({
       success: false,
       msg: "failed to fetch property",
       data: error,
@@ -86,12 +107,12 @@ export async function fetchSingleProperty(req: any, res: any) {
 //update a property
 export async function updateProperty(req: any, res: any) {
   try {
-    let property = await Property.findById(req.params.id);
+    let property = await Property.findById(req.query.id);
 
     const data = {
       name: req.body.name || property.name,
     };
-    property = await Property.findByIdAndUpdate(req.params.id, data, {
+    property = await Property.findByIdAndUpdate(req.query.id, data, {
       new: true,
     });
     res.status(200).json({
@@ -111,10 +132,10 @@ export async function updateProperty(req: any, res: any) {
 //delete a property
 export async function deleteProperty(req: any, res: any) {
   try {
-    let property = await Property.findById(req.params.id);
+    let property = await Property.findById(req.query.id);
 
     if (!property) {
-      //   return next("property being deleted has not been found");
+      // return next("property being deleted has not been found");
       return "property being deleted has not been found";
     }
 
@@ -128,6 +149,37 @@ export async function deleteProperty(req: any, res: any) {
     res.status(400).json({
       success: false,
       msg: "failed to delete property",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// @desc    search
+// @route   GET /api/user?searchQuery=searchQuery
+export async function searchProperty(req: any, res: any, searchQuery: string) {
+  try {
+    let findParams = searchQuery
+      ? {
+          $text: {
+            $search: searchQuery,
+            $caseSensitive: false,
+            $diacriticSensitive: false,
+          },
+        }
+      : {};
+
+    const properties = await Property.find({ ...findParams });
+
+    res.status(200).json({
+      success: true,
+      msg: `${searchQuery} searched successfully`,
+      data: properties,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: `failed to search ${searchQuery}`,
       data: error,
     });
     console.log(error);

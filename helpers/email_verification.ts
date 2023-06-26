@@ -9,9 +9,8 @@ function sendEmailVerification(
   email: string,
   res: NextApiResponse
 ) {
-  // url for sending the email
-//   TODO: refactor to use .env value 
-  const currenturl = `http://localhost:3000/`;
+  //endpoint for verifying emails
+  const url = `http://localhost:3000/api/verify-email?id=${_id}`;
 
   // const uniqueString = uuidv4() + _id
   const uniqueString = 1245 + _id;
@@ -21,9 +20,7 @@ function sendEmailVerification(
     from: process.env.NEXT_PUBLIC_AUTH_EMAIL,
     to: email,
     subject: `Verify your Email`,
-    html: `<p>Verfiy your email address to complete the sugnup and login to your email.</p><p>This link expires in <b>6 hours</b></p><p>Press <a href=${
-      currenturl + `user/verify` + _id + `/` + uniqueString
-    }>here</a> to proceed</p>`,
+    html: `<p>Verfiy your email address to complete the sugnup and login to your email.</p><p>This link expires in <b>6 hours</b></p><p>Press <a href=${url}>here</a> to proceed</p>`,
   };
 
   // hash the unique string

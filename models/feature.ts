@@ -8,15 +8,6 @@ const FeatureShema = new Schema({
     required: true,
     type: String,
   },
-  price: {
-    type: String,
-  },
-  rate: {
-    type: String,
-  },
-  created_at: {
-    type: Date,
-  }
 });
 
 const Feature = models.Feature || model("Feature", FeatureShema);

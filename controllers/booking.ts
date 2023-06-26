@@ -1,10 +1,63 @@
 import Booking from "models/booking";
+import Tenant from "models/tenant";
+import Unit from "models/unit";
+import Fuse from "fuse.js";
+import { createBill } from "./bills";
+import Bills from "models/bills";
+import moment from "moment";
 
 // get all bookings
 export async function fetchAllBookings(req: any, res: any) {
   try {
-    let bookings = await Booking.find();
-    res.status(200).json({
+    let bookings = await Booking.find()
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType" }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
+
+    res.json({
+      success: true,
+      msg: "bookings fetched successfully",
+      data: bookings,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch  bookings",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// get all Property Bookings
+export async function fetchAllPropertyBookings(req: any, res: any) {
+  const {
+    query: { property, searchQuery },
+  }: any = req;
+
+  try {
+    let bookings = await Booking.find({ "unit.property._id": property })
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType" }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
+
+    res.json({
       success: true,
       msg: "bookings fetched successfully",
       data: bookings,
@@ -22,7 +75,7 @@ export async function fetchAllBookings(req: any, res: any) {
 // create a booking
 export async function createBooking(req: any, res: any) {
   try {
-    const requiredFields = ["name"];
+    const requiredFields = ["user"];
 
     const includesAllFields = requiredFields.every((field) => {
       return !!req.body[field];
@@ -39,6 +92,7 @@ export async function createBooking(req: any, res: any) {
 
     const booking = new Booking({
       ...req.body,
+      status: "PENDING",
     });
 
     const newBooking = await booking.save();
@@ -47,11 +101,11 @@ export async function createBooking(req: any, res: any) {
       success: true,
       msg: "New booking created",
       _id: newBooking?._id,
-      name: newBooking?.name,
-      image: newBooking?.image,
-      unit: newBooking?.unit,
-      start_date: newBooking?.start_date,
-      end_date: newBooking?.end_date,
+      // name: newBooking?.name,
+      // image: newBooking?.image,
+      // unit: newBooking?.unit,
+      // start_date: newBooking?.start_date,
+      // end_date: newBooking?.end_date,
     });
   } catch (error: any) {
     console.log(error);
@@ -65,8 +119,20 @@ export async function createBooking(req: any, res: any) {
 //fetch booking by id
 export async function fetchSingleBooking(req: any, res: any) {
   try {
-    let booking = await Booking.findById(req.params.id);
-    res.status(200).json({
+    let booking = await Booking.findById(req.query.id)
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType" }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
+
+    res.json({
       success: true,
       msg: "booking fetched successfully",
       data: booking,
@@ -84,24 +150,33 @@ export async function fetchSingleBooking(req: any, res: any) {
 //update a booking
 export async function updateBooking(req: any, res: any) {
   try {
-    let booking = await Booking.findById(req.params.id);
+    let booking = await Booking.findById(req.query.id);
 
     const data = {
-      name: req.body.name || booking.name,
-      image: req.body.image || booking.image,
-      unit: req.body.unit || booking.unit,
-      start_date: req.body.start_date || booking.start_date,
-      end_date: req.body.end_date || booking.end_date,
+      ...req.body,
     };
-    booking = await Booking.findByIdAndUpdate(req.params.id, data, {
+    booking = await Booking.findByIdAndUpdate(req.query.id, data, {
       new: true,
-    });
+    })
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType" }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
+
     res.status(200).json({
       success: true,
       msg: "booking updated successfully",
       data: booking,
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json({
       success: false,
       msg: "failed to update booking",
@@ -113,7 +188,7 @@ export async function updateBooking(req: any, res: any) {
 //delete a booking
 export async function deleteBooking(req: any, res: any) {
   try {
-    let booking = await Booking.findById(req.params.id);
+    let booking = await Booking.findById(req.query.id);
 
     if (!booking) {
       //   return next("booking being deleted has not been found");
@@ -133,5 +208,224 @@ export async function deleteBooking(req: any, res: any) {
       data: error,
     });
     console.log(error);
+  }
+}
+
+// @desc    search
+// @route   GET /api/booking?searchQuery=searchQuery
+export async function searchBooking(req: any, res: any, searchQuery: string) {
+  try {
+    let bookings = await Booking.find()
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType" }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
+
+    const options = {
+      keys: ["user.last_name", "user.first_name", "user.email"],
+      threshold: 0.3,
+    };
+
+    if (searchQuery?.replace(/%/g, "")) {
+      const formatText = searchQuery?.replace(/%/g, "");
+      const fuse = new Fuse(bookings, options);
+      bookings = fuse.search(formatText)?.map(({ item }) => item);
+    }
+
+    res.status(200).json({
+      success: true,
+      msg: `${searchQuery} searched successfully`,
+      data: bookings,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: `failed to search ${searchQuery}`,
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+//accept a booking
+export async function acceptBooking(req: any, res: any) {
+  const { id } = req.body;
+  let additionalFeatures: any = [];
+
+  function PopulateAdditionalFeatures(booking: any) {
+    booking?.additionalFeatures.forEach((additionalFeature: any) => {
+      additionalFeatures.push(additionalFeature);
+    });
+    return additionalFeatures;
+  }
+
+  try {
+    //UPDATE booking status to accepted
+    // let booking = await Booking.findById(req.body.id);
+    let booking = await Booking.findByIdAndUpdate(
+      id,
+      {
+        status: "ACCEPTED",
+      },
+      {
+        new: true,
+      }
+    )
+      .populate({
+        path: "unit",
+        populate: [{ path: "unitType", populate: [{ path: "billingPeriod" }] }],
+      })
+      .populate({
+        path: "user",
+      })
+      .populate({
+        path: "additionalFeatures",
+        populate: [{ path: "feature" }],
+      });
+
+    let BOOKED_UNIT_STATUS = "ACCEPTED";
+    if (booking && booking?.unit?.status === BOOKED_UNIT_STATUS) {
+      res.status(403).json({
+        success: false,
+        msg: `booking cannot be made. Unit is ${BOOKED_UNIT_STATUS}`,
+      });
+    }
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        msg: "Booking not found",
+      });
+    }
+
+    console.log("BOOKING", booking)
+
+    try {
+      //CREATE a new tenant
+      const tenantObj = new Tenant({
+        user: booking?.user?._id,
+        unit: booking?.unit?._id,
+        startDate: booking?.startDate,
+        endDate: booking?.endDate,
+        additionalFeatures: PopulateAdditionalFeatures(booking),
+        customRent: booking?.customRent ?? null,
+        customBillingPeriod: booking?.customBillingPeriod,
+        nextRentBilling: Date.now(),
+        status: "PENDING",
+      });
+
+      const newTenant = await tenantObj.save();
+
+      //genrate bills
+      // Create bill 
+      if (!newTenant._id) {
+        return res.status(404).json({ error: "Tenant not created" });
+      }
+
+      // Create a rent bill
+      try {
+        const tenant = await Tenant.findById(newTenant._id)
+          .populate({
+            path: "additionalFeatures",
+            populate: [{ path: "billingPeriod" }],
+          })
+          .populate({
+            path: "unit",
+            populate: [{ 
+              path: "unitType", 
+              populate: [{ path: "billingPeriod" }] 
+            }],
+          })
+          .populate("customBillingPeriod")
+
+        const rentBill = new Bills({
+          startDate: tenant.startDate,
+          endDate: tenant?.customBillingPeriod?.time
+            ? moment(tenant?.startDate).add(
+              tenant?.customBillingPeriod?.time,
+              "ms"
+            )
+            : moment(tenant?.startDate).add(
+              tenant?.unit?.unitType?.billingPeriod?.time,
+              "ms"
+            ),
+          tenant: tenant._id,
+          type: "RENT", // Set the bill type as 'Rent'
+          propertyFeature: null, // No specific property feature for rent bill, so set it to null
+          amount: tenant?.unit?.unitType?.price,
+          pay_by: tenant?.customBillingPeriod?.time
+            ? moment(tenant?.startDate).add(
+              tenant?.customBillingPeriod?.time + 604800000,
+              "ms"
+            )
+            : moment(tenant?.startDate).add(
+              tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+              "ms"
+            ), // set dedault pay date to 7 days
+        });
+
+        await rentBill.save();
+
+        // Iterate through each additional feature ID
+        for (const feature of tenant?.additionalFeatures) {
+
+          // Create a new bill for each feature
+          const bill = new Bills({
+            startDate: tenant.startDate,
+            endDate: moment(tenant?.startDate).add(
+              tenant?.unit?.unitType?.billingPeriod?.time,
+              "ms"
+            ),
+            tenant: tenant._id,
+            type: "FEATURE", // set bill type to 'Feature'
+            propertyFeature: feature?._id,
+            amount: feature?.price, // Set the bill amount as the price from the property feature
+            pay_by: tenant?.customBillingPeriod?.time
+              ? moment(tenant?.startDate).add(
+                tenant?.customBillingPeriod?.time + 604800000,
+                "ms"
+              )
+              : moment(tenant?.startDate).add(
+                tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+                "ms"
+              ), // set dedault pay date to 7 days
+          });
+
+          await bill.save();
+        }
+      } catch (error) {
+        console.log("CREATE RENT ERROR", error);
+        return res.status(400).json({ error: "Failed to create rent bill" });
+      }
+
+
+      // Return a success response
+      res.status(200).json({ message: "Bills created successfully" });
+
+    } catch (error) {
+      console.log(error)
+      res.status(400).json({ error: "Failed to create bills" });
+    }
+
+
+    res.status(200).json({
+      success: true,
+      msg: "booking successfully accepted",
+      data: booking,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      success: false,
+      msg: "failed to update booking",
+      data: error,
+    });
   }
 }

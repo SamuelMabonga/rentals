@@ -1,26 +1,43 @@
 import { Schema, model, models } from "mongoose";
+import BillingPeriods from "./billingPeriod";
 
-const UnitTypeShema = new Schema({
-  image: {
-    type: String,
+const UnitTypeShema = new Schema(
+  {
+    image: {
+      type: String,
+    },
+    name: {
+      required: true,
+      type: String,
+    },
+    price: {
+      type: String,
+    },
+    billingPeriod: {
+      type: Schema.Types.ObjectId,
+      ref:  BillingPeriods
+    },
+    units: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Unit",
+      },
+    ],
+    property: {
+      type: Schema.Types.ObjectId,
+      ref: "Property",
+    },
+    defaultFeatures: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "PropertyFeatures",
+      },
+    ],
   },
-  name: {
-    required: true,
-    type: String,
-  },
-  price: {
-    type: String,
-  },
-  rate: {
-    type: String,
-  },
-  units: {
-    type: Array,
-  },
-  created_at: {
-    type: Date,
+  {
+    timestamps: true,
   }
-});
+);
 
 const UnitType = models.UnitType || model("UnitType", UnitTypeShema);
 

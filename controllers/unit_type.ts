@@ -3,7 +3,53 @@ import UnitType from "models/unit_type";
 // get all unit_types
 export async function fetchAllUnitTypes(req: any, res: any) {
   try {
-    let unit_types = await UnitType.find();
+    let unit_types = await UnitType.find()
+      .populate("billingPeriod")
+      .populate("defaultFeatures");
+    res.status(200).json({
+      success: true,
+      msg: "unit types fetched successfully",
+      data: unit_types,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch  unit types",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// get all unit_types by unit
+export async function fetchUnitTypesByUnit(req: any, res: any) {
+  let unitId = req.query.unitId;
+  try {
+    let unit_types = await UnitType.find({ unit: unitId })
+      .populate("billingPeriod")
+      .populate("defaultFeatures");
+    res.status(200).json({
+      success: true,
+      msg: "unit types fetched successfully",
+      data: unit_types,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch  unit types",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// get all unit_types by unit
+export async function fetchPropertyUnitTypes(req: any, res: any) {
+  let propertyId = req.query.id;
+  try {
+    let unit_types = await UnitType.find({ property: propertyId })
+      .populate("billingPeriod")
+      .populate("defaultFeatures");
     res.status(200).json({
       success: true,
       msg: "unit types fetched successfully",
@@ -52,6 +98,8 @@ export async function createUnitType(req: any, res: any) {
       rate: newUnitType?.rate,
       price: newUnitType?.price,
       units: newUnitType?.units,
+      defaultFeatures: newUnitType?.features,
+      property: newUnitType?.property,
       created_at: newUnitType?.created_at,
     });
   } catch (error: any) {
@@ -66,7 +114,9 @@ export async function createUnitType(req: any, res: any) {
 //fetch unit type by id
 export async function fetchSingleUnitType(req: any, res: any) {
   try {
-    let unit_type = await UnitType.findById(req.params.id);
+    let unit_type = await UnitType.findById(req.params.id)
+      .populate("billingPeriod")
+      .populate("defaultFeatures");
     res.status(200).json({
       success: true,
       msg: "unit type fetched successfully",
@@ -93,7 +143,7 @@ export async function updateUnitType(req: any, res: any) {
       rate: req.body.rate || unit_type.rate,
       created_at: req.body.created_at || unit_type.created_at,
       price: req.body.price || unit_type.price,
-      units: req.body.units || unit_type.units
+      units: req.body.units || unit_type.units,
     };
     unit_type = await unit_type.findByIdAndUpdate(req.params.id, data, {
       new: true,

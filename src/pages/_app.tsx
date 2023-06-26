@@ -1,9 +1,8 @@
 import * as React from 'react';
+import { Hydrate, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from 'next/app';
 import { CacheProvider, EmotionCache } from '@emotion/react';
-import { ThemeProvider, CssBaseline, createTheme } from '@mui/material';
-
-
+import { ThemeProvider, CssBaseline, createTheme, Box } from '@mui/material';
 
 import '../styles/globals.css';
 import "../styles/ReactCrop.css"
@@ -12,14 +11,20 @@ import lightThemeOptions from '@/theme/lightThemeOptions';
 import { SessionProvider, useSession } from 'next-auth/react';
 import { CollectionsContext, CollectionsProvider } from 'context/context';
 import DashboardLayout from 'Components/Dashboard/DashboardLayout';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+
+// const queryClient = new QueryClient();
 
 function Auth({ children }: any) {
   // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
   const { status } = useSession({ required: true })
 
-  if (status === "loading") {
-    return <div>Loading...</div>
-  }
+  // if (status === "loading") {
+  //   return <Box width="100vw" height="100vh">
+  //     Loading...
+  //   </Box>
+  // }
 
   return children
 }
@@ -36,6 +41,7 @@ const lightTheme = createTheme(lightThemeOptions);
 const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps: { session, ...pageProps } }: any = props;
 
+  const [queryClient] = React.useState(() => new QueryClient())
   return (
     <CacheProvider value={emotionCache}>
       <CollectionsProvider>
@@ -44,9 +50,14 @@ const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
           <SessionProvider session={session}>
             {Component.auth ? (
               <Auth>
-                <DashboardLayout>
-                  <Component {...pageProps} />
-                </DashboardLayout>
+                <QueryClientProvider client={queryClient}>
+                  <Hydrate state={pageProps.dehydratedState}>
+                    <DashboardLayout>
+                      <Component {...pageProps} />
+                    </DashboardLayout>
+                  </Hydrate>
+                  <ReactQueryDevtools initialIsOpen={false} />
+                </QueryClientProvider>
               </Auth>
             ) : (
               <Component {...pageProps} />

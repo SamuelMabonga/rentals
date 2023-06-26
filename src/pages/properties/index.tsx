@@ -3,21 +3,60 @@ import { PropertiesTable } from "Components/Properties/PropertiesTable"
 import PropertyForm from "Components/Properties/Forms/PropertyForm"
 import React, { useContext, useState } from "react"
 import { CollectionsContext } from "context/context"
-import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm"
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import { getSession, useSession } from "next-auth/react"
-import ImageCropper from "Components/Common/ImageCropper"
-// import ImageUploader from "Components/Common/ImageUploader"
+import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
+import fetchProperties from "apis/fetchProperties"
 
-type Property = {
-    // name: string;
-    // stargazers_count: number;
-};
+// type Property = {
+//     // name: string;
+//     // stargazers_count: number;
+// };
 
 type PageProps = {
-    data: any;
+    // data: any;
 };
 
+
+export default function Properties({
+    // data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    // CONTEXT
+    const {
+        setShowPropertyForm,
+    }: any = useContext(CollectionsContext)
+
+    // SESSION
+    const { status, data: session }: any = useSession()
+
+    const [openCreateForm, setOpenCreateForm] = useState(false)
+
+    const { data }: any = useQuery({ queryKey: ['properties'], queryFn: () => fetchProperties(session.accessToken) })
+
+    return (
+        <>
+            <Typography color="black" fontSize="1.5rem" fontWeight="600">My Properties</Typography>
+            <Box width="100%" display={"flex"} flexDirection={["column", "row"]} gap="1rem">
+                <TextField
+                    name="search"
+                    placeholder="Search"
+                    size="small"
+                    sx={{
+                        width: ["100%", "20rem"]
+                    }}
+                />
+                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setShowPropertyForm(true)}>Create New</Button>
+            </Box>
+            <PropertiesTable data={data?.data} />
+
+            <PropertyForm />
+            {/* <UnitTypeForm /> */}
+            {/* <ImageUploader /> */}
+        </>
+    )
+}
+
+Properties.auth = true
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
@@ -34,57 +73,15 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // Retrieve the access token from the session
     const accessToken = session?.accessToken;
 
-    // Make the API request with the access token included in the headers
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/property`, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-        },
-        method: "GET"
-    });
+    // REACT QUERY
+    const queryClient = new QueryClient()
 
-    const data = await response.json();
+    await queryClient.prefetchQuery(['properties'], () => fetchProperties(accessToken))
 
     return {
         props: {
-            data,
+            dehydratedState: dehydrate(queryClient),
         },
     };
 };
 
-
-
-export default function Properties({
-    data,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-        // CONTEXT
-        const {
-            setShowPropertyForm,
-        }: any = useContext(CollectionsContext)
-
-    const [openCreateForm, setOpenCreateForm] = useState(false)
-
-    return (
-        <>
-            <Typography color="black" fontSize="1.5rem" fontWeight="600">My Properties</Typography>
-            <Box width="100%" display={"flex"} flexDirection={["column", "row"]} gap="1rem">
-                <TextField
-                    name="search"
-                    placeholder="Search"
-                    size="small"
-                    sx={{
-                        width: ["100%", "20rem"]
-                    }}
-                />
-                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setShowPropertyForm(true)}>Create New</Button>
-            </Box>
-            <PropertiesTable data={data.data} />
-            {/* <ImageCropper open={true} /> */}
-
-            <PropertyForm />
-            <UnitTypeForm />
-            {/* <ImageUploader /> */}
-        </>
-    )
-}
-
-Properties.auth = true

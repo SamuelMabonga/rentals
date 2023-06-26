@@ -5,10 +5,16 @@ import { useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/TableRenderer';
+import fetchTenants from 'apis/fetchTenants';
+import { useQuery } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
+import moment from 'moment';
+import fetchPropertyTenants from 'apis/property/fetchPropertyTenants';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: string;
 }
 
 type Item = {
@@ -20,44 +26,10 @@ type Item = {
     actions: any;
 }
 
-export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
-    const data = [
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            unit: "string",
-            entryDate: "string",
-            endDate: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            unit: "string",
-            entryDate: "string",
-            endDate: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            unit: "string",
-            entryDate: "string",
-            endDate: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            unit: "string",
-            entryDate: "string",
-            endDate: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "string",
-            unit: "string",
-            entryDate: "string",
-            endDate: "string",
-        },
-    ]
+export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>) => {
+    const session: any = useSession()
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-tenants', property], queryFn: () => fetchPropertyTenants(session.data.accessToken, property) })
+
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -79,21 +51,21 @@ export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
             {
                 header: 'Name',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'name',
+                accessorKey: 'user.first_name',
             },
             {
                 header: 'Unit',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'unit',
+                accessorKey: 'unit.name',
             },
             {
                 header: 'Entry Date',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'entryDate',
+                cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+                accessorKey: 'startDate',
             },
             {
                 header: 'End Date',
-                cell: (row) => row.renderValue(),
+                cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
                 accessorKey: 'endDate',
             },
             {
@@ -122,17 +94,15 @@ export const TenantsTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
     return (
         <TableRenderer
-            data={data}
-            columns={columns} onRowClick={function (obj: any): void {
+            data={data?.data || []}
+            columns={columns}
+            onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
-            } }        />
+            } }
+            loading={isLoading}
+        />
+            // <h1>Hwey</h1>
     );
 };

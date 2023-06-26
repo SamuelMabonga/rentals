@@ -19,6 +19,25 @@ export async function fetchAllStaffs(req: any, res: any) {
   }
 }
 
+export async function fetchAllStaffsByRoles(req: any, res: any) {
+  let roleId = req.query.roleId;
+  try {
+    let staffs = await Staff.find({ role: roleId });
+    res.status(200).json({
+      success: true,
+      msg: "staffs fetched successfully",
+      data: staffs,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch  staffs",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
 // create a staff
 export async function createStaff(req: any, res: any) {
   try {
@@ -130,6 +149,37 @@ export async function deleteStaff(req: any, res: any) {
     res.status(400).json({
       success: false,
       msg: "failed to delete staff",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// @desc    search
+// @route   GET /api/staff?searchQuery=searchQuery
+export async function searchStaff(req: any, res: any, searchQuery: string) {
+  try {
+    let findParams = searchQuery
+      ? {
+          $text: {
+            $search: searchQuery,
+            $caseSensitive: false,
+            $diacriticSensitive: false,
+          },
+        }
+      : {};
+
+    const staff = await Staff.find({ ...findParams });
+
+    res.status(200).json({
+      success: true,
+      msg: `${searchQuery} searched successfully`,
+      data: staff,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: `failed to search ${searchQuery}`,
       data: error,
     });
     console.log(error);

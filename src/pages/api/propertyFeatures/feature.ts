@@ -1,10 +1,12 @@
 import {
-    createTenant,
-    deleteTenant,
-    fetchAllTenants,
-    fetchSingleTenant,
-    updateTenant,
-  } from "controllers/tenant";
+    createPropertyFeature,
+    deletePropertyFeature,
+    fetchAllPropertyFeatures,
+    fetchAllPropertyFeaturesByFeature,
+    fetchSinglePropertyFeature,
+    updatePropertyFeature,
+  } from "controllers/propertyFeatures";
+  import authenticateUser from "helpers/authenticate_user";
   import { connectToMongoDB } from "lib/mongodb";
   import { NextApiRequest, NextApiResponse } from "next";
   
@@ -12,25 +14,35 @@ import {
     req: NextApiRequest,
     res: NextApiResponse
   ) {
+    const {
+      query: { id, searchQuery },
+    }: any = req;
+  
+    authenticateUser(req, res);
+  
     connectToMongoDB().catch((err) => res.json(err));
   
     //type of request
     const { method } = req;
     switch (method) {
       case "GET":
-        fetchAllTenants(req, res);
+        if (id) {
+          fetchSinglePropertyFeature(req, res);
+        } else {
+          fetchAllPropertyFeaturesByFeature(req, res);
+        }
         break;
         // case "GET":
-        //   fetchSingleTenant(req, res);
+        //   fetchSingleFeature(req, res);
         break;
       case "POST":
-        createTenant(req, res);
+        createPropertyFeature(req, res);
         break;
       case "PUT":
-        updateTenant(req, res);
+        updatePropertyFeature(req, res);
         break;
       case "DELETE":
-        deleteTenant(req, res);
+        deletePropertyFeature(req, res);
         break;
       default:
         //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);

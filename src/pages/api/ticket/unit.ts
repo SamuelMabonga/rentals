@@ -1,10 +1,10 @@
 import {
-    createBooking,
-    deleteBooking,
-    fetchAllBookings,
-    fetchSingleBooking,
-    updateBooking,
-  } from "controllers/booking";
+    createTicket,
+    deleteTicket,
+    fetchUnitTickets,
+    updateTicket,
+  } from "controllers/ticket";
+  import authenticateUser from "helpers/authenticate_user";
   import { connectToMongoDB } from "lib/mongodb";
   import { NextApiRequest, NextApiResponse } from "next";
   
@@ -12,25 +12,26 @@ import {
     req: NextApiRequest,
     res: NextApiResponse
   ) {
-    connectToMongoDB().catch((err) => res.json(err));
+    authenticateUser(req, res);
   
+    connectToMongoDB().catch((err) => res.json(err));
     //type of request
     const { method } = req;
     switch (method) {
       case "GET":
-        fetchAllBookings(req, res);
+        fetchUnitTickets(req, res);
         break;
         // case "GET":
-        //   fetchSingleBooking(req, res);
+        //   fetchSingleTicket(req, res);
         break;
       case "POST":
-        createBooking(req, res);
+        createTicket(req, res);
         break;
       case "PUT":
-        updateBooking(req, res);
+        updateTicket(req, res);
         break;
       case "DELETE":
-        deleteBooking(req, res);
+        deleteTicket(req, res);
         break;
       default:
         //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);
