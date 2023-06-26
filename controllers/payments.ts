@@ -103,9 +103,11 @@ export async function flutterwaveWebhook(req: any, res: any) {
   const payload = req.body;
 
   try {
+    console.log("FINDING PAYMENT", payload.data.tx_ref);
     let payment = await Payments.findById(payload.data.tx_ref).populate({
       path: "bills",
     });
+    console.log("PAYMENT FOUND", payment)
 
     const data = {
       ...payment,
