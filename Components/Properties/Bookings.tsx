@@ -141,7 +141,7 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
             {
                 header: 'Actions',
                 cell: (row: any) => (
-                    <Box display="flex" gap="1rem" >
+                    <Box display="flex" gap="1rem">
                         <AlertDialog
                             buttonLabel="Accept"
                             buttonVariant="contained"
@@ -223,6 +223,6 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
                 throw new Error('Function not implemented.');
             }}
             loading={isLoading}
-            />
+        />
     );
 };

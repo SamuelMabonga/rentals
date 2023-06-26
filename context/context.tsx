@@ -51,7 +51,7 @@ const CollectionsProvider = ({children}: any) => {
 
     // BOOKING FORM
     const [openBookingForm, setOpenBookingForm] = useState(false)
-    const [bookingToEdit, setBookingToEdit] = useState(false)
+    const [bookingToEdit, setBookingToEdit] = useState({})
 
 
     // IMAGE UPLOADER
