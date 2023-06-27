@@ -30,7 +30,7 @@ export default async function handler(
 
         flutterwaveWebhook(req, res);
 
-        res.status(200).end()
+        // res.status(200).end()
       });
   } catch (error) {
     res.status(500).json({

@@ -105,16 +105,27 @@ export async function flutterwaveWebhook(req: any, res: any) {
   try {
     console.log("FINDING PAYMENT", payload.data.tx_ref);
     console.log("PAYLOAD", payload);
-    let payment = await Payments.findById(payload.data.tx_ref);
+    let payment = await Payments.findById(payload.data.tx_ref).populate("bills");
     console.log("PAYMENT FOUND", payment)
 
     const data = {
-      ...payment,
-      status: payment.data.status.toUpperCase(),
+      ...payment._doc,
+      status: "SUCCEESSFUL",
+      amountPaid: payload.data.amount,
     };
 
-    await Payments.findByIdAndUpdate(payload.data.tx_ref, data, {
+    console.log("DATA", data)
+
+    const updated = await Payments.findByIdAndUpdate(payload.data.tx_ref, data, {
       new: true,
+    });
+
+    console.log("UPDATED PAYMENT", updated)
+
+    return res.json({
+      success: true,
+      msg: "Payment updated",
+      data: updated,
     });
     
   } catch (error) {

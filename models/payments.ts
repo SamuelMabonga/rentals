@@ -1,6 +1,7 @@
 import { timeStamp } from "console";
 import { Schema, model, models } from "mongoose";
 import Tenant from "./tenant";
+import Bills from "./bills";
 
 const PaymentsShema = new Schema(
   {
@@ -11,12 +12,15 @@ const PaymentsShema = new Schema(
     bills: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Bills",
+        ref: Bills,
       },
     ],
     amount: {
       type: Number,
       required: true,
+    },
+    amountPaid: {
+      type: Number,
     },
     status: {
       type: String,
