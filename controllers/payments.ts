@@ -105,9 +105,7 @@ export async function flutterwaveWebhook(req: any, res: any) {
   try {
     console.log("FINDING PAYMENT", payload.data.tx_ref);
     console.log("PAYLOAD", payload);
-    let payment = await Payments.findById(payload.data.tx_ref).populate({
-      path: "bills",
-    });
+    let payment = await Payments.findById(payload.data.tx_ref);
     console.log("PAYMENT FOUND", payment)
 
     const data = {
@@ -120,6 +118,7 @@ export async function flutterwaveWebhook(req: any, res: any) {
     });
     
   } catch (error) {
+    console.log("ERROR", error)
     res.status(400).json({
       success: false,
       msg: "Failed to update payment",
