@@ -110,7 +110,7 @@ export async function flutterwaveWebhook(req: any, res: any) {
 
     const data = {
       ...payment._doc,
-      status: "SUCCEESSFUL",
+      status: payload.data.status.toUpperCase(),
       amountPaid: payload.data.amount,
     };
 
