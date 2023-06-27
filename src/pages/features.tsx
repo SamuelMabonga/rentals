@@ -49,7 +49,7 @@ export default function Features({
                 <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenFeaturesForm(true)}>Create New</Button>
             </Box>
             <FeaturesTable />
-            <FeaturesForm />
+            {/* <FeaturesForm /> */}
         </>
     )
 }

@@ -1,4 +1,4 @@
-export default async function fetchBillingPeriods(token: string) {
+export default async function fetchBillingPeriods(token: string, id: string) {
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/billingPeriods`, {
         headers: {
             Authorization: `Bearer ${token}`,

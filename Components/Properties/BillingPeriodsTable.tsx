@@ -112,9 +112,9 @@ export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) =
 
     return (
         <TableRenderer
-            data={data}
+            data={data.data}
             columns={columns}
-            onRowClick={(rowId) => router.push(`/billings/${rowId}`)}
+            onRowClick={(rowId) => router.push(`/billingsperiods/${rowId}`)}
         />
     );
 };

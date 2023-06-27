@@ -14,6 +14,6 @@ const BillingPeriodsSchema = new Schema(
 });
 
 const BillingPeriods =
-  models.BillingPeriods || model("BillingPeriods", BillingPeriodsSchema);
+  models.billingPeriods || model("BillingPeriods", BillingPeriodsSchema);
 
 export default BillingPeriods;

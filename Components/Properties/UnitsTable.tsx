@@ -35,7 +35,7 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
         queryFn: () => fetchPropertyUnits(session?.accessToken, property),
         enabled: !!session?.accessToken && !!property
     })
-
+    const router = useRouter()
     const columns: any = [
         {
             header: 'Image',
@@ -114,10 +114,8 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
         <TableRenderer
             data={data?.data || []}
             columns={columns}
-            onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
-            }}
-            loading={isLoading}
+            onRowClick={(rowId) => router.push(`/property-units/${rowId}`)}
+         loading={isLoading}
         />
     );
 };

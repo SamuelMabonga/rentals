@@ -11,7 +11,7 @@ import { useSession } from 'next-auth/react';
 import moment from 'moment';
 import fetchPropertyBookings from 'apis/property/fetchPropertyBookings';
 
-function AlertDialog({ buttonLabel, buttonVariant, buttonColor="primary", title, content, onAgree, agreeing, setAgreeing }: any) {
+function AlertDialog({ buttonLabel, buttonVariant, buttonColor = "primary", title, content, onAgree, agreeing, setAgreeing }: any) {
     const [open, setOpen] = useState(false);
 
     const handleClickOpen = (event: any) => {
@@ -45,13 +45,13 @@ function AlertDialog({ buttonLabel, buttonVariant, buttonColor="primary", title,
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <LinearProgress sx={{display: loading ? "flex" : "none"}} />
+                <LinearProgress sx={{ display: loading ? "flex" : "none" }} />
                 <DialogTitle id="alert-dialog-title">
                     {title}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                       {content}
+                        {content}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -61,7 +61,7 @@ function AlertDialog({ buttonLabel, buttonVariant, buttonColor="primary", title,
                         onClick={(event) => {
                             setAgreeing(true)
                             onAgree(event)
-                        }} 
+                        }}
                         autoFocus
                     >
                         Continue
@@ -162,9 +162,9 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
                                         body: JSON.stringify({
                                             status: "ACCEPTED",
                                             id: row.row.original._id,
-                                            startDate: row.row.original.startDate, 
-                                            endDate: row.row.original.endDate, 
-                                            customRent: null, 
+                                            startDate: row.row.original.startDate,
+                                            endDate: row.row.original.endDate,
+                                            customRent: null,
                                             customBillingPeriod: null
                                         })
                                     })
@@ -219,10 +219,7 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
         <TableRenderer
             data={data?.data || []}
             columns={columns}
-            onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
-            }}
-            loading={isLoading}
-            />
+            onRowClick={(rowId) => router.push(`/bookings/${rowId}`)}
+        />
     );
 };
