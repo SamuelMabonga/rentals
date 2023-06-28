@@ -19,16 +19,24 @@ const BillsShema = new Schema(
       default: "RENT",
       enum: ["RENT", "FEATURE"],
     },
+    status: {
+      type: String, // Rent / Feature
+      default: "PENDING",
+      enum: ["PAID", "PENDING", "OVERDUE"],
+    },
     propertyFeature: {
       type: Schema.Types.ObjectId,
       ref: PropertyFeatures,
     },
     amount: {
-      type: String,
+      type: Number,
     },
     pay_by: {
       type: Date,
     },
+    amountPaid: {
+      type: Number,
+    }
   },
   {
     timestamps: true,

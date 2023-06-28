@@ -1,3 +1,4 @@
+import Bills from "models/bills";
 import Payments from "models/payments";
 
 // get all payments
@@ -45,7 +46,7 @@ export async function createPayments(req: any, res: any) {
 //fetch Payments by id
 export async function fetchSinglePayment(req: any, res: any) {
   try {
-    let payment = await Payments.findById(req.params.id).populate({
+    let payment = await Payments.findById(req.query.id).populate({
       path: "bills",
     });
     res.status(200).json({
@@ -57,6 +58,25 @@ export async function fetchSinglePayment(req: any, res: any) {
     res.status(400).json({
       success: false,
       msg: "failed to fetch Payments",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// FETCH PAYMENTS BY TENANT
+export async function fetchPaymentsByTenant(req: any, res: any) {
+  try {
+    let payments = await Payments.find({ tenant: req.query.id }).populate("bills").populate("tenant");
+    res.status(200).json({
+      success: true,
+      msg: "Tenant's payments fetched successfully",
+      data: payments,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch tenant's payments",
       data: error,
     });
     console.log(error);
@@ -77,6 +97,7 @@ export async function updatePayments(req: any, res: any) {
     payment = await Payments.findByIdAndUpdate(req.params.id, data, {
       new: true,
     });
+
     res.status(200).json({
       success: true,
       msg: "Payments updated successfully",
@@ -103,10 +124,7 @@ export async function flutterwaveWebhook(req: any, res: any) {
   const payload = req.body;
 
   try {
-    console.log("FINDING PAYMENT", payload.data.tx_ref);
-    console.log("PAYLOAD", payload);
     let payment = await Payments.findById(payload.data.tx_ref).populate("bills");
-    console.log("PAYMENT FOUND", payment)
 
     const data = {
       ...payment._doc,
@@ -120,14 +138,59 @@ export async function flutterwaveWebhook(req: any, res: any) {
       new: true,
     });
 
-    console.log("UPDATED PAYMENT", updated)
+    if (payment.amount <= payload.data.amount) {
+      for (let i = 0; i < payment.bills.length; i++) {
+        const bill = payment.bills[i];
+        bill.status = "PAID";
+        await bill.save();
+      }
+    } else {
+      let amountLeft = payload.data.amount
+      for (let i = 0; i < payment.bills.length; i++) {
+        const bill = payment.bills[i];
+        if (amountLeft <= bill.amount) {
+          bill.status = "PARTIAL";
+          bill.amountPaid = amountLeft;
+          try {
+            await Bills.findByIdAndUpdate(bill._id, bill, {
+              new: true,
+            });
+          } catch (error) {
+            console.log("ERROR", error)
+            res.status(400).json({
+              success: false,
+              msg: "Failed to update bill",
+              data: error,
+            });
+          }
+          break;
+        } else {
+          bill.status = "PAID";
+          bill.amountPaid = bill.amount;
+          try {
+            await Bills.findByIdAndUpdate(bill._id, bill, {
+              new: true,
+            });
+            amountLeft = amountLeft - bill.amount
+          } catch (error) {
+            console.log("ERROR", error)
+            res.status(400).json({
+              success: false,
+              msg: "Failed to update bill",
+              data: error,
+            });
+          }
+        }
+      }
+
+    }
 
     return res.json({
       success: true,
       msg: "Payment updated",
       data: updated,
     });
-    
+
   } catch (error) {
     console.log("ERROR", error)
     res.status(400).json({
@@ -135,30 +198,31 @@ export async function flutterwaveWebhook(req: any, res: any) {
       msg: "Failed to update payment",
       data: error,
     });
-  }}
-
-  //delete a Payments
-  export async function deletePayment(req: any, res: any) {
-    try {
-      let payment = await Payments.findById(req.params.id);
-
-      if (payment) {
-        //   return next("Payments being deleted has not been found");
-        return "Payment being deleted has not been found";
-      }
-
-      await Payments.deleteOne(payment);
-
-      res.json({
-        success: true,
-        msg: "Payment deleted successfully",
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        msg: "failed to delete Payments",
-        data: error,
-      });
-      console.log(error);
-    }
   }
+}
+
+//delete a Payments
+export async function deletePayment(req: any, res: any) {
+  try {
+    let payment = await Payments.findById(req.params.id);
+
+    if (payment) {
+      //   return next("Payments being deleted has not been found");
+      return "Payment being deleted has not been found";
+    }
+
+    await Payments.deleteOne(payment);
+
+    res.json({
+      success: true,
+      msg: "Payment deleted successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to delete Payments",
+      data: error,
+    });
+    console.log(error);
+  }
+}

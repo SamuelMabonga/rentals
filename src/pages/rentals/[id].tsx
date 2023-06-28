@@ -6,36 +6,34 @@ import { getSession, useSession } from "next-auth/react"
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
 import { useRouter } from "next/router"
 import fetchARental from "apis/fetchARental"
-import { PaymentsTable } from "Components/Properties/PaymentsTable"
 import PaymentsForm from "Components/Properties/Forms/PaymentsForm"
 import { BillsTable } from "Components/Tenants/BillsTable"
 import RequestExtension from "Components/Tenants/Forms/RequestExtension"
 import { closePaymentModal, useFlutterwave } from "flutterwave-react-v3"
 import moment from "moment"
 import fetchBills from "apis/tenant/fetchBills"
+import { PaymentsTable } from "Components/Tenants/PaymentsTable"
 
 type PageProps = {
     // data: any;
 };
 
-function DetailsCard() {
+function DetailsCard({ label, value, icon }: any) {
     return (
         <Card sx={{ width: "100%", bgcolor: "white", color: "secondary", padding: "1rem", borderRadius: "0.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
             <Box display="flex" gap="0.5rem">
                 <Box width="2rem" height="2rem" color="grey">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    {icon}
                 </Box>
                 <Typography color="grey" fontSize="0.75rem" lineHeight={"130%"}>
                     Your <br />
                     <span style={{ fontWeight: "600", fontSize: "1.125rem" }}>
-                        Stay Duration
+                        {label}
                     </span>
                 </Typography>
             </Box>
 
-            <Typography color="black" fontWeight={"600"} fontSize="1.5rem" textAlign={"right"}>200/600 Days</Typography>
+            <Typography color="black" fontWeight={"600"} fontSize="1.5rem" textAlign={"right"}>{value}</Typography>
         </Card>
     )
 }
@@ -67,7 +65,7 @@ function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
             return <BillsTable tenant={tenant} openFlutterwave={openFlutterwave} />
 
         case "payments":
-            return <PaymentsTable />
+            return <PaymentsTable tenant={tenant} />
 
         case "messages":
         // return <BookingsTable />
@@ -108,7 +106,9 @@ export default function Property({
 
     const {
         unit,
-        _id
+        _id,
+        startDate,
+        endDate
     } = data?.data || {}
 
 
@@ -140,10 +140,42 @@ export default function Property({
             </Box>
 
             <Box width="100%" display="grid" gridTemplateColumns={["1fr", "1fr 1fr",]} gap="1rem">
-                <DetailsCard />
-                <DetailsCard />
-                <DetailsCard />
-                <DetailsCard />
+            <DetailsCard
+                    label="Entry Date"
+                    value={moment(startDate).format("DD MMM YYYY")}
+                    icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    }
+                />
+                <DetailsCard
+                    label="Exit Date"
+                    value={moment(endDate).format("DD MMM YYYY")}
+                    icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    }
+                />
+                <DetailsCard
+                    label="Tenancy length"
+                    value={`${moment(endDate).diff(moment(startDate), "days")} days`}
+                    icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    }
+                />
+                <DetailsCard
+                    label="Days Remaining"
+                    value={`${moment(endDate).diff(moment(), "days")} days`}
+                    icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    }
+                />
             </Box>
 
             <Box mt="2rem" width="100%" height="fit-content" overflow="hidden" display="flex" flexDirection="column" gap="1rem">
@@ -191,7 +223,7 @@ export default function Property({
                         Create New
                     </Button>
                 </Box>
-                <TableSwitch activeTab={activeTab} tenant={_id} openFlutterwave={openFlutterwave} />
+                <TableSwitch activeTab={activeTab} tenant={id} openFlutterwave={openFlutterwave} />
             </Box>
             <PaymentsForm tenant={id} />
             <RequestExtension tenant={id} />
