@@ -1,5 +1,5 @@
 export default async function fetchPropertyTenants(token: string, property: string) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/tenant?property=${property}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/tenant/property?id=${property}`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },

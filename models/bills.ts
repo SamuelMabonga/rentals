@@ -1,8 +1,9 @@
 import { Schema, model, models } from "mongoose";
 import Tenant from "./tenant";
 import PropertyFeatures from "./propertyFeatures";
+import Extensions from "./extensions";
 
-const BillsShema = new Schema(
+const BillsShema: any = new Schema(
   {
     startDate: {
       type: Date,
@@ -36,6 +37,10 @@ const BillsShema = new Schema(
     },
     amountPaid: {
       type: Number,
+    },
+    extended: {
+      type: Boolean,
+      default: false,
     }
   },
   {

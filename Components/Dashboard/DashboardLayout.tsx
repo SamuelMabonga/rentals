@@ -243,6 +243,11 @@ export default function DashboardLayout({ children }: any) {
                             display="flex"
                             justifyContent={"space-between"}
                             alignItems="center"
+                            // sx={{
+                            //     boxShadow: ["0px 4px 20px rgba(211, 205, 218, 0.25)", "none", ],
+                            //     border: ["solid rgba(211, 205, 218, 0.7)", ],
+                            //     borderWidth: ["0px 0px 1px 0px"]
+                            // }}
                         >
                             <Box display={["flex", "none"]} flexDirection="row" alignItems={"center"} gap="0.25rem">
                                 <MobileDrawer />
@@ -285,6 +290,10 @@ export default function DashboardLayout({ children }: any) {
                             gap="1.5rem"
                             bgcolor={"primary.light"}
                             borderRadius="1rem"
+                            sx={{
+                                boxShadow: ["inset 0px 4px 20px rgba(211, 205, 218, 1)", "none", ],
+                                border: ["1px solid rgba(211, 205, 218, 0.7)", "0px", ],
+                            }}
                         // sx={{
                         //     overflowY: ["hidden", "scroll"]
                         // }}

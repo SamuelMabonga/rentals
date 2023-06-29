@@ -16,12 +16,13 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import fetchPropertyFeatures from "apis/fetchPropertyFeatures";
 
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import moment from "moment"
+import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
+import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 
 const steps = [
     'Select a tenant',
@@ -75,8 +76,8 @@ const formSchema = yup.object().shape({
 
 export default function BookingForm({
     property,
-    unitTypes,
-    features
+    unitTypes: propertyUnitTypes,
+    features: propertyFeatures,
 }: any) {
     // CONTEXT
     const {
@@ -86,12 +87,26 @@ export default function BookingForm({
         bookingToEdit: toEdit,
         setBookingToEdit: setToEdit,
 
+        unitToBook: unit,
+
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
 
     const [isLoading, setIsLoading] = useState(false)
+
+    const token = session.data?.accessToken
+
+    const { data: features, isLoading: featuresLoading }: any = useQuery({
+        queryKey: ['property-features', token, property],
+        queryFn: () => fetchPropertyFeatures(token, property),
+    })
+
+    const { data: unitTypes, isLoading: unitTypesLoading }: any = useQuery({
+        queryKey: ['property-unitTypes', token, property],
+        queryFn: () => fetchPropertyUnitTypes(token, property),
+    })
 
     const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
         defaultValues: {
@@ -221,6 +236,13 @@ export default function BookingForm({
     // STEPPER
     const [step, setStep] = useState(0)
 
+    // useEffect(() => {
+    //     if (unit) {
+    //         setSelectedUnit(unit)
+    //         setStep(2)
+    //     }
+    // }, [unit])
+
 
     // SEARCH
     const [searchingUsers, setSearchingUsers] = useState(false)
@@ -332,7 +354,6 @@ export default function BookingForm({
                         </Collapse>
                     </Box>
 
-
                     <Box display={step === 1 ? "flex" : "none"} flexDirection="column" gap="1rem">
                         <FormControl>
                             <FormLabel>Select the unit type to book</FormLabel>
@@ -386,7 +407,7 @@ export default function BookingForm({
                                                     display="flex"
                                                     flexDirection="row"
                                                     alignItems="center"
-                                                    gap="0.5rem"
+                                                    gap="1rem"
                                                     padding="0.75rem"
                                                     border="1px solid"
                                                     borderColor={selectedUnit?._id === item._id ? "primary.main" : "lightgrey"}
@@ -399,9 +420,18 @@ export default function BookingForm({
                                                     }}
                                                 >
                                                     <Avatar sx={{ width: "3.5rem", height: "3.5rem" }} />
-                                                    <Box>
-                                                        <Typography>{item.name}</Typography>
-                                                        <Chip size="small" label={!item?.tenant ? "Vacant" : "Occupied"} />
+                                                    <Box display="flex" flexDirection="column" gap="0.25rem">
+                                                        <Typography fontWeight="600" color="grey">{item.name}</Typography>
+                                                        <Chip
+                                                            size="small"
+                                                            label={item?.status}
+                                                            color={item?.status === "AVAILABLE" ? "primary" : "error"}
+                                                            variant={"outlined"}
+                                                            sx={{
+                                                                fontWeight: "600",
+                                                                fontSize: "0.75rem",
+                                                            }}
+                                                        />
                                                     </Box>
 
                                                     <Box display={selectedUnit?._id === item._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">

@@ -14,20 +14,22 @@ import moment from "moment"
 
 
 const formSchema = yup.object().shape({
+    newDate: yup.string().required(),
     notes: yup.string().required(),
-    message: yup.string().required()
+    // billToExtend: yup.string().required(),
 })
 
 export default function RequestExtension({
     tenant,
     unitTypes,
-    features
+    features,
+    billToExtend
 }: any) {
     // CONTEXT
     const {
         openRequestExtension: open,
         setOpenRequestExtension: setIsOpen,
-        
+
         bookingToEdit: toEdit,
         setBookingToEdit: setToEdit,
         setSnackbarMessage
@@ -40,7 +42,7 @@ export default function RequestExtension({
     const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
         defaultValues: {
             newDate: "",
-            message: "",
+            notes: "",
         },
         mode: "onChange",
         reValidateMode: "onChange",
@@ -50,7 +52,7 @@ export default function RequestExtension({
     useEffect(() => {
         if (toEdit?.name) {
             setValue("newDate", toEdit.name)
-            setValue("message", toEdit.price)
+            setValue("notes", toEdit.price)
             return
         }
 
@@ -61,18 +63,50 @@ export default function RequestExtension({
     async function onSubmit(values: any) {
         setIsLoading(true)
 
-        const data = {
-            name: values.name,
-            price: values.price
-        }
-
-        console.log("VALUES", values)
-
+        // POST A PROPERTY
         const postData = {
-            newdate: values.newdate,
-            message: values.message
+            newDate: values.newDate,
+            notes: values.notes,
+            tenant: tenant,
+            type: "RENT",
+            bill: billToExtend
         }
 
+        try {
+            const res = await fetch('/api/extension/tenant', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.data.accessToken}`,
+                },
+                body: JSON.stringify({ ...postData })
+            })
+            const response = await res.json();
+            console.log(response)
+            setIsLoading(false)
+            setIsOpen(false)
+            setSnackbarMessage({
+                open: true,
+                vertical: 'top',
+                horizontal: 'center',
+                message: "Extension request submitted successfully",
+                icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </Box>
+            })
+        } catch (error) {
+            setIsLoading(false)
+            console.log(error)
+        }
+
+
+
+        // const data = {
+        //     name: values.name,
+        //     price: values.price
+        // }
 
 
         // // EDIT A PROPERTY
@@ -102,35 +136,6 @@ export default function RequestExtension({
         //     }
         // }
 
-        // POST A PROPERTY
-        try {
-            const res = await fetch('/api/bills/requestExtension', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${session.data.accessToken}`,
-                },
-                body: JSON.stringify({ ...postData })
-            })
-            const response = await res.json();
-            console.log(response)
-            setIsLoading(false)
-            setIsOpen(false)
-            setSnackbarMessage({
-                open: true,
-                vertical: 'top',
-                horizontal: 'center',
-                message: "Extension request submitted successfully",
-                icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </Box>
-            })
-        } catch (error) {
-            setIsLoading(false)
-            console.log(error)
-        }
     }
 
 
@@ -160,21 +165,20 @@ export default function RequestExtension({
                     onSubmit={handleSubmit(onSubmit)}
                     style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1.5rem" }}
                 >
-                        <FormControl sx={{ width: "100%" }}>
-                            <FormLabel>When will you be able to clear this rent bill</FormLabel>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
-                                    onChange={(event: any) => setValue("startDate", moment(event.$d).format("YYYY-MM-DD"))}
-                                />
-                            </LocalizationProvider>
-                        </FormControl>
-                        <FormControl sx={{ width: "100%" }}>
-                            <FormLabel>Add a message</FormLabel>
-                            <TextField
-                                {...register("message")}
-                                
+                    <FormControl sx={{ width: "100%" }}>
+                        <FormLabel>When will you be able to clear this rent bill</FormLabel>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                onChange={(event: any) => setValue("newDate", moment(event.$d).format("YYYY-MM-DD"))}
                             />
-                        </FormControl>
+                        </LocalizationProvider>
+                    </FormControl>
+                    <FormControl sx={{ width: "100%" }}>
+                        <FormLabel>Add a message</FormLabel>
+                        <TextField
+                            {...register("notes")}
+                        />
+                    </FormControl>
                 </form>
             </DialogContent>
             <DialogActions sx={{ padding: "1.5rem", display: "flex" }}>

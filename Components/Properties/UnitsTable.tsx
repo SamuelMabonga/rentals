@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/TableRenderer';
@@ -10,6 +10,8 @@ import { useQuery } from '@tanstack/react-query';
 import fetchUnits from 'apis/fetchUnits';
 import moment from 'moment';
 import fetchPropertyUnits from 'apis/property/fetchPropertyUnits';
+import { CollectionsContext } from 'context/context';
+import fetchPropertyFeatures from 'apis/property/fetchPropertyFeatures';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -28,30 +30,36 @@ type Item = {
 }
 
 export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) => {
+    // CONTEXT
+    const {
+        setOpenBookingForm,
+        setUnitToBook
+    }: any = useContext(CollectionsContext)
+
     // SESSION
     const { status, data: session }: any = useSession()
+    const token = session?.accessToken
     const { data, isLoading }: any = useQuery({
-        queryKey: ['property-units', property],
-        queryFn: () => fetchPropertyUnits(session?.accessToken, property),
-        enabled: !!session?.accessToken && !!property
+        queryKey: ['property-units', token, property],
+        queryFn: () => fetchPropertyUnits(token, property),
     })
 
     const columns: any = [
-        {
-            header: 'Image',
-            cell: (row: any) => {
-                return (
-                    <Avatar
-                        src={row.row.original.image}
-                        alt="Avatar"
-                        sx={{
-                            width: "3rem",
-                            height: "3rem"
-                        }}
-                    />
-                )
-            },
-        },
+        // {
+        //     header: 'Image',
+        //     cell: (row: any) => {
+        //         return (
+        //             <Avatar
+        //                 src={row.row.original.image}
+        //                 alt="Avatar"
+        //                 sx={{
+        //                     width: "3rem",
+        //                     height: "3rem"
+        //                 }}
+        //             />
+        //         )
+        //     },
+        // },
         {
             header: 'Name',
             cell: (row: any) => row.renderValue(),
@@ -69,16 +77,36 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
         },
         {
             header: 'Tenant',
-            cell: (row: any) => row?.renderValue() ?
-                row.renderValue() :
-                <Button variant="outlined" color="primary" size="small" sx={{ fontSize: "0.875rem", lineHeight: "100%", whiteSpace: "nowrap" }} >
+            cell: (row: any) => row?.row?.original?.status === "AVAILABLE" ?
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    sx={{ fontSize: "0.875rem", lineHeight: "100%", whiteSpace: "nowrap" }}
+                    onClick={(event) => {
+                        event.stopPropagation()
+                        event.preventDefault()
+
+                        setUnitToBook(row.row.original)
+                        setOpenBookingForm(true)
+                    }}
+                >
                     <Box width="1.5rem" height="1.5rem">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
                     </svg>
                     </Box>
                     Add Tenant
-                </Button>,
+                </Button> : 
+                <Button variant="outlined" disabled color="primary" size="small" sx={{ fontSize: "0.875rem", lineHeight: "100%", whiteSpace: "nowrap" }} >
+                <Box width="1.5rem" height="1.5rem">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
+                </svg>
+                </Box>
+                Ocuppied
+            </Button>
+                ,
             accessorKey: 'tenant.user.first_name',
         },
         {

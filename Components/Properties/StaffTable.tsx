@@ -129,12 +129,6 @@ export const StaffTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
     return (
         <TableRenderer
             data={data}

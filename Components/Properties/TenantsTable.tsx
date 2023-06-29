@@ -28,7 +28,8 @@ type Item = {
 
 export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>) => {
     const session: any = useSession()
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-tenants', property], queryFn: () => fetchPropertyTenants(session.data.accessToken, property) })
+    const token = session.data.accessToken
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-tenants', token, property], queryFn: () => fetchPropertyTenants(token, property) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(

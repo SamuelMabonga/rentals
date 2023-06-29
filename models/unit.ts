@@ -27,6 +27,8 @@ const UnitSchema = new Schema({
   // },
   status: {
     type: String,
+    enum: ["AVAILABLE", "OCCUPIED"],
+    default: "AVAILABLE"
   },
 }, {
   timestamps: true

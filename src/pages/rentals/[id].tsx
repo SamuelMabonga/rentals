@@ -20,20 +20,33 @@ type PageProps = {
 
 function DetailsCard({ label, value, icon }: any) {
     return (
-        <Card sx={{ width: "100%", bgcolor: "white", color: "secondary", padding: "1rem", borderRadius: "0.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <Card
+            sx={{
+                width: "100%",
+                bgcolor: "white",
+                color: "secondary",
+                padding: "1rem",
+                borderRadius: "1rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+                boxShadow: "0px 4px 20px rgba(211, 205, 218, 0.25)",
+                border: "1px solid rgba(211, 205, 218, 0.7)",
+            }}
+        >
             <Box display="flex" gap="0.5rem">
                 <Box width="2rem" height="2rem" color="grey">
                     {icon}
                 </Box>
                 <Typography color="grey" fontSize="0.75rem" lineHeight={"130%"}>
                     Your <br />
-                    <span style={{ fontWeight: "600", fontSize: "1.125rem" }}>
+                    <span style={{ fontWeight: "600", fontSize: "1rem" }}>
                         {label}
                     </span>
                 </Typography>
             </Box>
 
-            <Typography color="black" fontWeight={"600"} fontSize="1.5rem" textAlign={"right"}>{value}</Typography>
+            <Typography color="primary" fontWeight={"600"} fontSize="1.5rem" textAlign={"right"}>{value}</Typography>
         </Card>
     )
 }
@@ -125,22 +138,29 @@ export default function Property({
         });
     }
 
+    useEffect(() => {
+if (paymentConfig?.tx_ref) {
+            openFlutterwave()
+        }
+
+    }, [paymentConfig?.tx_ref])
+
     return (
         <>
-            <Box display="flex" flexDirection={["column", "row"]} gap="1rem" width="100%" justifyContent="space-between">
+            <Box display="flex" flexDirection={["column", "row"]} gap="1rem" width="100%" justifyContent="space-between" mt={["2rem", "1rem"]}>
                 <Box>
                     <Typography fontSize="1.5rem" fontWeight="600" color="primary.dark">{`${unit?.name}`}</Typography>
                     <Typography fontWeight="600" color="grey">{`${unit?.property?.name}`}</Typography>
                 </Box>
 
-                <Box display="flex" flexDirection={["column", "row"]} gap="1rem">
-                    <Button variant="contained" sx={{ height: "fit-content", padding: "1rem" }}>Renew your tenancy</Button>
-                    <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem" }} color="error" >Terminate tenancy</Button>
+                <Box display={["none", "flex"]} flexDirection={["column", "row"]} gap="1rem">
+                    <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem" }} color="error" >Terminate tenancy</Button>
+                    <Button variant="contained" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem" }}>Renew your tenancy</Button>
                 </Box>
             </Box>
 
             <Box width="100%" display="grid" gridTemplateColumns={["1fr", "1fr 1fr",]} gap="1rem">
-            <DetailsCard
+                <DetailsCard
                     label="Entry Date"
                     value={moment(startDate).format("DD MMM YYYY")}
                     icon={
@@ -176,6 +196,11 @@ export default function Property({
                         </svg>
                     }
                 />
+
+                <Box display={["flex", "none"]} flexDirection={["column", "row"]} sx={{ mt: "1.5rem" }} gap="1rem">
+                    <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem" }} color="error" >Terminate tenancy</Button>
+                    <Button variant="contained" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem" }}>Renew your tenancy</Button>
+                </Box>
             </Box>
 
             <Box mt="2rem" width="100%" height="fit-content" overflow="hidden" display="flex" flexDirection="column" gap="1rem">
@@ -204,6 +229,7 @@ export default function Property({
                         sx={{ ml: ["auto"] }}
                         onClick={() => {
                             if (activeTab === "bills") {
+
                                 return setOpenPaymentForm(true)
                             }
 
@@ -226,7 +252,6 @@ export default function Property({
                 <TableSwitch activeTab={activeTab} tenant={id} openFlutterwave={openFlutterwave} />
             </Box>
             <PaymentsForm tenant={id} />
-            <RequestExtension tenant={id} />
         </>
     )
 }

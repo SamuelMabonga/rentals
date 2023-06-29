@@ -24,7 +24,7 @@ const TenantSchema: any = new Schema({
     }
   ],
   customRent: {
-    type: String
+    type: Number
   },
   customBillingPeriod: {
     type: Schema.Types.ObjectId,

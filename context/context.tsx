@@ -52,6 +52,7 @@ const CollectionsProvider = ({children}: any) => {
     // BOOKING FORM
     const [openBookingForm, setOpenBookingForm] = useState(false)
     const [bookingToEdit, setBookingToEdit] = useState({})
+    const [unitToBook, setUnitToBook] = useState({})
 
 
     // IMAGE UPLOADER
@@ -139,6 +140,8 @@ const CollectionsProvider = ({children}: any) => {
             setOpenBookingForm,
             bookingToEdit,
             setBookingToEdit,
+            unitToBook,
+            setUnitToBook,
 
             // SNACKBAR MESSAGE
             snackbarMessage,

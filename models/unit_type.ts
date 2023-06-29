@@ -11,7 +11,7 @@ const UnitTypeShema = new Schema(
       type: String,
     },
     price: {
-      type: String,
+      type: Number,
     },
     billingPeriod: {
       type: Schema.Types.ObjectId,

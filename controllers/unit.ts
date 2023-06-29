@@ -50,10 +50,8 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
     query: { id, searchQuery },
   }: any = req;
 
-  console.log("PROPERTY ", id)
-
   try {
-    let units = await Unit.find()
+    let units = await Unit.find({property: id})
       .populate({ path: "unitType" })
     // .populate({
     //   path: "tenant",
@@ -95,7 +93,7 @@ export async function createUnit(req: any, res: any) {
 
     const unit = new Unit({
       ...req.body,
-      status: "Vacant"
+      status: "AVAILABLE"
     });
 
     const newUnit = await unit.save();

@@ -9,7 +9,7 @@ const PropertyFeaturesSchema = new Schema({
     ref: Feature,
   },
   price: {
-    type: String,
+    type: Number,
   },
   billingPeriod: {
     type: Schema.Types.ObjectId,

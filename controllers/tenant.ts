@@ -43,11 +43,11 @@ export async function fetchAllUserTenancies(req: any, res: any, id: string) {
 // get property's tenants
 export async function fetchAllPropertyTenants(req: any, res: any) {
   const {
-    query: { property, searchQuery },
+    query: { id, searchQuery },
   }: any = req;
 
   try {
-    let tenants = await Tenant.find({ "unit.property._id": property })
+    let tenants = await Tenant.find({ "unit.property": id })
       .populate("user")
       .populate({
         path: "unit",

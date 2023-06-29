@@ -213,14 +213,15 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
         []
     );
 
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', property], queryFn: () => fetchPropertyBookings(session.data.accessToken, property) })
+    const token = session.data.accessToken
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', token, property], queryFn: () => fetchPropertyBookings(token, property) })
 
     return (
         <TableRenderer
             data={data?.data || []}
             columns={columns}
             onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
+                console.log("Clicked row")
             }}
             loading={isLoading}
         />

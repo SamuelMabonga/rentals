@@ -40,11 +40,11 @@ export async function fetchAllBookings(req: any, res: any) {
 // get all Property Bookings
 export async function fetchAllPropertyBookings(req: any, res: any) {
   const {
-    query: { property, searchQuery },
+    query: { id, searchQuery },
   }: any = req;
 
   try {
-    let bookings = await Booking.find({ "unit.property._id": property })
+    let bookings = await Booking.find({ "unit.property": id })
       .populate({
         path: "unit",
         populate: [{ path: "unitType" }],
