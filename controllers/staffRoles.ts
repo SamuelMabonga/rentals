@@ -1,13 +1,22 @@
+import { getPageInfo } from "helpers/page_info";
 import StaffRoles from "models/staffRoles";
 
 // get all Staff Roles
 export async function fetchAllStaffRoles(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let staffRole = await StaffRoles.find();
+    const [staffRoles, staffRolesCount] = await Promise.all([
+      StaffRoles.find()
+        .skip((page - 1) * limit)
+        .limit(limit),
+      StaffRoles.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "Staff Roles fetched successfully",
-      data: staffRole,
+      data: staffRoles,
+      pageInfo: getPageInfo(limit, staffRolesCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -22,12 +31,20 @@ export async function fetchAllStaffRoles(req: any, res: any) {
 // get all Staff Roles by role id
 export async function fetchRoleAllStaffRoles(req: any, res: any) {
   let roleId = req.query.roleId;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let staffRole = await StaffRoles.find({ role: roleId });
+    const [staffRoles, staffRolesCount] = await Promise.all([
+      StaffRoles.find({ role: roleId })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      StaffRoles.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "Staff Roles fetched successfully",
-      data: staffRole,
+      data: staffRoles,
+      pageInfo: getPageInfo(limit, staffRolesCount, page),
     });
   } catch (error) {
     res.status(400).json({
