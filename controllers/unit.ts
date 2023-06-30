@@ -1,38 +1,41 @@
 import Unit from "models/unit";
 import Tenant from "models/tenant";
 import UnitType from "models/unit_type";
+import { getPageInfo } from "helpers/page_info";
 
 // get all units
 export async function fetchAllUnits(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    const {
-      unitType
-    } = req.query
+    const { unitType } = req.query;
     // let units = await Unit.find().populate("unitType");
 
+    console.log("UNIT TYPE", unitType);
 
-    console.log("UNIT TYPE", unitType)
+    let units;
+    let unitsCount = Unit.countDocuments();
 
-    let units
-
-    unitType !== undefined ?
-      (units = await Unit.find({ unitType: unitType }).populate({ path: "unitType" })
-        // .populate({
+    unitType !== undefined
+      ? (units = await Unit.find({ unitType: unitType })
+          .populate({ path: "unitType" })
+          .skip((page - 1) * limit)
+          .limit(limit))
+      : // .populate({
         //   path: "tenant",
         //   populate: [{ path: "user" }],
         // })
-      )
-      : (units = await Unit.find().populate({ path: "unitType" })
-        // .populate({
-        //   path: "tenant",
-        //   populate: [{ path: "user" }],
-        // })
-      );
+        (units = await Unit.find().populate({ path: "unitType" }));
+    // .populate({
+    //   path: "tenant",
+    //   populate: [{ path: "user" }],
+    // })
 
     res.status(200).json({
       success: true,
       msg: "units fetched successfully",
       data: units,
+      pageInfo: getPageInfo(limit, unitsCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -49,10 +52,20 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
   const {
     query: { id, searchQuery },
   }: any = req;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
 
   try {
-    let units = await Unit.find({property: id})
-      .populate({ path: "unitType" })
+    const [units, unitsCount] = await Promise.all([
+      Unit.find({ property: id })
+        .populate({
+          path: "unitType",
+        })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Unit.countDocuments(),
+    ]);
+
     // .populate({
     //   path: "tenant",
     //   populate: [{ path: "user" }],
@@ -62,9 +75,10 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
       success: true,
       msg: "Property units fetched successfully",
       data: units,
+      pageInfo: getPageInfo(limit, unitsCount, page),
     });
   } catch (error) {
-    console.log("ERROR MSG", error)
+    console.log("ERROR MSG", error);
     res.status(400).json({
       success: false,
       msg: "Failed to fetch property units",
@@ -93,7 +107,7 @@ export async function createUnit(req: any, res: any) {
 
     const unit = new Unit({
       ...req.body,
-      status: "AVAILABLE"
+      status: "AVAILABLE",
     });
 
     const newUnit = await unit.save();
