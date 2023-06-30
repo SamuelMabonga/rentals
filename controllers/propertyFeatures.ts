@@ -1,15 +1,24 @@
+import { getPageInfo } from "helpers/page_info";
 import PropertyFeatures from "models/propertyFeatures";
 
 // get all features
 export async function fetchAllPropertyFeatures(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let propertyFeature = await PropertyFeatures.find()
-      .populate({ path: "feature" })
-      .populate({ path: "billingPeriod" });
+    const [propertyFeatures, propertyFeaturesCount] = await Promise.all([
+      PropertyFeatures.find()
+        .populate({ path: "feature" })
+        .populate({ path: "billingPeriod" })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      PropertyFeatures.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "Property features fetched successfully",
-      data: propertyFeature,
+      data: propertyFeatures,
+      pageInfo: getPageInfo(limit, propertyFeaturesCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -45,14 +54,23 @@ export async function fetchSinglePropertyFeature(req: any, res: any) {
 //fetch property feature by feature
 export async function fetchAllPropertyFeaturesByFeature(req: any, res: any) {
   let featureId = req.body.featureId;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+
   try {
-    let propertyFeature = await PropertyFeatures.find({ feature: featureId })
-      .populate({ path: "feature" })
-      .populate({ path: "billingPeriod" });
+    const [propertyFeatures, propertyFeaturesCount] = await Promise.all([
+      PropertyFeatures.find({ feature: featureId })
+        .populate({ path: "feature" })
+        .populate({ path: "billingPeriod" })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      PropertyFeatures.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "Property features fetched successfully",
-      data: propertyFeature,
+      data: propertyFeatures,
+      pageInfo: getPageInfo(limit, propertyFeaturesCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -65,21 +83,26 @@ export async function fetchAllPropertyFeaturesByFeature(req: any, res: any) {
 }
 
 //fetch property feature by billing periods
-export async function fetchAllPropertyFeaturesByProperty(
-  req: any,
-  res: any
-) {
+export async function fetchAllPropertyFeaturesByProperty(req: any, res: any) {
   let property = req.query.id;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let propertyFeature = await PropertyFeatures.find({
-      property: property,
-    })
-      .populate({ path: "feature" })
-      .populate({ path: "billingPeriod" });
+    const [propertyFeatures, propertyFeaturesCount] = await Promise.all([
+      PropertyFeatures.find({
+        property: property,
+      })
+        .populate({ path: "feature" })
+        .populate({ path: "billingPeriod" })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      PropertyFeatures.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "Property features fetched successfully",
-      data: propertyFeature,
+      data: propertyFeatures,
+      pageInfo: getPageInfo(limit, propertyFeaturesCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -97,16 +120,24 @@ export async function fetchAllPropertyFeaturesByBillingPeriods(
   res: any
 ) {
   let billingPeriodId = req.body.billingPeriodId;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let propertyFeature = await PropertyFeatures.find({
-      billingPeriod: billingPeriodId,
-    })
-      .populate({ path: "feature" })
-      .populate({ path: "billingPeriod" });
+    const [propertyFeatures, propertyFeaturesCount] = await Promise.all([
+      PropertyFeatures.find({
+        billingPeriod: billingPeriodId,
+      })
+        .populate({ path: "feature" })
+        .populate({ path: "billingPeriod" })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      PropertyFeatures.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "Property features fetched successfully",
-      data: propertyFeature,
+      data: propertyFeatures,
+      pageInfo: getPageInfo(limit, propertyFeaturesCount, page),
     });
   } catch (error) {
     res.status(400).json({
