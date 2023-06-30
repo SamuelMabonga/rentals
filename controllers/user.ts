@@ -1,14 +1,23 @@
 import User from "models/user";
 import Fuse from "fuse.js";
+import { getPageInfo } from "helpers/page_info";
 
 // get all users
 export async function fetchAllUsers(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let users = await User.find();
+    const [users, usersCount] = await Promise.all([
+      User.find()
+        .skip((page - 1) * limit)
+        .limit(limit),
+      User.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "users fetched successfully",
       data: users,
+      pageInfo: getPageInfo(limit, usersCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -61,7 +70,7 @@ export async function fetchSingleUser(req: any, res: any) {
 //update a User
 export async function updateUser(req: any, res: any) {
   try {
-    let user:any = await User.findById(req.params.id);
+    let user: any = await User.findById(req.params.id);
 
     const data = {
       first_name: req.body.first_name || user.first_name,
@@ -90,7 +99,7 @@ export async function updateUser(req: any, res: any) {
 //delete a User
 export async function deleteUser(req: any, res: any) {
   try {
-    let user:any = await User.findById(req.params.id);
+    let user: any = await User.findById(req.params.id);
 
     if (!user) {
       //   return next("User being deleted has not been found");
