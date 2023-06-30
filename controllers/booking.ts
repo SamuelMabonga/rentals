@@ -5,27 +5,35 @@ import Fuse from "fuse.js";
 import { createBill } from "./bills";
 import Bills from "models/bills";
 import moment from "moment";
+import { getPageInfo } from "helpers/page_info";
 
 // get all bookings
 export async function fetchAllBookings(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let bookings = await Booking.find()
-      .populate({
-        path: "unit",
-        populate: [{ path: "unitType" }],
-      })
-      .populate({
-        path: "user",
-      })
-      .populate({
-        path: "additionalFeatures",
-        populate: [{ path: "feature" }],
-      });
-
+    const [bookings, bookingsCount] = await Promise.all([
+      Booking.find()
+        .populate({
+          path: "unit",
+          populate: [{ path: "unitType" }],
+        })
+        .populate({
+          path: "user",
+        })
+        .populate({
+          path: "additionalFeatures",
+          populate: [{ path: "feature" }],
+        })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Booking.countDocuments(),
+    ]);
     res.json({
       success: true,
       msg: "bookings fetched successfully",
       data: bookings,
+      pageInfo: getPageInfo(limit, bookingsCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -305,7 +313,7 @@ export async function acceptBooking(req: any, res: any) {
       });
     }
 
-    console.log("BOOKING", booking)
+    console.log("BOOKING", booking);
 
     try {
       //CREATE a new tenant
@@ -324,7 +332,7 @@ export async function acceptBooking(req: any, res: any) {
       const newTenant = await tenantObj.save();
 
       //genrate bills
-      // Create bill 
+      // Create bill
       if (!newTenant._id) {
         return res.status(404).json({ error: "Tenant not created" });
       }
@@ -338,44 +346,45 @@ export async function acceptBooking(req: any, res: any) {
           })
           .populate({
             path: "unit",
-            populate: [{ 
-              path: "unitType", 
-              populate: [{ path: "billingPeriod" }] 
-            }],
+            populate: [
+              {
+                path: "unitType",
+                populate: [{ path: "billingPeriod" }],
+              },
+            ],
           })
-          .populate("customBillingPeriod")
+          .populate("customBillingPeriod");
 
         const rentBill = new Bills({
           startDate: tenant.startDate,
           endDate: tenant?.customBillingPeriod?.time
             ? moment(tenant?.startDate).add(
-              tenant?.customBillingPeriod?.time,
-              "ms"
-            )
+                tenant?.customBillingPeriod?.time,
+                "ms"
+              )
             : moment(tenant?.startDate).add(
-              tenant?.unit?.unitType?.billingPeriod?.time,
-              "ms"
-            ),
+                tenant?.unit?.unitType?.billingPeriod?.time,
+                "ms"
+              ),
           tenant: tenant._id,
           type: "RENT", // Set the bill type as 'Rent'
           propertyFeature: null, // No specific property feature for rent bill, so set it to null
           amount: tenant?.unit?.unitType?.price,
           pay_by: tenant?.customBillingPeriod?.time
             ? moment(tenant?.startDate).add(
-              tenant?.customBillingPeriod?.time + 604800000,
-              "ms"
-            )
+                tenant?.customBillingPeriod?.time + 604800000,
+                "ms"
+              )
             : moment(tenant?.startDate).add(
-              tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
-              "ms"
-            ), // set dedault pay date to 7 days
+                tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+                "ms"
+              ), // set dedault pay date to 7 days
         });
 
         await rentBill.save();
 
         // Iterate through each additional feature ID
         for (const feature of tenant?.additionalFeatures) {
-
           // Create a new bill for each feature
           const bill = new Bills({
             startDate: tenant.startDate,
@@ -389,13 +398,13 @@ export async function acceptBooking(req: any, res: any) {
             amount: feature?.price, // Set the bill amount as the price from the property feature
             pay_by: tenant?.customBillingPeriod?.time
               ? moment(tenant?.startDate).add(
-                tenant?.customBillingPeriod?.time + 604800000,
-                "ms"
-              )
+                  tenant?.customBillingPeriod?.time + 604800000,
+                  "ms"
+                )
               : moment(tenant?.startDate).add(
-                tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
-                "ms"
-              ), // set dedault pay date to 7 days
+                  tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+                  "ms"
+                ), // set dedault pay date to 7 days
           });
 
           await bill.save();
@@ -405,15 +414,12 @@ export async function acceptBooking(req: any, res: any) {
         return res.status(400).json({ error: "Failed to create rent bill" });
       }
 
-
       // Return a success response
       res.status(200).json({ message: "Bills created successfully" });
-
     } catch (error) {
-      console.log(error)
+      console.log(error);
       res.status(400).json({ error: "Failed to create bills" });
     }
-
 
     res.status(200).json({
       success: true,
