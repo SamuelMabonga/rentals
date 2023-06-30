@@ -1,13 +1,23 @@
+import { getPageInfo } from "helpers/page_info";
 import Ticket from "models/ticket";
 
 // get all Tickets
 export async function fetchAllTickets(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let ticket = await Ticket.find().populate({ path: "unit" });
+    const [tickets, ticketsCount] = await Promise.all([
+      Ticket.find()
+        .populate({ path: "unit" })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Ticket.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "tickets fetched successfully",
-      data: Ticket,
+      data: tickets,
+      pageInfo: getPageInfo(limit, ticketsCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -22,12 +32,21 @@ export async function fetchAllTickets(req: any, res: any) {
 // get unit Tickets
 export async function fetchUnitTickets(req: any, res: any) {
   let unitId = req.body.unitId;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let ticket = await Ticket.find({ unit: unitId }).populate({ path: "unit" });
+    const [tickets, ticketsCount] = await Promise.all([
+      Ticket.find({ unit: unitId })
+        .populate({ path: "unit" })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Ticket.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "tickets fetched successfully",
-      data: Ticket,
+      data: tickets,
+      pageInfo: getPageInfo(limit, ticketsCount, page),
     });
   } catch (error) {
     res.status(400).json({
