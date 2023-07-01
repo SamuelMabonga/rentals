@@ -1,4 +1,10 @@
 import { Schema, model, models } from "mongoose";
+import Unit from "./unit";
+import User from "./user";
+import PropertyFeatures from "./propertyFeatures";
+import BillingPeriods from "./billingPeriod";
+import Property from "./property";
+
 
 const BookingSchema = new Schema({
   name: {
@@ -6,16 +12,20 @@ const BookingSchema = new Schema({
   },
   user: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: User,
   },
   unit: {
     type: Schema.Types.ObjectId,
-    ref: 'Unit',
+    ref: Unit,
+  },
+  property: {
+    type: Schema.Types.ObjectId,
+    ref: Property,
   },
   additionalFeatures: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'PropertyFeatures',
+      ref: PropertyFeatures,
     }
   ],
   startDate: {
@@ -38,7 +48,7 @@ const BookingSchema = new Schema({
   },
   customBillingPeriod: {
     type: Schema.Types.ObjectId,
-    ref: "BillingPeriods"
+    ref: BillingPeriods
   },
 }, {
   timestamps: true

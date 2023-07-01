@@ -1,6 +1,9 @@
 import { Schema, model, models } from "mongoose";
 import User from "./user";
 import Unit from "./unit";
+import PropertyFeatures from "./propertyFeatures";
+import BillingPeriods from "./billingPeriod";
+import Property from "./property";
 
 const TenantSchema: any = new Schema({
   user: {
@@ -20,7 +23,7 @@ const TenantSchema: any = new Schema({
   additionalFeatures: [
     {
       type: Schema.Types.ObjectId,
-      ref: "PropertyFeatures"
+      ref: PropertyFeatures
     }
   ],
   customRent: {
@@ -28,7 +31,7 @@ const TenantSchema: any = new Schema({
   },
   customBillingPeriod: {
     type: Schema.Types.ObjectId,
-    ref: "BillingPeriods"
+    ref: BillingPeriods
   },
   nextRentBilling: {
     type: Date
@@ -43,6 +46,10 @@ const TenantSchema: any = new Schema({
       "INACTIVE"
     ]
   },
+  property: {
+    type: Schema.Types.ObjectId,
+    ref: Property
+  }
 },{
   timestamps: true
 });

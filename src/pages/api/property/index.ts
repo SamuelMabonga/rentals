@@ -23,6 +23,14 @@ export default async function handler(
   }: any = req;
 
   const decodedToken = authenticateUser(req, res);
+
+  if (!decodedToken?.user?._id) {
+    return res.status(401).json({
+      success: false,
+      msg: "Not Authorized",
+    });
+  }
+
   try {
     await mongoose
       .connect(

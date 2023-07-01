@@ -24,18 +24,18 @@ import moment from "moment"
 import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 
-const steps = [
-    'Select a tenant',
-    'Select a unit',
-    'Tenancy details',
-    // 'Select your tenancy duration',
-];
+// const steps = [
+//     'Select a tenant',
+//     'Select a unit',
+//     'Tenancy details',
+//     // 'Select your tenancy duration',
+// ];
 
-function HorizontalStepper({ step }: any) {
+function HorizontalStepper({ step, steps }: any) {
     return (
         <Box sx={{ width: '100%' }}>
             <Stepper activeStep={step} alternativeLabel>
-                {steps.map((label) => (
+                {steps.map((label: any) => (
                     <Step key={label}>
                         <StepLabel>{label}</StepLabel>
                     </Step>
@@ -74,6 +74,27 @@ const formSchema = yup.object().shape({
     endDate: yup.string().required("Required")
 })
 
+const formSchema2 = yup.object().shape({
+    userSearchTerm: yup.string().required(),
+    user: yup.object().shape({
+        _id: yup.string().required("Required"),
+        first_name: yup.string().required("Required"),
+        last_name: yup.string().required("Required")
+    }),
+    additionalFeatures: yup.array().of(
+        yup.object().shape({
+            _id: yup.string().required("Required"),
+            feature: yup.object().shape({
+                _id: yup.string().required("Required"),
+                name: yup.string().required("Required")
+            }),
+        })
+    ),
+    startDate: yup.string().required("Required"),
+    endDate: yup.string().required("Required")
+
+})
+
 export default function BookingForm({
     property,
     unitTypes: propertyUnitTypes,
@@ -93,10 +114,9 @@ export default function BookingForm({
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
+    const token = session.data?.accessToken
 
     const [isLoading, setIsLoading] = useState(false)
-
-    const token = session.data?.accessToken
 
     const { data: features, isLoading: featuresLoading }: any = useQuery({
         queryKey: ['property-features', token, property],
@@ -125,7 +145,7 @@ export default function BookingForm({
                 name: ""
             },
             additionalFeatures: [
-                {_id: "", feature: {_id: "", name: ""}}
+                { _id: "", feature: { _id: "", name: "" } }
             ],
             startDate: "",
             endDate: ""
@@ -133,7 +153,7 @@ export default function BookingForm({
         },
         mode: "onChange",
         reValidateMode: "onChange",
-        resolver: yupResolver(formSchema),
+        resolver: yupResolver(Object.keys(unit).length > 0 ? formSchema2 : formSchema),
     });
 
     useEffect(() => {
@@ -150,24 +170,52 @@ export default function BookingForm({
     async function onSubmit(values: any) {
         setIsLoading(true)
 
+        const postData = {
+            user: values.user._id,
+            unit: Object.keys(unit).length > 0 ? unit._id : values.unit._id,
+            additionalFeatures: [...values.additionalFeatures.map((item: any) => item._id)],
+            startDate: values.startDate,
+            endDate: values.endDate,
+            property
+        }
+
+        // POST A PROPERTY
+        try {
+            const res = await fetch('/api/booking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.data.accessToken}`,
+                },
+                body: JSON.stringify({ ...postData })
+            })
+            await res.json();
+
+            setIsLoading(false)
+            setIsOpen(false)
+            setSnackbarMessage({
+                open: true,
+                vertical: 'top',
+                horizontal: 'center',
+                message: "Feature feature created successfully",
+                icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </Box>
+            })
+        } catch (error) {
+            setIsLoading(false)
+            console.log(error)
+
+        }
+
+
+
         const data = {
             name: values.name,
             price: values.price
         }
-
-        console.log("VALUES", values)
-
-        const postData = {
-            user: values.user._id,
-            unit: values.unit._id,
-            additionalFeatures: [...values.additionalFeatures.map((item: any) => item._id)],
-            startDate: values.startDate,
-            endDate: values.endDate
-        }
-
-
-
-
         // // EDIT A PROPERTY
         // if (toEdit?.name) {
         //     const edited = {
@@ -194,37 +242,6 @@ export default function BookingForm({
         //         return
         //     }
         // }
-
-        // POST A PROPERTY
-        try {
-            const res = await fetch('/api/booking', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${session.data.accessToken}`,
-                },
-                body: JSON.stringify({ ...postData })
-            })
-            const response = await res.json();
-            console.log(response)
-            setIsLoading(false)
-            setIsOpen(false)
-            setSnackbarMessage({
-                open: true,
-                vertical: 'top',
-                horizontal: 'center',
-                message: "Feature feature created successfully",
-                icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </Box>
-            })
-        } catch (error) {
-            setIsLoading(false)
-            console.log(error)
-
-        }
     }
 
 
@@ -234,14 +251,21 @@ export default function BookingForm({
     const [units, setUnits] = useState<any>([])
 
     // STEPPER
+    const [steps, setSteps] = useState([
+        'Select a tenant',
+        'Select a unit',
+        'Tenancy details',
+    ])
     const [step, setStep] = useState(0)
 
-    // useEffect(() => {
-    //     if (unit) {
-    //         setSelectedUnit(unit)
-    //         setStep(2)
-    //     }
-    // }, [unit])
+    useEffect(() => {
+        if (unit) {
+            setSteps([
+                'Select a tenant',
+                'Tenancy details',
+            ])
+        }
+    }, [unit])
 
 
     // SEARCH
@@ -270,7 +294,7 @@ export default function BookingForm({
                 </IconButton>
             </DialogTitle>
             <DialogContent>
-                <HorizontalStepper step={step} />
+                <HorizontalStepper step={step} steps={steps} />
                 <form
                     id="booking-form"
                     onSubmit={handleSubmit(onSubmit)}
@@ -354,7 +378,7 @@ export default function BookingForm({
                         </Collapse>
                     </Box>
 
-                    <Box display={step === 1 ? "flex" : "none"} flexDirection="column" gap="1rem">
+                    <Box display={Object?.keys(unit)?.length > 0 && step === 1 ? "none" : step === 1 ? "flex" : "none"} flexDirection="column" gap="1rem">
                         <FormControl>
                             <FormLabel>Select the unit type to book</FormLabel>
                             <Autocomplete
@@ -373,7 +397,7 @@ export default function BookingForm({
                                             },
                                             method: "GET"
                                         });
-                                
+
                                         const res = await response.json();
                                         setUnits(res.data)
                                         setLoadingUnits(false)
@@ -449,8 +473,7 @@ export default function BookingForm({
                         </Box>
                     </Box>
 
-
-                    <Box display={step === 2 ? "flex" : "none"} flexDirection="column" gap="1rem">
+                    <Box display={Object?.keys(unit)?.length > 0 && step === 1 ? "flex" : step === 2 ? "flex" : "none"} flexDirection="column" gap="1rem">
                         <FormControl sx={{ width: "100%" }}>
                             <FormLabel>Select additional features for your booking</FormLabel>
                             <Autocomplete
@@ -461,7 +484,7 @@ export default function BookingForm({
                                 onChange={(event, value: any) => {
                                     setSelectedUnit(null)
                                     if (value?.length < 1) {
-                                        return setValue("additionalFeatures", [{_id: "", feature: [{_id: "", name: ""}]}])
+                                        return setValue("additionalFeatures", [{ _id: "", feature: [{ _id: "", name: "" }] }])
                                     }
                                     setValue("additionalFeatures", value)
                                 }}
@@ -487,8 +510,8 @@ export default function BookingForm({
                                 <FormLabel>When would you like to end</FormLabel>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
-                                    // label="Basic date picker"
-                                    onChange={(event: any) => setValue("endDate", moment(event.$d).format("YYYY-MM-DD"))}
+                                        // label="Basic date picker"
+                                        onChange={(event: any) => setValue("endDate", moment(event.$d).format("YYYY-MM-DD"))}
                                     />
                                 </LocalizationProvider>
                             </FormControl>
@@ -514,7 +537,7 @@ export default function BookingForm({
                         console.log("ERROR", errors)
 
                         if (step === 0) {
-                            if (watch("user")?._id !=="" && !errors?.user ) {
+                            if (watch("user")?._id !== "" && !errors?.user) {
                                 return setStep((prev) => prev + 1)
                             }
                         }
@@ -526,7 +549,7 @@ export default function BookingForm({
                         }
                     }}
                 >
-                    {step === 2 ? `Submit Booking` :`Next`}
+                    {Object.keys(unit).length > 0 && step === 1 ? `Submit Booking` : step === 2 ? `Submit Booking` : `Next`}
                 </Button>
                 {/* <Button
                     variant="contained"

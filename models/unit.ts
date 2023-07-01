@@ -1,5 +1,5 @@
 import { Schema, model, models } from "mongoose";
-import UnitType from "./unit_type";
+import UnitType from "./unitType";
 import Property from "./property";
 import Tenant from "./tenant";
 

@@ -21,6 +21,8 @@ import UnitForm from "Components/Properties/Forms/UnitForm"
 import BookingForm from "Components/Properties/Forms/BookingForm"
 import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
+import fetchPropertyUnits from "apis/property/fetchPropertyUnits"
+// import { fetchAllPropertyFeatures } from "controllers/propertyFeatures"
 
 type PageProps = {
     // data: any;
@@ -37,14 +39,14 @@ function TableSwitch({ activeTab, property }: any) {
         case "bookings":
             return <BookingsTable property={property} />
 
-        case "staff":
-            return <StaffTable />
+        // case "staff":
+        //     return <StaffTable />
 
         case "unitTypes":
             return <UnitTypesTable property={property} />
 
-        case "tickets":
-            return <TicketsTable />
+        // case "tickets":
+        //     return <TicketsTable />
 
         case "propertyFeatures":
             return <PropertyFeaturesTable property={property} />
@@ -86,23 +88,22 @@ export default function Property({
 
     // SESSION
     const { status, data: session }: any = useSession()
+    const token = session?.accessToken
 
     const router = useRouter()
     const { id }: any = router.query
 
-    const property = id
-
-    const { data }: any = useQuery({ queryKey: ['property', id], queryFn: () => fetchAProperty(session.accessToken, id) })
-    const { data: features }: any = useQuery({ queryKey: ['property-features', id], queryFn: () => fetchPropertyFeatures(session.accessToken, property) })
-    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
-    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', id], queryFn: () => fetchPropertyUnitTypes(session.accessToken, property) })
+    const { data }: any = useQuery({ queryKey: ['property', id, token], queryFn: () => fetchAProperty(token, id) })
+    // const { data: features }: any = useQuery({ queryKey: ['property-features', token, id], queryFn: () => fetchPropertyFeatures(token, property) })
+    // const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
+    // const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', token, id], queryFn: () => fetchPropertyUnitTypes(token, id) })
 
     const {
         _id,
         name,
         details,
         gallery
-    } = data.data
+    } = data?.data || {}
 
     return (
         <>
@@ -210,14 +211,12 @@ export default function Property({
                         Create New
                     </Button>
                 </Box>
-                <TableSwitch activeTab={activeTab} property={_id} />
+                <TableSwitch activeTab={activeTab} property={id} />
             </Box>
-            {/* <FeaturesForm />
-            <BillingPeriodsForm /> */}
-            <UnitTypeForm property={_id} features={features} billingPeriods={billingPeriods} />
-            <PropertyFeatureForm property={_id} />
-            <UnitForm property={_id} unitTypes={unitTypes} />
-            <BookingForm property={_id} unitTypes={unitTypes} features={features} />
+            <UnitTypeForm property={id} />
+            <PropertyFeatureForm property={id} />
+            <UnitForm property={id} />
+            <BookingForm property={id} />
         </>
     )
 }
@@ -227,8 +226,7 @@ Property.auth = true
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
 
-    const { query }: any = context
-    const { id } = query;
+    const id = context.query.id as string;
 
     if (!session) {
         return {
@@ -246,10 +244,10 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     const queryClient = new QueryClient()
 
     await Promise.all([
-        await queryClient.prefetchQuery(['property', id], () => fetchAProperty(accessToken, id)),
+        await queryClient.prefetchQuery(['property', id, accessToken], () => fetchAProperty(accessToken, id)),
         // await queryClient.prefetchQuery(['unitTypes'], () => fetchUnitTypes(accessToken)),
-        // await queryClient.prefetchQuery(['propertyFeatures'], () => fetchPropertyFeatures(accessToken)),
-        // await queryClient.prefetchQuery(['units'], () => fetchUnits(accessToken)),
+        // await queryClient.prefetchQuery(['property-features', id], () => fetchPropertyFeatures(accessToken, id)),
+        // await queryClient.prefetchQuery(['units', id, accessToken], () => fetchPropertyUnits(accessToken, id)),
         // await queryClient.prefetchQuery(['bookings'], () => fetchBookings(accessToken)),
         // await queryClient.prefetchQuery(['tenants'], () => fetchTenants(accessToken)),
     ])

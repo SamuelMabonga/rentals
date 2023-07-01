@@ -90,6 +90,10 @@ const CollectionsProvider = ({children}: any) => {
     // LOADING BACKDROP
     const [ openLoadingBackdrop, setOpenLoadingBackdrop] = useState(false)
 
+    // VIEW TENANT
+    const [ openViewTenant, setOpenViewTenant ] = useState(false)
+
+
     return (
         <CollectionsContext.Provider value={{
             collections,
@@ -174,6 +178,10 @@ const CollectionsProvider = ({children}: any) => {
             // LOADING BACKDROP
             openLoadingBackdrop,
             setOpenLoadingBackdrop,
+
+            // VIEW TENANT
+            openViewTenant,
+            setOpenViewTenant,
 
         }}>
             {children}

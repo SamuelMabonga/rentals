@@ -1,5 +1,7 @@
 import { Schema, model, models } from "mongoose";
 import BillingPeriods from "./billingPeriod";
+import Property from "./property";
+import PropertyFeatures from "./propertyFeatures";
 
 const UnitTypeShema = new Schema(
   {
@@ -17,20 +19,20 @@ const UnitTypeShema = new Schema(
       type: Schema.Types.ObjectId,
       ref:  BillingPeriods
     },
-    units: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Unit",
-      },
-    ],
+    // units: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Unit",
+    //   },
+    // ],
     property: {
       type: Schema.Types.ObjectId,
-      ref: "Property",
+      ref: Property,
     },
     defaultFeatures: [
       {
         type: Schema.Types.ObjectId,
-        ref: "PropertyFeatures",
+        ref: PropertyFeatures,
       },
     ],
   },

@@ -11,8 +11,9 @@ import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
 const formSchema = yup.object().shape({
-    // name: yup.string().required("Name is required"),
-    // price: yup.string().required("Price is required"),
+    feature: yup.object().required("Feature is required"),
+    price: yup.string().required("Price is required"),
+    billingPeriod: yup.object().required("Billing period is required"),
 })
 
 export default function PropertyFeatureForm({property}: any) {
@@ -27,8 +28,9 @@ export default function PropertyFeatureForm({property}: any) {
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
-    const { data: features }: any = useQuery({ queryKey: ['features'], queryFn: () => fetchFeatures(session.data.accessToken) })
-    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.data.accessToken) })
+    const token = session?.data?.accessToken
+    const { data: features }: any = useQuery({ queryKey: ['features', token], queryFn: () => fetchFeatures(token) })
+    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -219,6 +221,7 @@ export default function PropertyFeatureForm({property}: any) {
                     variant="contained"
                     type="submit"
                     form="property-features-form"
+                    onClick={() => console.log(errors)}
                 >
                     {toEdit?.name ? `Edit Property Feature` : `Create Property Feature`}
                 </Button>

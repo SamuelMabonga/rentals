@@ -2,10 +2,10 @@ import Property from "models/property";
 
 // get all properties
 //none admin fetch properties
-export async function fetchOwnerProperties(req: any, res: any ) {
-  let ownerId = req.query.ownerId
+export async function fetchOwnerProperties(req: any, res: any, owner: string ) {
+  // let ownerId = req.query.ownerId
   try {
-    let properties = await Property.find({ owner: `${ownerId}` });
+    let properties = await Property.find({ owner: `${owner}` });
 
     res.status(200).json({
       success: true,
@@ -27,13 +27,15 @@ export async function fetchAllProperties(req: any, res: any) {
   try {
     let properties = await Property.find();
 
-    res.status(200).json({
+    res.statusCode = 200
+    res.setHeader('Content-Type', 'application/json');
+    return res.end(JSON.stringify({
       success: true,
-      msg: "properties fetched successfully",
+      msg: "Properties fetched successfully",
       data: properties,
-    });
+    }));
   } catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       msg: "failed to fetch  properties",
       data: error,
@@ -62,8 +64,6 @@ export async function createProperty(req: any, res: any, userFetching: string) {
       });
     }
 
-    console.log("OWNER HERERE", userFetching);
-
     const property = new Property({
       ...req.body,
       owner: userFetching
@@ -87,6 +87,7 @@ export async function createProperty(req: any, res: any, userFetching: string) {
 
 //fetch property by id
 export async function fetchSingleProperty(req: any, res: any) {
+  console.log("fetching property", req.query.id)
   try {
     let property = await Property.findById(req.query.id)
     res.json({
@@ -100,7 +101,7 @@ export async function fetchSingleProperty(req: any, res: any) {
       msg: "failed to fetch property",
       data: error,
     });
-    console.log(error);
+    console.log("PROPERTY CAST ERROR", error);
   }
 }
 

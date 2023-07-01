@@ -1,23 +1,40 @@
 import BUIDING_TYPES from "constants";
 import { Schema, model, models } from "mongoose";
+import User from "./user";
 
-const propertySchema = new Schema(
+const propertySchema: any = new Schema(
   {
     name: {
       type: String,
       required: true,
       unique: true,
+      minlength: 2, // Example validation rule: minimum length of 2 characters
+      maxlength: 100, // Example validation rule: maximum length of 100 characters
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: User,
       required: true,
     },
     cover_photo: {
       type: String,
+      validate: {
+        validator: function (value: any) {
+          // Example custom validation: check if the URL is valid
+          return /^https?:\/\/[\w\-]+(\.[\w\-]+)+[/#?]?.*$/.test(value);
+        },
+        message: "Invalid cover photo URL",
+      },
     },
     profile_photo: {
       type: String,
+      validate: {
+        validator: function (value: any) {
+          // Example custom validation: check if the URL is valid
+          return /^https?:\/\/[\w\-]+(\.[\w\-]+)+[/#?]?.*$/.test(value);
+        },
+        message: "Invalid profile photo URL",
+      },
     },
     details: {
       type: String,
@@ -25,12 +42,19 @@ const propertySchema = new Schema(
     price: {
       type: String,
     },
-    gallery: {
-      type: Array,
-    },
+    gallery: [{
+      type: String,
+      validate: {
+        validator: function (value: any) {
+          // Example custom validation: check if the URL is valid
+          return /^https?:\/\/[\w\-]+(\.[\w\-]+)+[/#?]?.*$/.test(value);
+        },
+        message: "Invalid gallery photo URL",
+      },
+    }],
     building_type: {
       type: String,
-      // enum:  // BUIDING_TYPES
+      enum: BUIDING_TYPES,
     },
     number_of_units: {
       type: String,
@@ -40,7 +64,7 @@ const propertySchema = new Schema(
     timestamps: true,
   }
 );
-//indexed fields for searching
+
 propertySchema.index({
   name: "text",
 });

@@ -7,6 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import fetchBills from "apis/tenant/fetchBills";
 import { set } from "mongoose";
 import moment from "moment";
+import currencyFormatter from "Components/Common/currencyFormatter";
+
 
 
 export default function PaymentsForm({ tenant }: any) {
@@ -134,12 +136,12 @@ export default function PaymentsForm({ tenant }: any) {
                             <Typography fontSize="1.5rem">Total</Typography>
                         </Box>
 
-                        <Typography fontSize="1.5rem" fontWeight="600" ml="auto">UGX {selectedBills.reduce((partialSum: any, a: any) => partialSum + +a.amount, 0)}</Typography>
+                        <Typography fontSize="1.5rem" fontWeight="600" ml="auto">{currencyFormatter(selectedBills.reduce((partialSum: any, a: any) => partialSum + +a.amount, 0), "UGX")}</Typography>
                     </Box>
 
                     <Box display="flex" flexDirection="column" gap="0.5rem">
                         {
-                            data?.data?.map((bill: any, i: any) => {
+                            data?.data?.filter((item: any) => item.status !== "PAID").map((bill: any, i: any) => {
                                 return (
                                     <Box
                                         key={i}
@@ -162,8 +164,9 @@ export default function PaymentsForm({ tenant }: any) {
                                         }}
                                     >
                                         <Box>
-                                            <Typography fontWeight="500">{bill.type === "RENT" ? "Rent" : bill.propertyFeature.feature.name}</Typography>
-                                            <Typography fontSize={"0.875rem"} color="grey">{`${moment(bill.startDate).format("DD-MM-YY")} - ${moment(bill.endDate).format("DD-MM-YY")}`}</Typography>
+                                            <Typography fontSize={"0.875rem"} fontWeight="400">{bill.type === "RENT" ? "Rent" : bill.propertyFeature.feature.name}</Typography>
+                                            <Typography fontWeight="600" fontSize={"1.125rem"}>{currencyFormatter(bill.amount, "UGX")}</Typography>
+                                            <Typography fontSize={"0.875rem"} color="grey">{`${moment(bill.startDate).format("DD-MM-YY")} to ${moment(bill.endDate).format("DD-MM-YY")}`}</Typography>
                                         </Box>
 
                                         <Box

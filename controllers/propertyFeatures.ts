@@ -76,18 +76,18 @@ export async function fetchAllPropertyFeaturesByProperty(
     })
       .populate({ path: "feature" })
       .populate({ path: "billingPeriod" });
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       msg: "Property features fetched successfully",
       data: propertyFeature,
     });
   } catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       msg: "failed to fetch property features",
       data: error,
     });
-    console.log(error);
+    // console.log("FETCH PROPERTY FEATURES ERROR", error);
   }
 }
 
@@ -103,18 +103,18 @@ export async function fetchAllPropertyFeaturesByBillingPeriods(
     })
       .populate({ path: "feature" })
       .populate({ path: "billingPeriod" });
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       msg: "Property features fetched successfully",
       data: propertyFeature,
     });
   } catch (error) {
-    res.status(400).json({
+    console.log(error);
+    return res.status(400).json({
       success: false,
       msg: "failed to fetch property features",
       data: error,
     });
-    console.log(error);
   }
 }
 

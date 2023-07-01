@@ -1,7 +1,7 @@
 import { Schema, model, models } from "mongoose";
 import Feature from "./feature";
-import BillingPeriods from "@/pages/billingPeriods";
 import Property from "./property";
+import BillingPeriods from "./billingPeriod";
 
 const PropertyFeaturesSchema = new Schema({
   feature: {

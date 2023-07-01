@@ -27,11 +27,12 @@ export default function Properties({
     }: any = useContext(CollectionsContext)
 
     // SESSION
-    const { status, data: session }: any = useSession()
+    const session: any = useSession()
+    const token = session?.data?.accessToken
 
     const [openCreateForm, setOpenCreateForm] = useState(false)
 
-    const { data }: any = useQuery({ queryKey: ['properties'], queryFn: () => fetchProperties(session.accessToken) })
+    const { data }: any = useQuery({ queryKey: ['properties', token], queryFn: () => fetchProperties(token) })
 
     return (
         <>
@@ -76,7 +77,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // REACT QUERY
     const queryClient = new QueryClient()
 
-    await queryClient.prefetchQuery(['properties'], () => fetchProperties(accessToken))
+    await queryClient.prefetchQuery(['properties', accessToken], () => fetchProperties(accessToken))
 
     return {
         props: {

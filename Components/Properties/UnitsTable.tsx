@@ -1,17 +1,12 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
-import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
-import type { ColumnDef } from '@tanstack/react-table';
 import { useContext, useMemo } from 'react';
-import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/TableRenderer';
 import { useSession } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
-import fetchUnits from 'apis/fetchUnits';
 import moment from 'moment';
 import fetchPropertyUnits from 'apis/property/fetchPropertyUnits';
 import { CollectionsContext } from 'context/context';
-import fetchPropertyFeatures from 'apis/property/fetchPropertyFeatures';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -37,8 +32,8 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
     }: any = useContext(CollectionsContext)
 
     // SESSION
-    const { status, data: session }: any = useSession()
-    const token = session?.accessToken
+    const session: any = useSession()
+    const token = session?.data?.accessToken
     const { data, isLoading }: any = useQuery({
         queryKey: ['property-units', token, property],
         queryFn: () => fetchPropertyUnits(token, property),

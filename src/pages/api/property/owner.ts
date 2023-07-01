@@ -31,7 +31,7 @@ export default async function handler(
       )
       .then(() => {
         // USER
-        const { _id, role } = decodedToken.user;
+        const { _id: owner, role } = decodedToken.user;
 
         const { method } = req;
         switch (method) {
@@ -41,11 +41,11 @@ export default async function handler(
             } else if (searchQuery) {
               searchProperty(req, res, searchQuery);
             } else {
-              fetchOwnerProperties(req, res);
+              fetchOwnerProperties(req, res, owner);
             }
             break;
           case "POST":
-            createProperty(req, res, _id);
+            createProperty(req, res, owner);
             break;
           case "PUT":
             updateProperty(req, res);

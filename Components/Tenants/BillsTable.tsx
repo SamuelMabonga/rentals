@@ -49,8 +49,8 @@ function AlertDialog({
     }, [agreeing])
 
     return (
-        <div>
-            <Button variant={buttonVariant} color={buttonColor} size="small" sx={{ fontSize: "0.875rem", display: hide ? "none" : "block" }} onClick={handleClickOpen}>
+        <div style={{display: hide ? "none" : "block"}}>
+            <Button variant={buttonVariant} color={buttonColor} size="small" sx={{ fontSize: "0.875rem",  }} onClick={handleClickOpen}>
                 {buttonLabel}
             </Button>
             <Dialog
@@ -58,6 +58,7 @@ function AlertDialog({
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
+                sx={{display: hide ? "none" : "block"}}
             >
                 <LinearProgress sx={{ display: loading ? "flex" : "none" }} />
                 <DialogTitle id="alert-dialog-title">
@@ -169,7 +170,7 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                     <Box display="flex" gap="1rem" >
                         <AlertDialog
                             hide={row.row.original.status === "PAID"}
-                            buttonLabel="Accept"
+                            buttonLabel="Pay"
                             buttonVariant="contained"
                             title="Are you sure you want to pay this bill?"
                             content="If you accept, you will be redirected to the payment page"
@@ -189,7 +190,6 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
 
                                 // setAccepting(true)
 
-                                console.log("SESSION", session)
                                 try {
                                     const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/payments`, {
                                         method: "POST",
@@ -257,68 +257,18 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                                     alert("Failed to accept")
                                 }
                             }}
-                            // onOpen={() => {
-                            //     setPaymentConfig({
-                            //         tx_ref: row?.row?.original?._id,
-                            //         amount: +row?.row?.original?.amount,
-                            //         currency: "UGX",
-                            //         payment_options: "card,mobilemoney,ussd",
-                            //         // customer: {
-                            //         //     email: user?.email,
-                            //         //     phonenumber: user?.phoneNumber,
-                            //         //     name: user?.first_name
-                            //         // },
-                            //         customer: {
-                            //             email: "samuel@gmail.com",
-                            //             phonenumber: "0785663783",
-                            //             name: "Mabonga Samuel"
-                            //         },
-                            //         customizations: {
-                            //             title: "Rent Payment",
-                            //             description: "Payment for rent",
-                            //             logo: "https://assets.piedpiper.com/logo.png",
-                            //         }
-                            //     })
-
-                            //     openFlutterwave()
-                            // }}
                         />
                         <Button
                             variant={"outlined"}
                             size="small"
                             sx={{
                                 fontSize: "0.875rem",
-                                display: row?.row?.original?.status === "PAID" ? "none" : "block"
+                                display: row?.row?.original?.status === "PAID" ? "block" : "none"
                             }}
                             onClick={async (event) => {
                                 event.preventDefault()
                                 event.stopPropagation()
 
-                                if (row?.row?.original?.status === "PAID") return
-
-                                await setPaymentConfig({
-                                    tx_ref: row?.row?.original?._id,
-                                    amount: +row?.row?.original?.amount,
-                                    currency: "UGX",
-                                    payment_options: "card,mobilemoney,ussd",
-                                    // customer: {
-                                    //     email: user?.email,
-                                    //     phonenumber: user?.phoneNumber,
-                                    //     name: user?.first_name
-                                    // },
-                                    customer: {
-                                        email: "samuel@gmail.com",
-                                        phonenumber: "0785663783",
-                                        name: "Mabonga Samuel"
-                                    },
-                                    customizations: {
-                                        title: "Rent Payment",
-                                        description: "Payment for rent",
-                                        logo: "https://assets.piedpiper.com/logo.png",
-                                    }
-                                })
-
-                                openFlutterwave()
 
                             }}
                         >
@@ -330,7 +280,7 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                             size="small"
                             sx={{
                                 fontSize: "0.875rem",
-                                display: row?.row?.original?.type === "RENT" ? "block" : "none"
+                                display: row?.row?.original?.status === "PAID" ? "none" : "flex"
                             }}
                             onClick={(event) => {
                                 event.preventDefault()

@@ -44,7 +44,7 @@ export async function fetchAllPropertyBookings(req: any, res: any) {
   }: any = req;
 
   try {
-    let bookings = await Booking.find({ "unit.property": id })
+    let bookings = await Booking.find({ "property": id })
       .populate({
         path: "unit",
         populate: [{ path: "unitType" }],
@@ -319,6 +319,7 @@ export async function acceptBooking(req: any, res: any) {
         customBillingPeriod: booking?.customBillingPeriod,
         nextRentBilling: Date.now(),
         status: "PENDING",
+        property: booking?.unit?.property,
       });
 
       const newTenant = await tenantObj.save();

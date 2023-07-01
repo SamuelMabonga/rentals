@@ -25,13 +25,13 @@ export async function fetchAllUserTenancies(req: any, res: any, id: string) {
     let tenants = await Tenant.find({ user: id })
       .populate("user")
       .populate("unit");
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       msg: "User's tenancies fetched successfully",
       data: tenants,
     });
   } catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       msg: "failed to fetch user's tenancies",
       data: error,
@@ -47,11 +47,10 @@ export async function fetchAllPropertyTenants(req: any, res: any) {
   }: any = req;
 
   try {
-    let tenants = await Tenant.find({ "unit.property": id })
+    let tenants = await Tenant.find({ "property": id })
       .populate("user")
       .populate({
         path: "unit",
-        populate: [{ path: "tenant" }, { path: "property" }],
       });
     res.status(200).json({
       success: true,

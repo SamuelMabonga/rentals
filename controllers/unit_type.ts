@@ -1,4 +1,4 @@
-import UnitType from "models/unit_type";
+import UnitType from "models/unitType";
 
 // get all unit_types
 export async function fetchAllUnitTypes(req: any, res: any) {

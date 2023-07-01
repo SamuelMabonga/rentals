@@ -75,7 +75,7 @@ export const TableRenderer = <T extends object>({ data, columns, onRowClick, loa
                                         boxShadow: "0px 4px 20px rgba(211, 205, 218, 0.25)",
                                         border: "1px solid rgba(211, 205, 218, 0.7)",
                                     }}
-                                    onClick={() => onRowClick(row.original._id)}
+                                    onClick={() => onRowClick(row.original)}
                                 >
                                     {row.getVisibleCells().map((cell: any) => (
                                         <TableCell key={cell.id}

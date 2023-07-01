@@ -7,6 +7,7 @@ import fetchBillingPeriods from "apis/fetchBillingPeriods"
 import fetchFeatures from "apis/fetchFeatures"
 import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
 import fetchUnitTypes from "apis/fetchUnitTypes"
+import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 import { CollectionsContext } from "context/context"
 import { fetchAllBillingPeriods } from "controllers/billingPeriods"
 import { useSession } from "next-auth/react"
@@ -20,7 +21,7 @@ const formSchema = yup.object().shape({
     // description: yup.string().required("Description is required"),
 })
 
-export default function UnitForm({property, unitTypes}: any) {
+export default function UnitForm({property}: any) {
     // CONTEXT
     const {
         openUnitForm: open,
@@ -34,7 +35,9 @@ export default function UnitForm({property, unitTypes}: any) {
     const { id }: any = router.query
 
     // SESSION
-    const { status, data: session }: any = useSession()
+    const session: any = useSession()
+    const token = session?.data?.accessToken
+    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', token, id], queryFn: () => fetchPropertyUnitTypes(token, id) })
     // const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
     // const { data: unitTypes }: any = useQuery({ queryKey: ['unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
 
@@ -104,7 +107,7 @@ export default function UnitForm({property, unitTypes}: any) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${session.accessToken}`,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({ ...data })
             })

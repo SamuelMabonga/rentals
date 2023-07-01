@@ -20,7 +20,11 @@ const formSchema = yup.object().shape({
     // description: yup.string().required("Description is required"),
 })
 
-export default function UnitTypeForm({property, features, billingPeriods}: any) {
+export default function UnitTypeForm({
+    property,
+    // billingPeriods,
+    // features
+}: any) {
     // CONTEXT
     const {
         showUnitTypeForm: open,
@@ -31,13 +35,13 @@ export default function UnitTypeForm({property, features, billingPeriods}: any) 
     }: any = useContext(CollectionsContext)
 
     const router = useRouter()
-    const {id}: any = router.query
 
     // SESSION
-    const { status, data: session }: any = useSession()
-    // const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
-    // const { data: features }: any = useQuery({ queryKey: ['propertyFeatures', property], queryFn: () => fetchPropertyFeatures(session.accessToken, property) })
-    // const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
+    const session: any = useSession()
+    const token = session?.data?.accessToken
+
+    const { data: features }: any = useQuery({ queryKey: ['property-features', token, property], queryFn: () => fetchPropertyFeatures(token, property) })
+    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -106,13 +110,13 @@ export default function UnitTypeForm({property, features, billingPeriods}: any) 
 
         // POST A PROPERTY
         try {
-            const res = await fetch('/api/unitTypes',{
+            const res = await fetch('/api/unitTypes', {
                 method: 'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                    Authorization: `Bearer ${session.accessToken}`,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({...data})
+                body: JSON.stringify({ ...data })
             })
             const response = await res.json();
             console.log(response)
@@ -124,13 +128,13 @@ export default function UnitTypeForm({property, features, billingPeriods}: any) 
                 horizontal: 'center',
                 message: "Unit type created successfully",
                 icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </Box>
             })
             return
-        } catch(error) {
+        } catch (error) {
             setIsLoading(false)
             console.log(error)
         }
@@ -210,7 +214,7 @@ export default function UnitTypeForm({property, features, billingPeriods}: any) 
                         <FormLabel>Billing Period</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
-                            options={billingPeriods?.data  || []}
+                            options={billingPeriods?.data || []}
                             getOptionLabel={(option: any) => option.name}
                             onChange={(event, value) => setValue("billingPeriod", value)}
                             renderInput={(params) =>

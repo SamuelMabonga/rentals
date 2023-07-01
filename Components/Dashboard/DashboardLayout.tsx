@@ -1,17 +1,18 @@
 import { Menu } from "@mui/icons-material"
-import { Avatar, Box, Button, IconButton, Snackbar, Typography } from "@mui/material"
+import { Avatar, Box, Button, CircularProgress, IconButton, Snackbar, Typography } from "@mui/material"
 import ConsecutiveSnackbars from "Components/Common/ConsecutiveSnackbars"
 import LoadingBackdrop from "Components/Common/LoadingBackdrop"
 import MobileDrawer from "Components/Common/MobileDrawer"
 import NavItem from "Components/Common/NavItem"
 import RegularSnackbar from "Components/Common/RegularSnackBar"
+import { CollectionsContext } from "context/context"
 // import ImageUploader from "Components/Common/ImageUploader"
 import { motion, useIsomorphicLayoutEffect } from "framer-motion"
 import { signOut, useSession } from "next-auth/react"
 import dynamic from "next/dynamic"
 import Head from "next/head"
 import { useRouter } from "next/router"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 
 const ImageUploader = dynamic(() =>
     import('../Common/ImageUploader'),
@@ -22,6 +23,11 @@ const MBox = motion(Box)
 const MTypo = motion(Typography)
 
 export default function DashboardLayout({ children }: any) {
+
+    // CONTEXT
+    const { setSnackbarMessage }: any = useContext(CollectionsContext)
+
+
     const router = useRouter()
     const { status, data: session } = useSession({
         required: true,
@@ -69,6 +75,49 @@ export default function DashboardLayout({ children }: any) {
     useEffect(() => {
         setTimeout(() => setIsLoading(false), 2000)
     }, [])
+
+
+    // const router = useRouter();
+
+// Listen for route changes
+useEffect(() => {
+  const handleRouteChangeStart = () => {
+    // Set loading state to true when route change starts
+
+    setSnackbarMessage({
+        open: true,
+        vertical: 'top',
+        horizontal: 'center',
+        message: "Loading...",
+        icon: <Box color="white"><CircularProgress size={24} color="inherit" /></Box>
+    })
+  };
+
+  const handleRouteChangeComplete = () => {
+    // Set loading state to false when route change completes
+    setSnackbarMessage({
+        open: false,
+        vertical: 'top',
+        horizontal: 'center',
+        message: "",
+        icon: <CircularProgress size={24} />
+    })
+
+    // Scroll to top on route change
+    window.scrollTo(0, 0);
+  };
+
+  // Add event listeners for route changes
+  router.events.on('routeChangeStart', handleRouteChangeStart);
+  router.events.on('routeChangeComplete', handleRouteChangeComplete);
+
+  // Clean up the event listeners on unmount
+  return () => {
+    router.events.off('routeChangeStart', handleRouteChangeStart);
+    router.events.off('routeChangeComplete', handleRouteChangeComplete);
+  };
+}, []);
+
 
     return (
         <>

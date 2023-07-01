@@ -26,7 +26,6 @@ export default async function handler(
       role
     } = req.body;
 
-    console.log(email)
     const userExists = await User.findOne({ email });
 
     if (userExists) {

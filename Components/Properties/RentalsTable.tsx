@@ -113,7 +113,7 @@ export const RentalsTable = <T extends object>({ data }: ReactTableProps<T>) => 
         <TableRenderer
             data={data}
             columns={columns}
-            onRowClick={(rowId) => router.push(`/rentals/${rowId}`)}
+            onRowClick={(row: any) => router.push(`/rentals/${row._id}`)}
         />
     );
 };

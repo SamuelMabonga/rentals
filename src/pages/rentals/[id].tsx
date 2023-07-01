@@ -139,7 +139,7 @@ export default function Property({
     }
 
     useEffect(() => {
-if (paymentConfig?.tx_ref) {
+        if (paymentConfig?.tx_ref) {
             openFlutterwave()
         }
 
@@ -147,59 +147,61 @@ if (paymentConfig?.tx_ref) {
 
     return (
         <>
-            <Box display="flex" flexDirection={["column", "row"]} gap="1rem" width="100%" justifyContent="space-between" mt={["2rem", "1rem"]}>
+            <Box display="flex" flexDirection={["column", "row"]} gap="1rem" width="100%" mt={["2rem", "1rem"]}>
                 <Box>
                     <Typography fontSize="1.5rem" fontWeight="600" color="primary.dark">{`${unit?.name}`}</Typography>
                     <Typography fontWeight="600" color="grey">{`${unit?.property?.name}`}</Typography>
                 </Box>
 
-                <Box display={["none", "flex"]} flexDirection={["column", "row"]} gap="1rem">
+                {/* <Box display={["none", "flex"]} flexDirection={["column", "row"]} gap="1rem">
                     <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem" }} color="error" >Terminate tenancy</Button>
                     <Button variant="contained" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem" }}>Renew your tenancy</Button>
-                </Box>
+                </Box> */}
             </Box>
 
-            <Box width="100%" display="grid" gridTemplateColumns={["1fr", "1fr 1fr",]} gap="1rem">
-                <DetailsCard
-                    label="Entry Date"
-                    value={moment(startDate).format("DD MMM YYYY")}
-                    icon={
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    }
-                />
-                <DetailsCard
-                    label="Exit Date"
-                    value={moment(endDate).format("DD MMM YYYY")}
-                    icon={
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    }
-                />
-                <DetailsCard
-                    label="Tenancy length"
-                    value={`${moment(endDate).diff(moment(startDate), "days")} days`}
-                    icon={
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    }
-                />
-                <DetailsCard
-                    label="Days Remaining"
-                    value={`${moment(endDate).diff(moment(), "days")} days`}
-                    icon={
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    }
-                />
+            <Box width="100%" gap="1rem">
+                <Box width="100%" display="grid" gridTemplateColumns={["1fr", "1fr 1fr",]} gap="1rem">
+                    <DetailsCard
+                        label="Entry Date"
+                        value={moment(startDate).format("DD MMM YYYY")}
+                        icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        }
+                    />
+                    <DetailsCard
+                        label="Exit Date"
+                        value={moment(endDate).format("DD MMM YYYY")}
+                        icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        }
+                    />
+                    <DetailsCard
+                        label="Tenancy length"
+                        value={`${moment(endDate).diff(moment(startDate), "days")} days`}
+                        icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        }
+                    />
+                    <DetailsCard
+                        label="Days Remaining"
+                        value={`${moment(endDate).diff(moment(), "days")} days`}
+                        icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        }
+                    />
+                </Box>
 
-                <Box display={["flex", "none"]} flexDirection={["column", "row"]} sx={{ mt: "1.5rem" }} gap="1rem">
-                    <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem" }} color="error" >Terminate tenancy</Button>
-                    <Button variant="contained" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem" }}>Renew your tenancy</Button>
+                <Box display={["flex"]} flexDirection={["column", "row"]} sx={{ mt: "1.5rem" }} gap="1rem">
+                    <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], ml: "auto" }} color="error" >Terminate tenancy</Button>
+                    <Button variant="contained" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], }}>Renew your tenancy</Button>
                 </Box>
             </Box>
 

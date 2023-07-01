@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/TableRenderer';
@@ -10,6 +10,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import moment from 'moment';
 import fetchPropertyTenants from 'apis/property/fetchPropertyTenants';
+import ViewTenant from './Common/ViewTenant';
+import { CollectionsContext } from 'context/context';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -27,6 +29,13 @@ type Item = {
 }
 
 export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>) => {
+    
+    // CONTEXT
+    const {
+        setOpenViewTenant
+    }: any = useContext(CollectionsContext)
+
+
     const session: any = useSession()
     const token = session.data.accessToken
     const { data, isLoading }: any = useQuery({ queryKey: ['property-tenants', token, property], queryFn: () => fetchPropertyTenants(token, property) })
@@ -96,14 +105,17 @@ export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>)
     );
 
     return (
-        <TableRenderer
+        <>
+                <TableRenderer
             data={data?.data || []}
             columns={columns}
             onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
+                setOpenViewTenant(true)
             } }
             loading={isLoading}
         />
+        <ViewTenant />
+        </>
             // <h1>Hwey</h1>
     );
 };
