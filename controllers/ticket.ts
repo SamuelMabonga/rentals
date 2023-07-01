@@ -89,21 +89,6 @@ export async function fetchUnitTickets(req: any, res: any) {
 // create a Ticket
 export async function createTicket(req: any, res: any) {
   try {
-    const requiredFields = ["name"];
-
-    const includesAllFields = requiredFields.every((field) => {
-      return !!req.body[field];
-    });
-    console.log("required fields is", includesAllFields);
-
-    if (!includesAllFields) {
-      return res.status(400).json({
-        success: false,
-        msg: "Please supply all required fields",
-        requiredFields,
-      });
-    }
-
     const ticket = new Ticket({
       ...req.body,
     });
@@ -113,10 +98,7 @@ export async function createTicket(req: any, res: any) {
     return res.json({
       success: true,
       msg: "New ticket created",
-      _id: newTicket?._id,
-      unit: newTicket?.unit,
-      image: newTicket?.image,
-      message: newTicket?.message,
+      data: newTicket,
     });
   } catch (error: any) {
     console.log(error);
@@ -154,8 +136,9 @@ export async function updateTicket(req: any, res: any) {
     let ticket = await Ticket.findById(req.params.id);
 
     const data = {
-      unit: req.body.unit || ticket.unit,
-      image: req.body.image || ticket.image,
+      status: req.body.status || ticket.status,
+      tenantSatisfaction:
+        req.body.tenantSatisfaction || ticket.tenantSatisfaction,
       message: req.body.message || ticket.message,
     };
     ticket = await Ticket.findByIdAndUpdate(req.params.id, data, {

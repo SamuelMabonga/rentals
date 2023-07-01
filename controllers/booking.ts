@@ -50,25 +50,32 @@ export async function fetchAllPropertyBookings(req: any, res: any) {
   const {
     query: { id, searchQuery },
   }: any = req;
-
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let bookings = await Booking.find({ "property": id })
-      .populate({
-        path: "unit",
-        populate: [{ path: "unitType" }],
-      })
-      .populate({
-        path: "user",
-      })
-      .populate({
-        path: "additionalFeatures",
-        populate: [{ path: "feature" }],
-      });
+    const [bookings, bookingsCount] = await Promise.all([
+      Booking.find({ property: id })
+        .populate({
+          path: "unit",
+          populate: [{ path: "unitType" }],
+        })
+        .populate({
+          path: "user",
+        })
+        .populate({
+          path: "additionalFeatures",
+          populate: [{ path: "feature" }],
+        })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Booking.countDocuments(),
+    ]);
 
     res.json({
       success: true,
       msg: "bookings fetched successfully",
       data: bookings,
+      pageInfo: getPageInfo(limit, bookingsCount, page),
     });
   } catch (error) {
     res.status(400).json({
