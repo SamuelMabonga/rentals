@@ -18,7 +18,7 @@ export default function BillingPeriodsForm() {
         openBillingPeriodsForm: open,
         setOpenBillingPeriodsForm: setIsOpen,
         billingPeriodsToEdit: toEdit,
-        setBillingPeriodsToEdit: setToEdit,
+        setBillingPeriodToEdit: setToEdit,
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
 

@@ -114,10 +114,14 @@ export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) =
         <TableRenderer
             data={data?.data}
             columns={columns}
-            onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
-            }}
+                        onRowClick={(row: any) => router.push(`/billingperiods/${row._id}`)}
             pageInfo={data?.pageInfo}
         />
+        // <TableRenderer
+        //     data={data}
+        //     columns={columns}
+        //     onRowClick={(row: any) => router.push(`/billingsperiods/${row._id}`)}
+        //     pageInfo={pageInfo}
+        // />
     );
 };
