@@ -6,14 +6,37 @@ const TicketShema = new Schema({
   },
   unit: {
     type: Schema.Types.ObjectId,
-    ref: 'Unit',
+    ref: "Unit",
   },
   message: {
     type: String,
   },
+  type: {
+    type: String,
+    enum: [
+      "MAINTENANCE AND REPAIR",
+      "SAFETY CONCERNS",
+      "NOISE COMPLAINTS",
+      "PEST INFECTION",
+      "RENTAL PAYMENT ISSUES",
+      "DISPUTES WITH LANDLORDS",
+      "PRIVACY VIOLATIONS",
+      "HEALTH AND SANITATION ISSUES",
+      "ACCESSIBILITY ISSUES",
+      "UNRESPONSIVE LANDLORDS",
+    ],
+  },
+  status: {
+    type: String,
+    enum: ["FIXED", "INPROGRESS"],
+  },
+  tenantSatisfaction: {
+    type: String,
+    enum: ["YES", "NO"],
+  },
   created_at: {
     type: Date,
-  }
+  },
 });
 
 const Ticket = models.Ticket || model("Ticket", TicketShema);
