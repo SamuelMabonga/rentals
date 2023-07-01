@@ -1,15 +1,24 @@
+import { getPageInfo } from "helpers/page_info";
 import UnitType from "models/unitType";
 
 // get all unit_types
 export async function fetchAllUnitTypes(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let unit_types = await UnitType.find()
-      .populate("billingPeriod")
-      .populate("defaultFeatures");
+    const [unitTypes, unitTypesCount] = await Promise.all([
+      UnitType.find()
+        .populate("billingPeriod")
+        .populate("defaultFeatures")
+        .skip((page - 1) * limit)
+        .limit(limit),
+      UnitType.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "unit types fetched successfully",
-      data: unit_types,
+      data: unitTypes,
+      pageInfo: getPageInfo(limit, unitTypesCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -24,14 +33,22 @@ export async function fetchAllUnitTypes(req: any, res: any) {
 // get all unit_types by unit
 export async function fetchUnitTypesByUnit(req: any, res: any) {
   let unitId = req.query.unitId;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let unit_types = await UnitType.find({ unit: unitId })
-      .populate("billingPeriod")
-      .populate("defaultFeatures");
+    const [unitTypes, unitTypesCount] = await Promise.all([
+      UnitType.find({ unit: unitId })
+        .populate("billingPeriod")
+        .populate("defaultFeatures")
+        .skip((page - 1) * limit)
+        .limit(limit),
+      UnitType.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "unit types fetched successfully",
-      data: unit_types,
+      data: unitTypes,
+      pageInfo: getPageInfo(limit, unitTypesCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -45,15 +62,23 @@ export async function fetchUnitTypesByUnit(req: any, res: any) {
 
 // get all unit_types by unit
 export async function fetchPropertyUnitTypes(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   let propertyId = req.query.id;
   try {
-    let unit_types = await UnitType.find({ property: propertyId })
-      .populate("billingPeriod")
-      .populate("defaultFeatures");
+    const [unitTypes, unitTypesCount] = await Promise.all([
+      UnitType.find({ property: propertyId })
+        .populate("billingPeriod")
+        .populate("defaultFeatures")
+        .skip((page - 1) * limit)
+        .limit(limit),
+      UnitType.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "unit types fetched successfully",
-      data: unit_types,
+      data: unitTypes,
+      pageInfo: getPageInfo(limit, unitTypesCount, page),
     });
   } catch (error) {
     res.status(400).json({

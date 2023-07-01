@@ -1,16 +1,25 @@
+import { getPageInfo } from "helpers/page_info";
 import Property from "models/property";
 
 // get all properties
 //none admin fetch properties
-export async function fetchOwnerProperties(req: any, res: any, owner: string ) {
-  // let ownerId = req.query.ownerId
+export async function fetchOwnerProperties(req: any, res: any, owner: string) {
+  // let ownerId = req.query.ownerId;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let properties = await Property.find({ owner: `${owner}` });
+    const [properties, propertiesCount] = await Promise.all([
+      Property.find({ owner: `${owner}` })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Property.countDocuments(),
+    ]);
 
     res.status(200).json({
       success: true,
       msg: "properties fetched successfully",
       data: properties,
+      pageInfo: getPageInfo(limit, propertiesCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -24,8 +33,15 @@ export async function fetchOwnerProperties(req: any, res: any, owner: string ) {
 
 // get admin all properties
 export async function fetchAllProperties(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let properties = await Property.find();
+    const [properties, propertiesCount] = await Promise.all([
+      Property.find()
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Property.countDocuments(),
+    ]);
 
     res.statusCode = 200
     res.setHeader('Content-Type', 'application/json');
@@ -33,6 +49,7 @@ export async function fetchAllProperties(req: any, res: any) {
       success: true,
       msg: "Properties fetched successfully",
       data: properties,
+      pageInfo: getPageInfo(limit, propertiesCount, page),
     }));
   } catch (error) {
     return res.status(400).json({
@@ -66,7 +83,7 @@ export async function createProperty(req: any, res: any, userFetching: string) {
 
     const property = new Property({
       ...req.body,
-      owner: userFetching
+      owner: userFetching,
     });
 
     const newProperty = await property.save();
@@ -89,7 +106,7 @@ export async function createProperty(req: any, res: any, userFetching: string) {
 export async function fetchSingleProperty(req: any, res: any) {
   console.log("fetching property", req.query.id)
   try {
-    let property = await Property.findById(req.query.id)
+    let property = await Property.findById(req.query.id);
     res.json({
       success: true,
       msg: "property fetched successfully",

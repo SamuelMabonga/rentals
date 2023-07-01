@@ -1,13 +1,24 @@
+import { getPageInfo } from "helpers/page_info";
 import Tenant from "models/tenant";
 
 // get all tenants
 export async function fetchAllTenants(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let tenants = await Tenant.find().populate("user").populate("unit");
+    const [tenants, tenantsCount] = await Promise.all([
+      Tenant.find()
+        .populate("user")
+        .populate("unit")
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Tenant.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "tenants fetched successfully",
       data: tenants,
+      pageInfo: getPageInfo(limit, tenantsCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -21,14 +32,22 @@ export async function fetchAllTenants(req: any, res: any) {
 
 // get user's tenancies
 export async function fetchAllUserTenancies(req: any, res: any, id: string) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let tenants = await Tenant.find({ user: id })
-      .populate("user")
-      .populate("unit");
+    const [tenants, tenantsCount] = await Promise.all([
+      Tenant.find({ user: id })
+        .populate("user")
+        .populate("unit")
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Tenant.countDocuments(),
+    ]);
     return res.status(200).json({
       success: true,
       msg: "User's tenancies fetched successfully",
       data: tenants,
+      pageInfo: getPageInfo(limit, tenantsCount, page),
     });
   } catch (error) {
     return res.status(400).json({
@@ -45,17 +64,25 @@ export async function fetchAllPropertyTenants(req: any, res: any) {
   const {
     query: { id, searchQuery },
   }: any = req;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
 
   try {
-    let tenants = await Tenant.find({ "property": id })
-      .populate("user")
-      .populate({
-        path: "unit",
-      });
+    const [tenants, tenantsCount] = await Promise.all([
+      Tenant.find({ "property": id })
+        .populate("user")
+        .populate({
+          path: "unit",
+          })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Tenant.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "Property's tenants fetched successfully",
       data: tenants,
+      pageInfo: getPageInfo(limit, tenantsCount, page),
     });
   } catch (error) {
     res.status(400).json({

@@ -5,18 +5,28 @@ import Fuse from "fuse.js";
 import Bills from "models/bills";
 import moment from "moment";
 import PropertyFeatures from "models/propertyFeatures";
+import { getPageInfo } from "helpers/page_info";
 
 // get all bills
 export async function fetchAllBills(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let bills = await Bills.find().populate({
-      path: "tenant",
-    });
+    const [bills, billsCount] = await Promise.all([
+      Bills.find()
+        .populate({
+          path: "tenant",
+        })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Bills.countDocuments(),
+    ]);
 
     res.json({
       success: true,
       msg: "bills fetched successfully",
       data: bills,
+      pageInfo: getPageInfo(limit, billsCount, page),
     });
   } catch (error) {
     res.status(400).json({

@@ -1,13 +1,22 @@
+import { getPageInfo } from "helpers/page_info";
 import Feature from "models/feature";
 
 // get all features
 export async function fetchAllFeatures(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let feature = await Feature.find();
+    const [features, featuresCount] = await Promise.all([
+      Feature.find()
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Feature.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "features fetched successfully",
-      data: feature,
+      data: features,
+      pageInfo: getPageInfo(limit, featuresCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -50,7 +59,7 @@ export async function createFeature(req: any, res: any) {
       name: newFeature?.name,
       image: newFeature?.image,
       rate: newFeature?.rate,
-      price: newFeature?.price
+      price: newFeature?.price,
     });
   } catch (error: any) {
     console.log(error);

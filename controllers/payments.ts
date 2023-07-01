@@ -1,14 +1,24 @@
+import { getPageInfo } from "helpers/page_info";
 import Bills from "models/bills";
 import Payments from "models/payments";
 
 // get all payments
 export async function fetchAllPayments(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let payments = await Payments.find().populate({ path: "bills" });
+    const [payments, paymentsCount] = await Promise.all([
+      Payments.find()
+        .populate({ path: "bills" })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Payments.countDocuments(),
+    ]);
     res.status(200).json({
       success: true,
       msg: "payments fetched successfully",
       data: payments,
+      pageInfo: getPageInfo(limit, paymentsCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -67,7 +77,9 @@ export async function fetchSinglePayment(req: any, res: any) {
 // FETCH PAYMENTS BY TENANT
 export async function fetchPaymentsByTenant(req: any, res: any) {
   try {
-    let payments = await Payments.find({ tenant: req.query.id }).populate("bills").populate("tenant");
+    let payments = await Payments.find({ tenant: req.query.id })
+      .populate("bills")
+      .populate("tenant");
     res.status(200).json({
       success: true,
       msg: "Tenant's payments fetched successfully",
@@ -116,7 +128,7 @@ export async function flutterwaveWebhook(req: any, res: any) {
   // If you specified a secret hash, check for the signature
   const secretHash = process.env.NEXT_PUBLIC_FW_HASH;
   const signature = req.headers["verif-hash"];
-  if (!signature || (signature !== secretHash)) {
+  if (!signature || signature !== secretHash) {
     // This request isn't from Flutterwave; discard
     res.status(401).end();
   }
@@ -124,7 +136,9 @@ export async function flutterwaveWebhook(req: any, res: any) {
   const payload = req.body;
 
   try {
-    let payment = await Payments.findById(payload.data.tx_ref).populate("bills");
+    let payment = await Payments.findById(payload.data.tx_ref).populate(
+      "bills"
+    );
 
     const data = {
       ...payment._doc,
@@ -132,11 +146,15 @@ export async function flutterwaveWebhook(req: any, res: any) {
       amountPaid: payload.data.amount,
     };
 
-    console.log("DATA", data)
+    console.log("DATA", data);
 
-    const updated = await Payments.findByIdAndUpdate(payload.data.tx_ref, data, {
-      new: true,
-    });
+    const updated = await Payments.findByIdAndUpdate(
+      payload.data.tx_ref,
+      data,
+      {
+        new: true,
+      }
+    );
 
     if (payment.amount <= payload.data.amount) {
       for (let i = 0; i < payment.bills.length; i++) {
@@ -145,7 +163,7 @@ export async function flutterwaveWebhook(req: any, res: any) {
         await bill.save();
       }
     } else {
-      let amountLeft = payload.data.amount
+      let amountLeft = payload.data.amount;
       for (let i = 0; i < payment.bills.length; i++) {
         const bill = payment.bills[i];
         if (amountLeft <= bill.amount) {
@@ -156,7 +174,7 @@ export async function flutterwaveWebhook(req: any, res: any) {
               new: true,
             });
           } catch (error) {
-            console.log("ERROR", error)
+            console.log("ERROR", error);
             res.status(400).json({
               success: false,
               msg: "Failed to update bill",
@@ -171,9 +189,9 @@ export async function flutterwaveWebhook(req: any, res: any) {
             await Bills.findByIdAndUpdate(bill._id, bill, {
               new: true,
             });
-            amountLeft = amountLeft - bill.amount
+            amountLeft = amountLeft - bill.amount;
           } catch (error) {
-            console.log("ERROR", error)
+            console.log("ERROR", error);
             res.status(400).json({
               success: false,
               msg: "Failed to update bill",
@@ -182,7 +200,6 @@ export async function flutterwaveWebhook(req: any, res: any) {
           }
         }
       }
-
     }
 
     return res.json({
@@ -190,9 +207,8 @@ export async function flutterwaveWebhook(req: any, res: any) {
       msg: "Payment updated",
       data: updated,
     });
-
   } catch (error) {
-    console.log("ERROR", error)
+    console.log("ERROR", error);
     res.status(400).json({
       success: false,
       msg: "Failed to update payment",

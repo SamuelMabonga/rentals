@@ -1,13 +1,24 @@
+import { getPageInfo } from "helpers/page_info";
 import BillingPeriods from "models/billingPeriod";
 
 // get all Staff Roles
 export async function fetchAllBillingPeriods(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let billingPeriod = await BillingPeriods.find();
+
+    const [billingPeriods, billingPeriodsCount] = await Promise.all([
+      BillingPeriods.find()
+        .skip((page - 1) * limit)
+        .limit(limit),
+      BillingPeriods.countDocuments(),
+    ]);
+
     res.status(200).json({
       success: true,
       msg: "Billing periods fetched successfully",
-      data: billingPeriod,
+      data: billingPeriods,
+      pageInfo: getPageInfo(limit, billingPeriodsCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -85,9 +96,13 @@ export async function updateBillingPeriod(req: any, res: any) {
     const data = {
       name: req.body.name || billingPeriod.name,
     };
-    billingPeriod = await BillingPeriods.findByIdAndUpdate(req.params.id, data, {
-      new: true,
-    });
+    billingPeriod = await BillingPeriods.findByIdAndUpdate(
+      req.params.id,
+      data,
+      {
+        new: true,
+      }
+    );
     res.status(200).json({
       success: true,
       msg: "Billing period updated successfully",
@@ -108,7 +123,6 @@ export async function deleteBillingPeriod(req: any, res: any) {
     let billingPeriod = await BillingPeriods.findById(req.params.id);
 
     if (!billingPeriod) {
-
       return "Billing period being deleted has not been found";
     }
 
