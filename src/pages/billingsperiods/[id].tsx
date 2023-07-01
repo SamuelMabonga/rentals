@@ -56,7 +56,6 @@ function DetailsCard() {
           </span>
         </Typography>
       </Box>
-
       <Typography
         color="black"
         fontWeight={"600"}
@@ -68,7 +67,6 @@ function DetailsCard() {
     </Card>
   );
 }
-
 // FLUTTERWAVE CONFIG
 const config: any = {
   public_key: process.env.NEXT_PUBLIC_FW_PUBLIC_KEY,
@@ -107,10 +105,11 @@ function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
       return <></>;
   }
 }
-
-export default function Property({
-  // data,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default
+ function BillingPeriods
+ ({
+  //  data 
+  }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const {
     activeRentalTab: activeTab,
     setActiveRentalTab: setActiveTab,
@@ -287,7 +286,7 @@ export default function Property({
   );
 }
 
-Property.auth = true;
+BillingPeriods.auth = true;
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async (
   context
@@ -305,16 +304,16 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (
       },
     };
   }
-
   // Retrieve the access token from the session
   const accessToken = session?.accessToken;
   // REACT QUERY
   const queryClient = new QueryClient();
-
   await Promise.all([
     await queryClient.prefetchQuery(
       ["biillingsperiods", id],
-      () => fetchBillingPeriods(accessToken, id)
+      () => fetchBillingPeriods(accessToken,
+        //  id
+         )
     ),
     // await queryClient.prefetchQuery(['tenant-bills', id], () => fetchBills(accessToken, id)),
   ]);

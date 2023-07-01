@@ -14,24 +14,19 @@ const formSchema = yup.object().shape({
     // name: yup.string().required("Name is required"),
     // price: yup.string().required("Price is required"),
 })
-
 export default function PropertyFeatureForm({property}: any) {
     // CONTEXT
     const {
         openPropertyFeaturesForm: open,
         setOpenPropertyFeaturesForm: setIsOpen,
-
         propertyFeatureToEdit: toEdit,
         setPropertyFeatureToEdit: setToEdit,
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
-
     const session: any = useSession()
     const { data: features }: any = useQuery({ queryKey: ['features'], queryFn: () => fetchFeatures(session.data.accessToken) })
     const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.data.accessToken) })
-
     const [isLoading, setIsLoading] = useState(false)
-
     const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
         defaultValues: {
             feature: "",
@@ -43,7 +38,6 @@ export default function PropertyFeatureForm({property}: any) {
         reValidateMode: "onChange",
         resolver: yupResolver(formSchema),
     });
-
     useEffect(() => {
         if (toEdit?.feature) {
             setValue("feature", toEdit.feature)
@@ -143,7 +137,6 @@ export default function PropertyFeatureForm({property}: any) {
             alert("Error")
         }
     }
-
     return (
         <Dialog
             open={open}

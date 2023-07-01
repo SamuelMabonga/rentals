@@ -18,3 +18,4 @@ const paymentMethodSchema = new mongoose.Schema({
 const PaymentMethod = mongoose.model('PaymentMethod', paymentMethodSchema);
 
 export default PaymentMethod;
+

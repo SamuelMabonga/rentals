@@ -11,13 +11,11 @@ import PaymentsForm from "Components/Properties/Forms/PaymentsForm"
 import { BillsTable } from "Components/Tenants/BillsTable"
 import RequestExtension from "Components/Tenants/Forms/RequestExtension"
 import { closePaymentModal, useFlutterwave } from "flutterwave-react-v3"
-import moment from "moment"
-import fetchBills from "apis/tenant/fetchBills"
+import moment from "moment";
 
 type PageProps = {
     // data: any;
 };
-
 function DetailsCard() {
     return (
         <Card sx={{ width: "100%", bgcolor: "white", color: "secondary", padding: "1rem", borderRadius: "0.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -34,13 +32,10 @@ function DetailsCard() {
                     </span>
                 </Typography>
             </Box>
-
             <Typography color="black" fontWeight={"600"} fontSize="1.5rem" textAlign={"right"}>200/600 Days</Typography>
         </Card>
     )
 }
-
-
 // FLUTTERWAVE CONFIG
 const config: any = {
     public_key: process.env.NEXT_PUBLIC_FW_PUBLIC_KEY,
@@ -59,8 +54,6 @@ const config: any = {
         logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
     },
 };
-
-
 function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
     switch (activeTab) {
         case "bills":
@@ -79,7 +72,6 @@ function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
             return <></>
     }
 }
-
 export default function Property({
     // data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -198,9 +190,7 @@ export default function Property({
         </>
     )
 }
-
 Property.auth = true
-
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
 

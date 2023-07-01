@@ -29,7 +29,7 @@ type PageProps = {
 function TableSwitch({ activeTab, property }: any) {
     switch (activeTab) {
         case "units":
-            return <UnitsTable property={property}  />
+            return <UnitsTable property={property} />
 
         case "tenants":
             return <TenantsTable property={property} />

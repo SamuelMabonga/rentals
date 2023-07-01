@@ -3,7 +3,6 @@ import { Hydrate, QueryClient, QueryClientProvider } from "@tanstack/react-query
 import type { AppProps } from 'next/app';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { ThemeProvider, CssBaseline, createTheme, Box } from '@mui/material';
-
 import '../styles/globals.css';
 import "../styles/ReactCrop.css"
 import createEmotionCache from '@/utility/createEmotionCache';
@@ -12,7 +11,6 @@ import { SessionProvider, useSession } from 'next-auth/react';
 import { CollectionsContext, CollectionsProvider } from 'context/context';
 import DashboardLayout from 'Components/Dashboard/DashboardLayout';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-
 
 // const queryClient = new QueryClient();
 

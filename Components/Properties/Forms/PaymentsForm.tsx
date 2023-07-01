@@ -93,7 +93,7 @@ export default function PaymentsForm({ tenant }: any) {
 
                     <Box display="flex" flexDirection="column" gap="0.5rem">
                         {
-                            data?.data?.map((bill: any, i: any) => {
+                            data?.data.map((bill: any, i: any) => {
                                 return (
                                     <Box
                                         key={i}
