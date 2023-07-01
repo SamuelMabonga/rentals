@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-sync-scripts */
 import { Menu } from "@mui/icons-material"
 import { Avatar, Box, Button, CircularProgress, IconButton, Snackbar, Typography } from "@mui/material"
 import ConsecutiveSnackbars from "Components/Common/ConsecutiveSnackbars"

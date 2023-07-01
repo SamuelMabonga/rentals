@@ -14,6 +14,10 @@ import RequestExtension from "Components/Tenants/Forms/RequestExtension";
 import { closePaymentModal, useFlutterwave } from "flutterwave-react-v3";
 import fetchBillingPeriods from "apis/fetchBillingPeriods";
 import BillingPeriodsForm from "Components/Properties/Forms/BillingPeriodsForm";
+import UnitTypeForm from "Components/Properties/Forms/UnitTypeForm";
+import PropertyFeatureForm from "Components/Properties/Forms/PropertyFeatureForm";
+import UnitForm from "Components/Properties/Forms/UnitForm";
+import BookingForm from "Components/Properties/Forms/BookingForm";
 
 type PageProps = {};
 
@@ -99,16 +103,16 @@ function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
       return <BillingPeriodsForm />
 
     case "tickets":
-      // return <StaffTable />
+    // return <StaffTable />
 
     default:
       return <></>;
   }
 }
 export default
- function BillingPeriods
- ({
-  //  data 
+  function BillingPeriods
+  ({
+    //  data 
   }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const {
     activeRentalTab: activeTab,
@@ -146,7 +150,7 @@ export default
         console.log(response);
         closePaymentModal(); // this will close the modal programmatically
       },
-      onClose: () => {},
+      onClose: () => { },
     });
   }
 
@@ -159,18 +163,18 @@ export default
         width="100%"
         justifyContent="space-between"
       >
-   <Box>
-  <Typography
-    fontSize="1.5rem"
-    fontWeight="600"
-    color="primary.dark"
-  >
-    {`${unit?.name ?? ''}`}
-  </Typography>
-  <Typography fontWeight="600" color="grey">
-    {`${unit?.property?.name ?? ''}`}
-  </Typography>
-</Box>
+        <Box>
+          <Typography
+            fontSize="1.5rem"
+            fontWeight="600"
+            color="primary.dark"
+          >
+            {`${unit?.name ?? ''}`}
+          </Typography>
+          <Typography fontWeight="600" color="grey">
+            {`${unit?.property?.name ?? ''}`}
+          </Typography>
+        </Box>
 
 
         <Box
@@ -193,19 +197,6 @@ export default
           </Button>
         </Box>
       </Box>
-
-      {/* <Box
-        width="100%"
-        display="grid"
-        gridTemplateColumns={["1fr", "1fr 1fr"]}
-        gap="1rem"
-      >
-        <DetailsCard />
-        <DetailsCard />
-        <DetailsCard />
-        <DetailsCard />
-      </Box> */}
-
       <Box
         mt="2rem"
         width="100%"
@@ -263,11 +254,11 @@ export default
               }
 
               if (activeTab === "messages") {
-                return setShowUnitTypeForm(true);
+                return setOpenBillingPeriodsForm(true);
               }
 
               if (activeTab === "tickets") {
-                return setShowUnitTypeForm(true);
+                return setOpenBillingPeriodsForm(true);
               }
             }}
           >
@@ -280,6 +271,10 @@ export default
           openFlutterwave={openFlutterwave}
         />
       </Box>
+      <BillingPeriodsForm property={id} />
+      <PropertyFeatureForm property={id} />
+      <UnitForm property={id} />
+      <BookingForm property={id} />
       <PaymentsForm tenant={id} />
       <RequestExtension tenant={id} />
     </>
@@ -313,7 +308,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (
       ["biillingsperiods", id],
       () => fetchBillingPeriods(accessToken,
         //  id
-         )
+      )
     ),
     // await queryClient.prefetchQuery(['tenant-bills', id], () => fetchBills(accessToken, id)),
   ]);
