@@ -1,12 +1,8 @@
 // 'use client';
 
 import { yupResolver } from "@hookform/resolvers/yup"
-import { CheckCircle } from "@mui/icons-material"
 import { Autocomplete, Avatar, Box, Button, Chip, CircularProgress, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
-import FileInput from "Components/FileInput"
-import fetchUnitTypeUnits from "apis/fetchUnitTypeUnits"
-import fetchUnitTypes from "apis/fetchUnitTypes"
 import { CollectionsContext } from "context/context"
 import { useSession } from "next-auth/react"
 import React, { useContext, useEffect, useState } from "react"
@@ -15,7 +11,7 @@ import * as yup from "yup"
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+// import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -92,7 +88,6 @@ const formSchema2 = yup.object().shape({
     ),
     startDate: yup.string().required("Required"),
     endDate: yup.string().required("Required")
-
 })
 
 export default function BookingForm({
@@ -109,7 +104,6 @@ export default function BookingForm({
         setBookingToEdit: setToEdit,
 
         unitToBook: unit,
-
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
 
@@ -391,7 +385,7 @@ export default function BookingForm({
                                     setLoadingUnits(true)
 
                                     try {
-                                        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/unit?unitType=${value._id}`, {
+                                        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/unit/unitType?id=${value._id}`, {
                                             headers: {
                                                 Authorization: `Bearer ${session.data.accessToken}`,
                                             },
@@ -399,6 +393,7 @@ export default function BookingForm({
                                         });
 
                                         const res = await response.json();
+                                        console.log("UNITS", res.data)
                                         setUnits(res.data)
                                         setLoadingUnits(false)
                                     } catch (error) {

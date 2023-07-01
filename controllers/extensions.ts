@@ -61,6 +61,35 @@ export async function fetchAllProperties(req: any, res: any) {
   }
 }
 
+// fetch extensions by property id
+export async function fetchExtensionsByProperty(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+  try {
+    const [properties, propertiesCount] = await Promise.all([
+      Extensions.find({ property: req.query.id}).populate({path: "tenant", populate: [{path: "user"}]}).populate("bill")
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Extensions.countDocuments(),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      msg: "Extensions fetched successfully",
+      data: properties,
+      pageInfo: getPageInfo(limit, propertiesCount, page),
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      msg: "Failed to fetch  extensions",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+
 // create a property
 export async function createExtension(req: any, res: any) {
   try {

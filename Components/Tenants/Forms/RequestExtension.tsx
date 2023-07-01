@@ -30,8 +30,8 @@ export default function RequestExtension({
         openRequestExtension: open,
         setOpenRequestExtension: setIsOpen,
 
-        bookingToEdit: toEdit,
-        setBookingToEdit: setToEdit,
+        // bookingToEdit: toEdit,
+        // setBookingToEdit: setToEdit,
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
 
@@ -49,16 +49,16 @@ export default function RequestExtension({
         resolver: yupResolver(formSchema),
     });
 
-    useEffect(() => {
-        if (toEdit?.name) {
-            setValue("newDate", toEdit.name)
-            setValue("notes", toEdit.price)
-            return
-        }
+    // useEffect(() => {
+    //     if (toEdit?.name) {
+    //         setValue("newDate", toEdit.name)
+    //         setValue("notes", toEdit.price)
+    //         return
+    //     }
 
-        reset()
+    //     reset()
 
-    }, [toEdit])
+    // }, [toEdit])
 
     async function onSubmit(values: any) {
         setIsLoading(true)
@@ -67,9 +67,10 @@ export default function RequestExtension({
         const postData = {
             newDate: values.newDate,
             notes: values.notes,
-            tenant: tenant,
+            tenant: tenant._id,
             type: "RENT",
-            bill: billToExtend
+            bill: billToExtend,
+            property: tenant.property,
         }
 
         try {
@@ -149,7 +150,7 @@ export default function RequestExtension({
             <DialogTitle sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Typography fontWeight="600">Request for extension on rent payment</Typography>
                 <IconButton onClick={() => {
-                    setToEdit({})
+                    // setToEdit({})
                     setIsOpen(false)
                 }}>
                     <Box width="1.5rem" height="1.5rem">

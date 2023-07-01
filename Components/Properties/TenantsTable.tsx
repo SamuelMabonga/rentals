@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/Common/TableRenderer';
@@ -104,6 +104,8 @@ export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>)
         []
     );
 
+    const [tenantToView, setTenantToView] = useState<any>(null)
+
     return (
         <>
                 <TableRenderer
@@ -111,11 +113,13 @@ export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>)
             pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
+                console.log(obj)
                 setOpenViewTenant(true)
+                setTenantToView(obj)
             } }
             loading={isLoading}
         />
-        <ViewTenant />
+        <ViewTenant tenant={tenantToView} />
         </>
             // <h1>Hwey</h1>
     );

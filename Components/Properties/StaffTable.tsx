@@ -132,7 +132,9 @@ export const StaffTable = <T extends object>({ }: ReactTableProps<T>) => {
     return (
         <TableRenderer
             data={data}
-            columns={columns} onRowClick={function (obj: any): void {
+            pageInfo={{ total: 0, page: 0, pageSize: 0, lastPage: 0 }}
+            columns={columns}
+            onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
             } }        />
     );

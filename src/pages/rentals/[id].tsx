@@ -13,6 +13,8 @@ import { closePaymentModal, useFlutterwave } from "flutterwave-react-v3"
 import moment from "moment"
 import fetchBills from "apis/tenant/fetchBills"
 import { PaymentsTable } from "Components/Tenants/PaymentsTable"
+import { TicketsTable } from "Components/Tenants/TicketsTable"
+import TicketForm from "Components/Tenants/Forms/TicketForm"
 
 type PageProps = {
     // data: any;
@@ -78,20 +80,20 @@ function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
             return <BillsTable tenant={tenant} openFlutterwave={openFlutterwave} />
 
         case "payments":
-            return <PaymentsTable tenant={tenant} />
+            return <PaymentsTable tenant={tenant?.id} />
 
         case "messages":
         // return <BookingsTable />
 
         case "tickets":
-        // return <StaffTable />
+        return <TicketsTable tenant={tenant} />
 
         default:
             return <></>
     }
 }
 
-export default function Property({
+export default function Rental({
     // data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const {
@@ -201,7 +203,13 @@ export default function Property({
 
                 <Box display={["flex"]} flexDirection={["column", "row"]} sx={{ mt: "1.5rem" }} gap="1rem">
                     <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], ml: "auto" }} color="error" >Terminate tenancy</Button>
-                    <Button variant="contained" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], }}>Renew your tenancy</Button>
+                    <Button
+                        variant="contained"
+                        sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], }}
+                        // onClick={() => setOpenRenewalForm(true)}
+                    >
+                        Renew your tenancy
+                    </Button>
                 </Box>
             </Box>
 
@@ -251,14 +259,15 @@ export default function Property({
                         Create New
                     </Button>
                 </Box>
-                <TableSwitch activeTab={activeTab} tenant={id} openFlutterwave={openFlutterwave} />
+                <TableSwitch activeTab={activeTab} tenant={data?.data} openFlutterwave={openFlutterwave} />
             </Box>
             <PaymentsForm tenant={id} />
+            <TicketForm tenant={id} />
         </>
     )
 }
 
-Property.auth = true
+Rental.auth = true
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });

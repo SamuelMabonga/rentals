@@ -122,15 +122,10 @@ export const TicketsTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
     return (
         <TableRenderer
             data={data}
+            pageInfo={{}}
             columns={columns} onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
             } }        />

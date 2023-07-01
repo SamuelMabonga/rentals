@@ -10,11 +10,12 @@ import moment from 'moment';
 import { useQuery } from '@tanstack/react-query';
 import fetchPayments from 'apis/tenant/fetchPayments';
 import { useSession } from 'next-auth/react';
+import fetchTickets from 'apis/tenant/fetchTickets';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
-    tenant: string;
+    tenant: any;
 }
 
 type Item = {
@@ -26,17 +27,19 @@ type Item = {
     actions: any;
 }
 
-export const PaymentsTable = <T extends object>({ tenant: id }: ReactTableProps<T>) => {
+export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) => {
     // CONTEXT
     const {
         setShowPropertyForm,
         setPropertyToEdit
     }: any = useContext(CollectionsContext)
 
+    const tenantId = tenant?._id
+
     const session: any = useSession()
     const token = session.data?.accessToken
 
-    const {data, isLoading} = useQuery(["payments", id, token], () => fetchPayments(token, id))
+    const {data, isLoading} = useQuery(["tenant-tickets", tenantId, token], () => fetchTickets(token, tenantId))
         
 
     const router = useRouter()

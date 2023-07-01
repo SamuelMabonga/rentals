@@ -3,6 +3,7 @@ import { Autocomplete, Avatar, Box, Button, Card, Dialog, DialogActions, DialogC
 import { useQuery } from "@tanstack/react-query"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 import { CollectionsContext } from "context/context"
+import moment from "moment"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import React, { useContext, useEffect, useState } from "react"
@@ -38,7 +39,7 @@ function DetailsCard({ label, value, icon }: any) {
 }
 
 
-export default function ViewTenant({ property }: any) {
+export default function ViewTenant({ tenant }: any) {
     // CONTEXT
     const {
         openViewTenant: open,
@@ -81,8 +82,8 @@ export default function ViewTenant({ property }: any) {
                     <Box display="flex" gap="1rem" alignItems="center">
                         <Avatar sx={{ width: "4rem", height: "4rem" }} />
                         <Box>
-                            <Typography fontWeight="600" fontSize="1.125rem">Mabonga Samuel</Typography>
-                            <Typography>samuelmabonga@gmail.com</Typography>
+                            <Typography fontWeight="600" fontSize="1.125rem">{`${tenant?.user?.first_name} ${tenant?.user?.last_name}`}</Typography>
+                            <Typography color="grey" fontWeight="500">{tenant?.user?.email}</Typography>
                         </Box>
                     </Box>
 
@@ -90,8 +91,8 @@ export default function ViewTenant({ property }: any) {
                     <Box width="100%" display="grid" gridTemplateColumns={["1fr", "1fr 1fr",]} gap="1rem">
                         <DetailsCard
                             label="Entry Date"
-                            // value={moment(startDate).format("DD MMM YYYY")}
-                            value="12/12/2021"
+                            value={moment(tenant?.startDate).format("DD MMM YYYY")}
+                            // value="12/12/2021"
                             icon={
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -100,8 +101,8 @@ export default function ViewTenant({ property }: any) {
                         />
                         <DetailsCard
                             label="Exit Date"
-                            // value={moment(endDate).format("DD MMM YYYY")}
-                            value="12/12/2021"
+                            value={moment(tenant?.endDate).format("DD MMM YYYY")}
+                            // value="12/12/2021"
                             icon={
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -110,8 +111,8 @@ export default function ViewTenant({ property }: any) {
                         />
                         <DetailsCard
                             label="Tenancy length"
-                            // value={`${moment(endDate).diff(moment(startDate), "days")} days`}
-                            value="12/12/2021"
+                            value={`${moment(tenant?.endDate).diff(moment(tenant?.startDate), "days")} days`}
+                            // value="12/12/2021"
                             icon={
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -120,8 +121,8 @@ export default function ViewTenant({ property }: any) {
                         />
                         <DetailsCard
                             label="Days Remaining"
-                            // value={`${moment(endDate).diff(moment(), "days")} days`}
-                            value="12/12/2021"
+                            value={`${moment(tenant?.endDate).diff(moment(), "days")} days`}
+                            // value="12/12/2021"
                             icon={
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />

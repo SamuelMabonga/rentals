@@ -1,6 +1,7 @@
 import { Schema, model, models } from "mongoose";
 import Tenant from "./tenant";
 import Bills from "./bills";
+import Property from "./property";
 
 const ExtensionsShema = new Schema(
     {
@@ -29,6 +30,10 @@ const ExtensionsShema = new Schema(
         message: {
             type: String,
         },
+        property: {
+            type: Schema.Types.ObjectId,
+            ref: Property,
+        }
     },
     {
         timestamps: true,

@@ -87,6 +87,46 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
   }
 }
 
+// fetch units by unit type
+export async function fetchUnitsByUnitType(req: any, res: any) {
+  const {
+    query: { id, searchQuery },
+  }: any = req;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+
+  try {
+    const [units, unitsCount] = await Promise.all([
+      Unit.find({ "unitType": id })
+        .populate({
+          path: "unitType",
+        })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Unit.countDocuments(),
+    ]);
+
+    // .populate({
+    //   path: "tenant",
+    //   populate: [{ path: "user" }],
+    // })
+
+    res.status(200).json({
+      success: true,
+      msg: "Unit type units fetched successfully",
+      data: units,
+      pageInfo: getPageInfo(limit, unitsCount, page),
+    });
+  } catch (error) {
+    console.log("ERROR MSG", error);
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch unit type units",
+      data: error,
+    });
+  }
+}
+
 // create a unit
 export async function createUnit(req: any, res: any) {
   try {

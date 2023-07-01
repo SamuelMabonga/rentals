@@ -102,6 +102,7 @@ export const FeaturesTable = <T extends object>({ }: ReactTableProps<T>) => {
     return (
         <TableRenderer
             data={data.data}
+            pageInfo={data.dataInfo}
             columns={columns} onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
             }} />

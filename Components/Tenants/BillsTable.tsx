@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import fetchBills from 'apis/tenant/fetchBills';
 import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3';
 import RequestExtension from './Forms/RequestExtension';
+import currencyFormatter from 'Components/Common/currencyFormatter';
 
 function AlertDialog({
     hide,
@@ -69,7 +70,7 @@ function AlertDialog({
                         {content}
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions>
+                <DialogActions sx={{padding: "1rem"}}>
                     <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
                     <Button
                         variant="contained"
@@ -90,7 +91,7 @@ function AlertDialog({
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
-    tenant: string
+    tenant: any
     openFlutterwave: any
 }
 
@@ -120,13 +121,41 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
-    const token = session.data?.accessToken
-    const { data, isLoading, refetch }: any = useQuery({ queryKey: ['tenant-bills', tenant, token], queryFn: () => fetchBills(token, tenant) })
+    const token = session?.data?.accessToken
+    const tenantId = tenant?._id
+    const { data, isLoading, refetch }: any = useQuery({ queryKey: ['tenant-bills', tenantId, token], queryFn: () => fetchBills(token, tenantId) })
 
     const { data: user }: any = useSession()
 
     const router = useRouter()
 
+    const handleFlutterPayment = useFlutterwave(paymentConfig);
+
+    function handleOpenFlutterwave() {
+        handleFlutterPayment({
+            callback: (response: any) => {
+                console.log(response);
+                closePaymentModal() // this will close the modal programmatically
+            },
+            onClose: () => { },
+        });
+    }
+
+    useEffect(() => {
+        if (!paymentConfig?.tx_ref) {
+            return
+        }
+
+        console.log("paymentConfig", paymentConfig)
+
+        handleFlutterPayment({
+            callback: (response: any) => {
+                console.log(response);
+                closePaymentModal() // this will close the modal programmatically
+            },
+            onClose: () => { },
+        });
+    }, [paymentConfig?.tx_ref])
 
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -136,8 +165,8 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                 accessorKey: 'type',
             },
             {
-                header: 'Amount (UGX)',
-                cell: (row) => row.renderValue(),
+                header: 'Amount',
+                cell: (row) => currencyFormatter(row.renderValue(), "UGX"),
                 accessorKey: 'amount',
             },
             {
@@ -180,8 +209,6 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                                 event.stopPropagation()
                                 event.stopPropagation()
 
-                                console.log("ROW", row.row.original)
-
                                 const payment = {
                                     amount: row.row.original.amount,
                                     bills: [row.row.original._id, ],
@@ -194,7 +221,7 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                                     const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/payments`, {
                                         method: "POST",
                                         headers: {
-                                            Authorization: `Bearer ${session.data.accessToken}`,
+                                            Authorization: `Bearer ${token}`,
                                             'Content-Type': 'application/json',
                                         },
                                         body: JSON.stringify({
@@ -202,59 +229,32 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                                         })
                                     })
 
-                                    console.log("RES", await res.json())
-
                                     const {data: {_id}} = await res.json()
 
-                                    setPaymentConfig({
+                                    await setPaymentConfig({
+                                        public_key: process.env.NEXT_PUBLIC_FW_PUBLIC_KEY,
                                         tx_ref: _id,
                                         amount: row.row.original.amount,
                                         currency: "UGX",
                                         payment_options: "card,mobilemoney,ussd",
                                         customer: {
-                                            email: user?.email,
-
+                                            email: user?.user?.email,
                                             phonenumber: "0784******",
-                                            name: user?.first_name
+                                            name: `${user?.user?.first_name} ${user?.user?.last_name}`
                                         },
                                         customizations: {
                                             title: "Rent Payment",
                                             description: "Payment for rent",
                                             logo: "https://assets.piedpiper.com/logo.png",
-                                        }
-
-                                             
+                                        }     
                                     })
-
-
-
-                                    // let config = {
-                                    //     tx_ref: row?.row?.original?._id,
-                                    //     amount: +row?.row?.original?.amount,
-                                    //     currency: "UGX",
-                                    //     payment_options: "card,mobilemoney,ussd",
-                                    //     // customer: {
-                                    //     //     email: user?.email,
-                                    //     //     phonenumber: user?.phoneNumber,
-                                    //     //     name: user?.first_name
-                                    //     // },
-                                    //     customer: {
-                                    //         email: "samuel@gmail.com",
-                                    //         phonenumber: "0785663783",
-                                    //         name: "Mabonga Samuel"
-                                    //     },
-                                    //     customizations: {
-                                    //         title: "Rent Payment",
-                                    //         description: "Payment for rent",
-                                    //         logo: "https://assets.piedpiper.com/logo.png",
-                                    //     }
-                                    // }
-
-
+            
                                     // setAccepting(false)
                                 } catch (error) {
                                     // setAccepting(false)
                                     alert("Failed to accept")
+
+                                    console.log("ACCEPT ERROR", error)
                                 }
                             }}
                         />
@@ -301,18 +301,6 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
         ],
         []
     );
-
-    const handleFlutterPayment = useFlutterwave(paymentConfig);
-
-    function handleOpenFlutterwave() {
-        handleFlutterPayment({
-            callback: (response: any) => {
-                console.log(response);
-                closePaymentModal() // this will close the modal programmatically
-            },
-            onClose: () => { },
-        });
-    }
 
     return (
         <React.Fragment>

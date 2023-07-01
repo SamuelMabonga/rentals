@@ -29,6 +29,34 @@ export async function fetchAllTickets(req: any, res: any) {
   }
 }
 
+// get all Tickets
+export async function fetchTicketsByTenant(req: any, res: any) {
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+  try {
+    const [tickets, ticketsCount] = await Promise.all([
+      Ticket.find()
+        .populate({ path: "unit" })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Ticket.countDocuments(),
+    ]);
+    res.status(200).json({
+      success: true,
+      msg: "tickets fetched successfully",
+      data: tickets,
+      pageInfo: getPageInfo(limit, ticketsCount, page),
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to fetch  tickets",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
 // get unit Tickets
 export async function fetchUnitTickets(req: any, res: any) {
   let unitId = req.body.unitId;
