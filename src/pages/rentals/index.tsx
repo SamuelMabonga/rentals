@@ -26,11 +26,12 @@ export default function Rentals({
     }: any = useContext(CollectionsContext)
 
     // SESSION
-    const { status, data: session }: any = useSession()
+    const session: any = useSession()
+    const token = session?.data?.accessToken
 
     const [openCreateForm, setOpenCreateForm] = useState(false)
 
-    const { data }: any = useQuery({ queryKey: ['tenancies'], queryFn: () => fetchUserTenancies(session.accessToken) })
+    const { data }: any = useQuery({ queryKey: ['tenancies', token], queryFn: () => fetchUserTenancies(token) })
 
     return (
         <>
@@ -46,7 +47,7 @@ export default function Rentals({
                 />
                 <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setShowPropertyForm(true)}>Create New</Button>
             </Box>
-            <RentalsTable data={data?.data} />
+            <RentalsTable data={data?.data} pageInfo={data?.pageInfo} />
             <PropertyForm />
         </>
     )
@@ -72,7 +73,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // REACT QUERY
     const queryClient = new QueryClient()
 
-    await queryClient.prefetchQuery(['tenancies'], () => fetchUserTenancies(accessToken))
+    await queryClient.prefetchQuery(['tenancies', accessToken], () => fetchUserTenancies(accessToken))
     return {
         props: {
             dehydratedState: dehydrate(queryClient),

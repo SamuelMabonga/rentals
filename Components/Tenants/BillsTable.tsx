@@ -3,7 +3,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
-import { TableRenderer } from 'Components/TableRenderer';
+import { TableRenderer } from 'Components/Common/TableRenderer';
 import { CollectionsContext } from 'context/context';
 import moment from 'moment';
 import { useSession } from 'next-auth/react';
@@ -318,6 +318,7 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
         <React.Fragment>
             <TableRenderer
                 data={data?.data}
+                pageInfo={data?.pageInfo}
                 columns={columns}
                 onRowClick={(rowId) => console.log(rowId)}
                 loading={isLoading}

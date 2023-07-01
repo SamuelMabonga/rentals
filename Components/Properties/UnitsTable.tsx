@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { useContext, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { TableRenderer } from 'Components/TableRenderer';
+import { TableRenderer } from 'Components/Common/TableRenderer';
 import { useSession } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
 import moment from 'moment';
@@ -136,6 +136,7 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
     return (
         <TableRenderer
             data={data?.data || []}
+            pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');

@@ -4,7 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
-import { TableRenderer } from 'Components/TableRenderer';
+import { TableRenderer } from 'Components/Common/TableRenderer';
 import { useSession } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
 import fetchUnits from 'apis/fetchUnits';
@@ -95,7 +95,8 @@ export const UsersTable = <T extends object>({ }: ReactTableProps<T>) => {
 
     return (
         <TableRenderer
-            data={data.data}
+            data={data?.data}
+            pageInfo={data?.pageInfo}
             columns={columns} onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
             }} />

@@ -4,12 +4,13 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useContext, useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
-import { TableRenderer } from 'Components/TableRenderer';
+import { TableRenderer } from 'Components/Common/TableRenderer';
 import { CollectionsContext } from 'context/context';
 import moment from 'moment';
 
 interface ReactTableProps<T extends object> {
     data: T[];
+    pageInfo: any;
     // columns: ColumnDef<T>[];
 }
 
@@ -22,7 +23,7 @@ type Item = {
     actions: any;
 }
 
-export const RentalsTable = <T extends object>({ data }: ReactTableProps<T>) => {
+export const RentalsTable = <T extends object>({ data, pageInfo }: ReactTableProps<T>) => {
     // CONTEXT
     const {
         setShowPropertyForm,
@@ -112,6 +113,7 @@ export const RentalsTable = <T extends object>({ data }: ReactTableProps<T>) => 
     return (
         <TableRenderer
             data={data}
+            pageInfo={pageInfo}
             columns={columns}
             onRowClick={(row: any) => router.push(`/rentals/${row._id}`)}
         />

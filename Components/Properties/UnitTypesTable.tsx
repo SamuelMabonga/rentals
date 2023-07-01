@@ -4,7 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useContext, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { CollectionsContext } from 'context/context';
-import { TableRenderer } from 'Components/TableRenderer';
+import { TableRenderer } from 'Components/Common/TableRenderer';
 import { useQuery } from '@tanstack/react-query';
 import fetchUnitTypes from 'apis/fetchUnitTypes';
 import { useSession } from 'next-auth/react';

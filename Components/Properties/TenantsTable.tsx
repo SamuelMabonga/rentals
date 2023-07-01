@@ -4,7 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useContext, useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
-import { TableRenderer } from 'Components/TableRenderer';
+import { TableRenderer } from 'Components/Common/TableRenderer';
 import fetchTenants from 'apis/fetchTenants';
 import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
@@ -108,6 +108,7 @@ export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>)
         <>
                 <TableRenderer
             data={data?.data || []}
+            pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
                 setOpenViewTenant(true)

@@ -4,7 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
-import { TableRenderer } from 'Components/TableRenderer';
+import { TableRenderer } from 'Components/Common/TableRenderer';
 import { useQuery } from '@tanstack/react-query';
 import fetchBookings from 'apis/fetchBookings';
 import { useSession } from 'next-auth/react';
@@ -214,11 +214,13 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
     );
 
     const token = session.data.accessToken
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', token, property], queryFn: () => fetchPropertyBookings(token, property) })
+    const [bookingsPage, setBookingsPage] = useState(1)
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', token, property], queryFn: () => fetchPropertyBookings(token, property, bookingsPage) })
 
     return (
         <TableRenderer
             data={data?.data || []}
+            pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
                 console.log("Clicked row")
