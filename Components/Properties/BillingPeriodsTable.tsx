@@ -1,11 +1,11 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/Common/TableRenderer';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery,QueryCache } from '@tanstack/react-query';
 import fetchFeatures from 'apis/fetchFeatures';
 import { useSession } from 'next-auth/react';
 import fetchBillingPeriods from 'apis/fetchBillingPeriods';
@@ -30,10 +30,18 @@ type Item = {
 
 export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) => {
     // CONTEXT
-    const { setOpenBillingPeriodsForm,setCollections, setBillingPeriodToEdit, setBillingPeriodToDelete }: any = useContext(CollectionsContext)
+    const { setOpenBillingPeriodsForm, setCollections, setBillingPeriodToEdit, setBillingPeriodToDelete }: any = useContext(CollectionsContext)
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
+    const { data, isLoading, isError } = useQuery(['billingPeriods'], () => fetchBillingPeriods(session.accessToken, 'GET'));
+    const deleteBillingPeriod = useMutation((id: string) => fetchBillingPeriods(session.accessToken, 'DELETE', id), {
+        onSuccess: () => {
+        //   QueryCache.invalidateQueries(['billingPeriods']); // Invalidate the query to refetch the data
+        },
+      });
+    
+    const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false);
+
 
     console.log(data)
     const router = useRouter()
@@ -95,10 +103,10 @@ export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) =
                         </IconButton>
 
                         <IconButton
-                            onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
+                            onClick={(event) => {
                                 event.stopPropagation();
                                 setBillingPeriodToDelete(row.row.original);
-                                setOpenBillingPeriodsForm(true);
+                                setOpenDeleteConfirmation(true);
                             }}
                         >
                             <Box width="1.5rem" height="1.5rem">
@@ -118,6 +126,7 @@ export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) =
                                 </svg>
                             </Box>
                         </IconButton>
+
                     </Box>
                 ),
             },
@@ -147,4 +156,8 @@ export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) =
         // />
     );
 };
+
+function setOpenDeleteConfirmation(arg0: boolean) {
+    throw new Error('Function not implemented.');
+}
 

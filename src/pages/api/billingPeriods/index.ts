@@ -36,7 +36,7 @@ export default async function handler(
       deleteBillingPeriod(req, res);
       break;
     default:
-      //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);
+        res.setHeader("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);
       res.status(405).end(`Method ${method} not Allowed`);
       break;
   }
