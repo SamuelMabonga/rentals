@@ -73,7 +73,7 @@ export default function UnitTypeForm({
         const data = {
             ...values,
             details: values.description,
-            features: values.features.map((item: any) => item._id),
+            features: values?.features ? values.features.map((item: any) => item._id) : null,
             billingPeriod: values.billingPeriod._id,
             property: property
         }

@@ -1,12 +1,18 @@
 import { Schema, model, models } from "mongoose";
+import Tenant from "./tenant";
+import Unit from "./unit";
 
 const TicketShema = new Schema({
   image: {
     type: String,
   },
+  tenant: {
+    type: Schema.Types.ObjectId,
+    ref: Tenant,
+  },
   unit: {
     type: Schema.Types.ObjectId,
-    ref: "Unit",
+    ref: Unit,
   },
   message: {
     type: String,
@@ -28,15 +34,15 @@ const TicketShema = new Schema({
   },
   status: {
     type: String,
-    enum: ["FIXED", "INPROGRESS"],
+    enum: ["FIXED", "INPROGRESS", "PENDING"],
+    default: "PENDING",
   },
   tenantSatisfaction: {
     type: String,
     enum: ["YES", "NO"],
   },
-  created_at: {
-    type: Date,
-  },
+}, {
+  timestamps: true,
 });
 
 const Ticket = models.Ticket || model("Ticket", TicketShema);

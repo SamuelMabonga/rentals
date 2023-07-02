@@ -174,7 +174,7 @@ export async function createBill(
   }
 }
 
-// cron billls
+// cron bills
 // create a bill
 export async function createCronBills(req: any, res: any) {
   try {
@@ -199,26 +199,26 @@ export async function createCronBills(req: any, res: any) {
         customBillingPeriod,
         endDate,
         startDate,
-      } = tenant && tenant;
+      } = tenant;
 
       try {
-        let latestRent: any = await Bills.find({ tenant: _id, type: "RENT" })
+        let latestRent: any[] = await Bills.find({ tenant: _id, type: "RENT" })
           .sort({ createdAt: -1 })
           .limit(1);
 
         let currentDate = new Date();
-        let latestEndDate = new Date(`${latestRent[0]?.endDate}`);
+        let latestEndDate = latestRent.length > 0 ? new Date(latestRent[0]?.endDate) : null;
 
-        if (latestRent && currentDate > latestEndDate) {
+        if (latestEndDate && currentDate > latestEndDate) {
           const newRent = new Bills({
             amount: !customRent ? unit.unitType.price : customRent,
             startDate: startDate,
             endDate: !customBillingPeriod
-              ? moment(tenant?.startDate).add(
-                  unit?.unitType?.billingPeriod?.time,
-                  "ms"
-                )
-              : moment(startDate).add(customBillingPeriod?.time, "ms"),
+              ? moment(startDate).add(1, unit?.unitType?.billingPeriod?.period)
+              : moment(startDate).add(1, customBillingPeriod?.period),
+            pay_by: !customBillingPeriod
+            ? moment(startDate).add(1, unit?.unitType?.billingPeriod?.period).add(7, "days")
+            : moment(startDate).add(1, customBillingPeriod?.period).add(7, "days"),
             tenant: _id,
             type: "RENT",
           });
@@ -226,13 +226,13 @@ export async function createCronBills(req: any, res: any) {
           await newRent.save();
         }
       } catch (error) {
-        console.log("Failed to create rent bill");
+        console.log("Failed to create rent bill for tenant:", _id);
         console.log(error);
       }
 
       for (const feature of additionalFeatures) {
         try {
-          let latestBill: any = await Bills.find({
+          let latestBill: any[] = await Bills.find({
             tenant: _id,
             type: "FEATURE",
             propertyFeature: feature._id,
@@ -241,16 +241,14 @@ export async function createCronBills(req: any, res: any) {
             .limit(1);
 
           let currentDate = new Date();
-          let latestEndDate = new Date(`${latestBill[0]?.endDate}`);
+          let latestEndDate = latestBill.length > 0 ? new Date(latestBill[0]?.endDate) : null;
 
-          if (latestBill && currentDate > latestEndDate) {
+          if (latestEndDate && currentDate > latestEndDate) {
             let newBill = new Bills({
               amount: feature.price,
               startDate: startDate,
-              endDate: moment(startDate).add(
-                feature?.billingPeriod?.time,
-                "ms"
-              ),
+              endDate: moment(startDate).add(1, feature?.billingPeriod?.period),
+              pay_by: moment(startDate).add(1, feature?.billingPeriod?.period).add(7, "days"),
               tenant: _id,
               type: "FEATURE",
               propertyFeature: feature._id,
@@ -259,10 +257,13 @@ export async function createCronBills(req: any, res: any) {
             await newBill.save();
           }
         } catch (error) {
+          console.log("Failed to create bill for feature:", feature._id);
           console.log(error);
         }
       }
-    } // Return a success response
+    }
+
+    // Return a success response
     res.status(200).json({ message: "Bills created successfully" });
   } catch (error: any) {
     console.log(error);
@@ -273,6 +274,7 @@ export async function createCronBills(req: any, res: any) {
     });
   }
 }
+
 
 //fetch bill by id
 export async function fetchSinglebill(req: any, res: any) {

@@ -80,7 +80,7 @@ function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
             return <BillsTable tenant={tenant} openFlutterwave={openFlutterwave} />
 
         case "payments":
-            return <PaymentsTable tenant={tenant?.id} />
+            return <PaymentsTable tenant={tenant?._id} />
 
         case "messages":
         // return <BookingsTable />
@@ -106,7 +106,8 @@ export default function Rental({
         setOpenPropertyFeaturesForm,
         setOpenUnitForm,
         setOpenBookingForm,
-        paymentConfig
+        paymentConfig,
+        setOpenTicketForm
     }: any = useContext(CollectionsContext)
 
     // SESSION
@@ -252,7 +253,7 @@ export default function Rental({
                             }
 
                             if (activeTab === "tickets") {
-                                return setShowUnitTypeForm(true)
+                                return setOpenTicketForm(true)
                             }
                         }}
                     >
@@ -262,7 +263,7 @@ export default function Rental({
                 <TableSwitch activeTab={activeTab} tenant={data?.data} openFlutterwave={openFlutterwave} />
             </Box>
             <PaymentsForm tenant={id} />
-            <TicketForm tenant={id} />
+            <TicketForm tenant={data?.data} />
         </>
     )
 }

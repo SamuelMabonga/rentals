@@ -46,13 +46,18 @@ export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) =
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
             {
-                header: 'Amount',
+                header: 'Type',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'amount',
+                accessorKey: 'type',
             },
+            // {
+            //     header: 'Message',
+            //     cell: (row) => row.renderValue(),
+            //     accessorKey: 'message',
+            // },
             {
                 header: 'Status',
-                cell: (row: any) => <Chip label={row.renderValue()} color="primary" sx={{bgcolor: row.renderValue() === "SUCCESSFUL" ? "limegreen" : row.renderValue() === "PENDING" ? "orange" : "red", fontWeight: "500", fontSize: "0.75rem"}} size="small" />,
+                cell: (row: any) => <Chip label={row.renderValue()} color="primary" sx={{ fontWeight: "500", fontSize: "0.75rem"}} size="small" />,
                 accessorKey: 'status',
             },
             {
@@ -60,11 +65,11 @@ export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) =
                 cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
                 accessorKey: 'createdAt',
             },
-            {
-                header: 'Date Paid',
-                cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
-                accessorKey: 'updatedAt',
-            },
+            // {
+            //     header: 'Date Paid',
+            //     cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+            //     accessorKey: 'updatedAt',
+            // },
             // {
             //     header: 'Actions',
             //     cell: (row) => (

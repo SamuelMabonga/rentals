@@ -194,6 +194,11 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                 accessorKey: 'endDate',
             },
             {
+                header: 'Pay By',
+                cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+                accessorKey: 'pay_by',
+            },
+            {
                 header: 'Actions',
                 cell: (row: any) => (
                     <Box display="flex" gap="1rem" >

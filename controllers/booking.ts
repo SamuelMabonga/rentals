@@ -365,28 +365,28 @@ export async function acceptBooking(req: any, res: any) {
 
         const rentBill = new Bills({
           startDate: tenant.startDate,
-          endDate: tenant?.customBillingPeriod?.time
+          endDate: tenant?.customBillingPeriod?.period
             ? moment(tenant?.startDate).add(
-                tenant?.customBillingPeriod?.time,
-                "ms"
-              )
+              1,
+              tenant?.customBillingPeriod?.period
+            )
             : moment(tenant?.startDate).add(
-                tenant?.unit?.unitType?.billingPeriod?.time,
-                "ms"
-              ),
+              1,
+              tenant?.unit?.unitType?.billingPeriod?.period
+            ),
           tenant: tenant._id,
           type: "RENT", // Set the bill type as 'Rent'
           propertyFeature: null, // No specific property feature for rent bill, so set it to null
           amount: tenant?.unit?.unitType?.price,
-          pay_by: tenant?.customBillingPeriod?.time
+          pay_by: tenant?.customBillingPeriod?.period
             ? moment(tenant?.startDate).add(
-                tenant?.customBillingPeriod?.time + 604800000,
-                "ms"
-              )
+              1,
+              tenant?.customBillingPeriod?.period
+            ).add(7, "days")
             : moment(tenant?.startDate).add(
-                tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
-                "ms"
-              ), // set dedault pay date to 7 days
+              1,
+              tenant?.unit?.unitType?.billingPeriod?.period
+            ).add(7, "days"), // set dedault pay date to 7 days
         });
 
         await rentBill.save();
@@ -397,22 +397,22 @@ export async function acceptBooking(req: any, res: any) {
           const bill = new Bills({
             startDate: tenant.startDate,
             endDate: moment(tenant?.startDate).add(
-              tenant?.unit?.unitType?.billingPeriod?.time,
-              "ms"
+              1,
+              tenant?.unit?.unitType?.billingPeriod?.period
             ),
             tenant: tenant._id,
             type: "FEATURE", // set bill type to 'Feature'
             propertyFeature: feature?._id,
             amount: feature?.price, // Set the bill amount as the price from the property feature
-            pay_by: tenant?.customBillingPeriod?.time
+            pay_by: tenant?.customBillingPeriod?.period
               ? moment(tenant?.startDate).add(
-                  tenant?.customBillingPeriod?.time + 604800000,
-                  "ms"
-                )
+                1,
+                tenant?.customBillingPeriod?.period
+              ).add(7, "days")
               : moment(tenant?.startDate).add(
-                  tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
-                  "ms"
-                ), // set dedault pay date to 7 days
+                1,
+                tenant?.unit?.unitType?.billingPeriod?.period
+              ).add(7, "days"), // set dedault pay date to 7 days
           });
 
           await bill.save();

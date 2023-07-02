@@ -8,6 +8,9 @@ const BillingPeriodsSchema = new Schema(
     },
     time: {
         type: Number
+    },
+    period: {
+        type: String,
     }
 }, {
     timestamps: true

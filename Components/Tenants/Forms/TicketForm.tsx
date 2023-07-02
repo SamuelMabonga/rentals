@@ -12,25 +12,26 @@ const formSchema = yup.object().shape({
     message: yup.string().required("Message is required"),
 })
 
-export default function TicketForm({tenant}: any) {
+export default function TicketForm({ tenant }: any) {
     // CONTEXT
     const {
-        openFeaturesForm: open,
-        setOpenFeaturesForm: setIsOpen,
+        openTicketForm: open,
+        setOpenTicketForm: setIsOpen,
 
-        featureToEdit: toEdit,
-        setFeatureToEdit: setToEdit,
+        ticketToEdit: toEdit,
+        setTicketToEdit: setToEdit,
 
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
+    const token = session.data?.accessToken
 
     const [isLoading, setIsLoading] = useState(false)
 
     const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
         defaultValues: {
-            type: {},
+            type: "",
             message: "",
             // features: ""
         },
@@ -41,8 +42,8 @@ export default function TicketForm({tenant}: any) {
 
     useEffect(() => {
         if (toEdit?.name) {
-            setValue("name", toEdit.name)
-            setValue("price", toEdit.price)
+            setValue("type", toEdit.name)
+            setValue("message", toEdit.price)
             return
         }
 
@@ -54,50 +55,26 @@ export default function TicketForm({tenant}: any) {
         setIsLoading(true)
 
         const data = {
-            name: values.name,
-            price: values.price
-        }
-
-
-        // EDIT A PROPERTY
-        if (toEdit?.name) {
-            const edited = {
-                ...toEdit,
-                name: values.name,
-                price: values.price
-            }
-            try {
-                const res = await fetch(`/api/feature?id=${toEdit._id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${session.data.accessToken}`,
-                    },
-                    body: JSON.stringify({ ...edited })
-                })
-                const response = await res.json();
-                console.log(response)
-                setIsLoading(false)
-                return
-            } catch (error) {
-                setIsLoading(false)
-                console.log(error)
-                return
-            }
+            type: values.type.value,
+            message: values.message,
+            tenant: tenant._id,
+            unit: tenant.unit._id,
+            property: tenant.unit.property._id,
         }
 
         // POST A PROPERTY
+        console.log(data)
         try {
-            const res = await fetch('/api/feature', {
+            const res = await fetch('/api/ticket/tenant', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${session.data.accessToken}`,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({ ...data })
             })
-            const response = await res.json();
-            console.log(response)
+            await res.json();
+            // console.log(response)
             setIsLoading(false)
             setIsOpen(false)
             setSnackbarMessage({
@@ -106,7 +83,7 @@ export default function TicketForm({tenant}: any) {
                 horizontal: 'center',
                 message: "Feature feature created successfully",
                 icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </Box>
@@ -115,6 +92,35 @@ export default function TicketForm({tenant}: any) {
             setIsLoading(false)
             console.log(error)
         }
+
+
+        // EDIT A PROPERTY
+        // if (toEdit?.name) {
+        //     const edited = {
+        //         ...toEdit,
+        //         name: values.name,
+        //         price: values.price
+        //     }
+        //     try {
+        //         const res = await fetch(`/api/feature?id=${toEdit._id}`, {
+        //             method: 'PUT',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //                 Authorization: `Bearer ${session.data.accessToken}`,
+        //             },
+        //             body: JSON.stringify({ ...edited })
+        //         })
+        //         const response = await res.json();
+        //         console.log(response)
+        //         setIsLoading(false)
+        //         return
+        //     } catch (error) {
+        //         setIsLoading(false)
+        //         console.log(error)
+        //         return
+        //     }
+        // }
+
     }
 
     return (
@@ -125,7 +131,7 @@ export default function TicketForm({tenant}: any) {
         >
             <LinearProgress sx={{ display: isLoading ? "block" : "none" }} />
             <DialogTitle sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Typography fontWeight="600">Create new feature</Typography>
+                <Typography fontWeight="600">Create new ticket</Typography>
                 <IconButton onClick={() => {
                     setToEdit({})
                     setIsOpen(false)
@@ -139,33 +145,30 @@ export default function TicketForm({tenant}: any) {
             </DialogTitle>
             <DialogContent>
                 <form
-                    id="features-form"
+                    id="ticket-form"
                     onSubmit={handleSubmit(onSubmit)}
                     style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}
                 >
                     <FormControl>
-                        <FormLabel>Name</FormLabel>
-                        <TextField
-                            placeholder=""
-                            {...register("name")}
-                            // value={}
-                        />
-                        <FormHelperText>{errors?.name?.message}</FormHelperText>
-                    </FormControl>
-                    <FormControl>
-                        <FormLabel>Price</FormLabel>
-                        <TextField
-                            placeholder=""
-                            {...register("price")}
-                            // value={}
-                        />
-                        <FormHelperText>{errors?.name?.message}</FormHelperText>
-                    </FormControl>
-                    <FormControl>
                         <FormLabel>Rate</FormLabel>
                         <Autocomplete
                             // {...register("features")}
-                            options={[{ label: "Yes", value: "Yes" }]}
+                            options={[
+                                { value: "MAINTENANCE AND REPAIR", label: "MAINTENANCE AND REPAIR" },
+                                { value: "SAFETY CONCERNS", label: "SAFETY CONCERNS" },
+                                { value: "NOISE COMPLAINTS", label: "NOISE COMPLAINTS" },
+                                { value: "PEST INFECTION", label: "PEST INFECTION" },
+                                { value: "RENTAL PAYMENT ISSUES", label: "RENTAL PAYMENT ISSUES" },
+                                { value: "DISPUTES WITH LANDLORDS", label: "DISPUTES WITH LANDLORDS" },
+                                { value: "PRIVACY VIOLATIONS", label: "PRIVACY VIOLATIONS" },
+                                { value: "HEALTH AND SANITATION ISSUES", label: "HEALTH AND SANITATION ISSUES" },
+                                { value: "ACCESSIBILITY ISSUES", label: "ACCESSIBILITY ISSUES" },
+                                { value: "UNRESPONSIVE LANDLORDS", label: "UNRESPONSIVE LANDLORDS" },
+                            ]}
+                            onChange={(event, value) => {
+                                setValue("type", value)
+                            }
+                            }
                             renderInput={(params) =>
                                 <TextField
                                     {...params}
@@ -174,16 +177,30 @@ export default function TicketForm({tenant}: any) {
                             }
                         />
                     </FormControl>
-                    <FileInput />
+                    <FormControl>
+                        <FormLabel>Message</FormLabel>
+                        <TextField
+                            placeholder=""
+                            {...register("message")}
+                            multiline
+                            rows={4}
+                        // value={}
+                        />
+                        <FormHelperText>{errors?.message?.message}</FormHelperText>
+                    </FormControl>
+
                 </form>
             </DialogContent>
             <DialogActions sx={{ padding: "1.5rem" }}>
                 <Button
                     variant="contained"
                     type="submit"
-                    form="features-form"
+                    form="ticket-form"
+                    onClick={() => {
+                        console.log(errors)
+                     }}
                 >
-                    {toEdit?.name ? `Edit Feature` : `Create Feature`}
+                    {toEdit?.name ? `Edit ticket` : `Create ticket`}
                 </Button>
             </DialogActions>
         </Dialog>

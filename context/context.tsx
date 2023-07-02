@@ -93,6 +93,10 @@ const CollectionsProvider = ({children}: any) => {
     // VIEW TENANT
     const [ openViewTenant, setOpenViewTenant ] = useState(false)
 
+    // TICKET FORM
+    const [ openTicketForm, setOpenTicketForm ] = useState(false)
+    const [ ticketToEdit, setTicketToEdit ] = useState(false)
+
 
     return (
         <CollectionsContext.Provider value={{
@@ -182,6 +186,12 @@ const CollectionsProvider = ({children}: any) => {
             // VIEW TENANT
             openViewTenant,
             setOpenViewTenant,
+
+            // TICKET FORM
+            openTicketForm,
+            setOpenTicketForm,
+            ticketToEdit,
+            setTicketToEdit,
 
         }}>
             {children}
