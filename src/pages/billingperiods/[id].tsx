@@ -271,7 +271,7 @@ export default
           openFlutterwave={openFlutterwave}
         />
       </Box>
-      <BillingPeriodsForm property={id} />
+      <BillingPeriodsForm bills={id} />
       <PropertyFeatureForm property={id} />
       <UnitForm property={id} />
       <BookingForm property={id} />

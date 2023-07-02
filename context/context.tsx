@@ -39,8 +39,10 @@ const CollectionsProvider = ({children}: any) => {
 
     // BILLING PERIODS FORM
     const [openBillingPeriodsForm, setOpenBillingPeriodsForm] = useState(false)
+    const [openPeriodsDelete, setOpenPeriodsDelete] = useState(false)
     const [billingPeriodToEdit, setBillingPeriodToEdit] = useState(false)
-
+    const [billingPeriodToDelete, setBillingPeriodToDelete] = useState(false); 
+    
     // PROPERTY FEATURES FORM
     const [openPropertyFeaturesForm, setOpenPropertyFeaturesForm] = useState(false)
     const [propertyFeatureToEdit, setPropertyFeatureToEdit] = useState({})
@@ -99,7 +101,7 @@ const CollectionsProvider = ({children}: any) => {
             collections,
             setCollections,
             refreshCollections,
-
+           
             // PROPERTIES CONTEXT
             activePropertiesTab,
             setActivePropertiesTab,
@@ -124,8 +126,11 @@ const CollectionsProvider = ({children}: any) => {
             openBillingPeriodsForm,
             setOpenBillingPeriodsForm,
             billingPeriodToEdit,
+            openPeriodsDelete,
+             setOpenPeriodsDelete,
             setBillingPeriodToEdit,
-
+            billingPeriodToDelete, 
+            setBillingPeriodToDelete,
 
             // Property Features form
             openPropertyFeaturesForm,

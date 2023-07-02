@@ -136,7 +136,7 @@ export const BillsTable = <T extends object>({ }: ReactTableProps<T>) => {
         <TableRenderer
             data={data}
             columns={columns}
-            onRowClick={(rowId) => router.push(`/rentals/${rowId}`)}
-        />
+            onRowClick={(rowId) => router.push(`/rentals/${rowId}`)} pageInfo={undefined}    />
+    
     );
 };
