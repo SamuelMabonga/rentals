@@ -135,6 +135,7 @@ export const PaymentsTable = <T extends object>({ }: ReactTableProps<T>) => {
     return (
         <TableRenderer
             data={data}
+            pageInfo={{}}
             columns={columns}
             onRowClick={(rowId) => router.push(`/rentals/${rowId}`)}
         />

@@ -116,6 +116,7 @@ export const UnitTypesTable = <T extends object>({ property }: ReactTableProps<T
     return (
         <TableRenderer
             data={data?.data}
+            pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
                 throw new Error('Function not implemented.');
