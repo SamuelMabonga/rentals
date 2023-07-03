@@ -7,6 +7,5 @@ export default async function fetchExtensions(token: string, property: string) {
     });
 
     const data = await response.json();
-
     return data
 }

@@ -11,7 +11,7 @@ import { useSession } from 'next-auth/react';
 // import fetchExtensions from 'apis/property/fetchExtensions';
 import currencyFormatter from 'Components/Common/currencyFormatter';
 import moment from 'moment';
-import fetchExtensions from 'apis/property/fetchExtensions';
+import fetchExtensions from 'apis/property/FetchExtensions';
 import AlertDialog from 'Components/Common/AlertDialog';
 import fetchTenancyModifications from 'apis/property/fetchTenancyModifications';
 

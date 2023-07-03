@@ -11,8 +11,8 @@ import { useSession } from 'next-auth/react';
 // import fetchExtensions from 'apis/property/fetchExtensions';
 import currencyFormatter from 'Components/Common/currencyFormatter';
 import moment from 'moment';
-import fetchExtensions from 'apis/property/fetchExtensions';
 import AlertDialog from 'Components/Common/AlertDialog';
+import fetchExtensions from 'apis/property/FetchExtensions';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
