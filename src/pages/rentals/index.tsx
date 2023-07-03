@@ -57,6 +57,7 @@ Rentals.auth = true
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
+
     // Retrieve the access token from the session
     const accessToken = session?.accessToken;
 

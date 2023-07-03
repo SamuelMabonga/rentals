@@ -8,7 +8,6 @@ import { TableRenderer } from 'Components/Common/TableRenderer';
 import { useQuery } from '@tanstack/react-query';
 import fetchFeatures from 'apis/fetchFeatures';
 import { useSession } from 'next-auth/react';
-// import fetchExtensions from 'apis/property/fetchExtensions';
 import currencyFormatter from 'Components/Common/currencyFormatter';
 import moment from 'moment';
 import AlertDialog from 'Components/Common/AlertDialog';

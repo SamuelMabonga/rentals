@@ -95,7 +95,7 @@ const CollectionsProvider = ({children}: any) => {
 
     // TICKET FORM
     const [ openTicketForm, setOpenTicketForm ] = useState(false)
-    const [ ticketToEdit, setTicketToEdit ] = useState(false)
+    const [ ticketToEdit, setTicketToEdit ] = useState({})
 
     // REQUEST TENANCY EXTENSION
     const [ openRequestTenancyExtension, setOpenRequestTenancyExtension ] = useState(false)

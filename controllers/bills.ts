@@ -110,26 +110,26 @@ export async function createBill(
         startDate: tenant?.startDate,
         endDate: tenant?.customBillingPeriod?.time
           ? moment(tenant?.startDate).add(
-              tenant?.customBillingPeriod?.time,
-              "ms"
-            )
+            tenant?.customBillingPeriod?.time,
+            "ms"
+          )
           : moment(tenant?.startDate).add(
-              tenant?.unit?.unitType?.billingPeriod?.time,
-              "ms"
-            ),
+            tenant?.unit?.unitType?.billingPeriod?.time,
+            "ms"
+          ),
         tenant: tenantId,
         type: "Rent", // Set the bill type as 'Rent'
         propertyFeature: null, // No specific property feature for rent bill, so set it to null
         amount: customRent ?? tenant?.unit?.unitType?.price,
         pay_by: tenant?.customBillingPeriod?.time
           ? moment(tenant?.start_date).add(
-              tenant?.customBillingPeriod?.time + 604800000,
-              "ms"
-            )
+            tenant?.customBillingPeriod?.time + 604800000,
+            "ms"
+          )
           : moment(tenant?.start_date).add(
-              tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
-              "ms"
-            ), // set dedault pay date to 7 days
+            tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+            "ms"
+          ), // set dedault pay date to 7 days
       });
 
       await rentBill.save();
@@ -154,13 +154,13 @@ export async function createBill(
         amount: feature?.price, // Set the bill amount as the price from the property feature
         pay_by: tenant?.customBillingPeriod?.time
           ? moment(tenant?.startDate).add(
-              tenant?.customBillingPeriod?.time + 604800000,
-              "ms"
-            )
+            tenant?.customBillingPeriod?.time + 604800000,
+            "ms"
+          )
           : moment(tenant?.startDate).add(
-              tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
-              "ms"
-            ), // set dedault pay date to 7 days
+            tenant?.unit?.unitType?.billingPeriod?.time + 604800000,
+            "ms"
+          ), // set dedault pay date to 7 days
       });
 
       await bill.save();
@@ -190,6 +190,8 @@ export async function createCronBills(req: any, res: any) {
         populate: [{ path: "unitType", populate: [{ path: "billingPeriod" }] }],
       });
 
+    console.log("TENANTS", tenants)
+
     for (const tenant of tenants) {
       const {
         _id,
@@ -201,30 +203,37 @@ export async function createCronBills(req: any, res: any) {
         startDate,
       } = tenant;
 
+      console.log("TENANT ID", _id)
+
       try {
-        let latestRent: any[] = await Bills.find({ tenant: _id, type: "RENT" })
+        let latestRent: any[] = await Bills.find({ tenant: _id.toString(), type: "RENT" })
           .sort({ createdAt: -1 })
           .limit(1);
 
-        let currentDate = new Date();
-        let latestEndDate = latestRent.length > 0 ? new Date(latestRent[0]?.endDate) : null;
+        console.log("LATEST RENT", latestRent)
 
-        if (latestEndDate && currentDate > latestEndDate) {
-          const newRent = new Bills({
-            amount: !customRent ? unit.unitType.price : customRent,
-            startDate: startDate,
-            endDate: !customBillingPeriod
-              ? moment(startDate).add(1, unit?.unitType?.billingPeriod?.period)
-              : moment(startDate).add(1, customBillingPeriod?.period),
-            pay_by: !customBillingPeriod
-            ? moment(startDate).add(1, unit?.unitType?.billingPeriod?.period).add(7, "days")
-            : moment(startDate).add(1, customBillingPeriod?.period).add(7, "days"),
-            tenant: _id,
-            type: "RENT",
-          });
+        if (!latestRent) return
 
-          await newRent.save();
-        }
+        if (moment().isBefore(moment(latestRent[0]?.endDate).format("DD-MM-YYYY"))) return
+
+
+        // if (moment(currentDate).isAfter(latestEndDate)) {
+        console.log("CREATING RENT BILL")
+        const newRent = new Bills({
+          amount: !customRent ? unit.unitType.price : customRent,
+          startDate: startDate,
+          endDate: !customBillingPeriod
+            ? moment().add(1, unit?.unitType?.billingPeriod?.period)
+            : moment().add(1, customBillingPeriod?.period),
+          pay_by: !customBillingPeriod
+            ? moment().add(1, unit?.unitType?.billingPeriod?.period).add(7, "days")
+            : moment().add(1, customBillingPeriod?.period).add(7, "days"),
+          tenant: _id,
+          type: "RENT",
+        });
+
+        await newRent.save();
+        // }
       } catch (error) {
         console.log("Failed to create rent bill for tenant:", _id);
         console.log(error);
@@ -240,22 +249,21 @@ export async function createCronBills(req: any, res: any) {
             .sort({ createdAt: -1 })
             .limit(1);
 
-          let currentDate = new Date();
-          let latestEndDate = latestBill.length > 0 ? new Date(latestBill[0]?.endDate) : null;
+          if (!latestBill) return
 
-          if (latestEndDate && currentDate > latestEndDate) {
-            let newBill = new Bills({
-              amount: feature.price,
-              startDate: startDate,
-              endDate: moment(startDate).add(1, feature?.billingPeriod?.period),
-              pay_by: moment(startDate).add(1, feature?.billingPeriod?.period).add(7, "days"),
-              tenant: _id,
-              type: "FEATURE",
-              propertyFeature: feature._id,
-            });
+          if (moment().isBefore(moment(latestBill[0]?.endDate).format("DD-MM-YYYY"))) return
 
-            await newBill.save();
-          }
+          let newBill = new Bills({
+            amount: feature.price,
+            startDate: startDate,
+            endDate: moment().add(1, feature?.billingPeriod?.period),
+            pay_by: moment(startDate).add(1, feature?.billingPeriod?.period).add(7, "days"),
+            tenant: _id,
+            type: "FEATURE",
+            propertyFeature: feature._id,
+          });
+
+          await newBill.save();
         } catch (error) {
           console.log("Failed to create bill for feature:", feature._id);
           console.log(error);

@@ -91,7 +91,7 @@ export const TenancyExtensionsTable = <T extends object>({ property }: ReactTabl
 
                         <AlertDialog
                             // hide={row.row.original.status === "PAID"}
-                            // disabled={row.row.original.status !== "PENDING"}
+                            disabled={row.row.original.status !== "PENDING"}
                             buttonLabel="Accept"
                             buttonVariant="contained"
                             title="Tenancy extension request"

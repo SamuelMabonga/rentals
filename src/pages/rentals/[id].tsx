@@ -87,7 +87,7 @@ function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
         // return <BookingsTable />
 
         case "tickets":
-        return <TicketsTable tenant={tenant} />
+            return <TicketsTable tenant={tenant} />
 
         default:
             return <></>
@@ -213,7 +213,20 @@ export default function Rental({
                 </Box>
 
                 <Box display={rentalStatus === "ACTIVE" ? "flex" : ["none"]} flexDirection={["column", "row"]} sx={{ mt: "1.5rem" }} gap="1rem">
-                    <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], ml: "auto" }} color="error" >Terminate tenancy</Button>
+                    <Button
+                        variant="outlined"
+                        sx={{
+                            height: "fit-content",
+                            padding: "1rem",
+                            borderRadius: "0.5rem",
+                            width: ["100%", "fit-content"],
+                            ml: "auto"
+                        }}
+                        color="error"
+                        onClick={() => setOpenRequestTenancyExtension(true)}
+                    >
+                        Terminate tenancy
+                    </Button>
                     <Button
                         variant="contained"
                         sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], }}
@@ -228,7 +241,7 @@ export default function Rental({
                     <Button
                         variant="contained"
                         sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], }}
-                        // onClick={() => setOpenRenewalForm(true)}
+                    // onClick={() => setOpenRenewalForm(true)}
                     >
                         Pay Bills
                     </Button>
