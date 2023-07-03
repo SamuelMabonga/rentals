@@ -10,67 +10,7 @@ import fetchBookings from 'apis/fetchBookings';
 import { useSession } from 'next-auth/react';
 import moment from 'moment';
 import fetchPropertyBookings from 'apis/property/fetchPropertyBookings';
-
-function AlertDialog({ buttonLabel, buttonVariant, buttonColor="primary", title, content, onAgree, agreeing, setAgreeing }: any) {
-    const [open, setOpen] = useState(false);
-
-    const handleClickOpen = (event: any) => {
-        event.stopPropagation()
-        setOpen(true);
-    };
-
-    const handleClose = (event: any) => {
-        event.stopPropagation()
-        setOpen(false);
-    };
-
-    const [loading, setLoading] = useState(false)
-
-    useEffect(() => {
-        if (agreeing) {
-            return setLoading(true)
-        }
-
-        return setLoading(false)
-    }, [agreeing])
-
-    return (
-        <div>
-            <Button variant={buttonVariant} color={buttonColor} size="small" sx={{ fontSize: "0.875rem" }} onClick={handleClickOpen}>
-                {buttonLabel}
-            </Button>
-            <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <LinearProgress sx={{display: loading ? "flex" : "none"}} />
-                <DialogTitle id="alert-dialog-title">
-                    {title}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                       {content}
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
-                    <Button
-                        variant="contained"
-                        onClick={(event) => {
-                            setAgreeing(true)
-                            onAgree(event)
-                        }} 
-                        autoFocus
-                    >
-                        Continue
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </div>
-    );
-}
+import AlertDialog from 'Components/Common/AlertDialog';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -130,12 +70,21 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
             },
             {
                 header: 'Status',
-                cell: (row) => <Chip label={row.row.original.status} color="primary" size="small" />,
+                cell: (row) => <Chip
+                                    label={row.row.original.status}
+                                    // color={row.row.original.status === "PENDING" ? "warning" : "limegreen"}
+                                    size="small"
+                                    sx={{
+                                        fontSize: "0.75rem",
+                                        bgcolor: row.row.original.status === "PENDING" ? "warning.main" : "limegreen",
+                                        color: "white",
+                                    }}
+                                />,
                 accessorKey: 'status',
             },
             {
                 header: 'Date Created',
-                cell: (row: any) => row.renderValue(),
+                cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
                 accessorKey: 'createdAt',
             },
             {
@@ -143,6 +92,7 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
                 cell: (row: any) => (
                     <Box display="flex" gap="1rem">
                         <AlertDialog
+                            disabled={row.row.original.status !== "PENDING"}
                             buttonLabel="Accept"
                             buttonVariant="contained"
                             title="Are you sure you want to accept this booking?"
@@ -178,6 +128,7 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
                             }}
                         />
                         <AlertDialog
+                            disabled={row.row.original.status !== "PENDING"}
                             buttonLabel="Decline"
                             buttonVariant="outlined"
                             buttonColor="error"

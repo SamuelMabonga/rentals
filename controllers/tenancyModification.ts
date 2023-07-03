@@ -2,6 +2,8 @@ import { getPageInfo } from "helpers/page_info";
 import Bills from "models/bills";
 import Extensions from "models/extensions";
 import Property from "models/property";
+import TenancyModification from "models/tenancyModification";
+import Tenant from "models/tenant";
 
 // get all properties
 //none admin fetch properties
@@ -62,27 +64,27 @@ export async function fetchAllProperties(req: any, res: any) {
 }
 
 // fetch extensions by property id
-export async function fetchExtensionsByProperty(req: any, res: any) {
+export async function fetchTenancyModificationsByProperty(req: any, res: any) {
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
     const [properties, propertiesCount] = await Promise.all([
-      Extensions.find({ property: req.query.id}).populate({path: "tenant", populate: [{path: "user"}]}).populate("bill")
+      TenancyModification.find({ property: req.query.id}).populate({path: "tenant", populate: [{path: "unit"}, {path: "user"}]})
         .skip((page - 1) * limit)
         .limit(limit),
-      Extensions.countDocuments(),
+      TenancyModification.countDocuments(),
     ]);
 
     return res.status(200).json({
       success: true,
-      msg: "Extensions fetched successfully",
+      msg: "Tenancy modifications fetched successfully",
       data: properties,
       pageInfo: getPageInfo(limit, propertiesCount, page),
     });
   } catch (error) {
     return res.status(400).json({
       success: false,
-      msg: "Failed to fetch  extensions",
+      msg: "Failed to fetch tenancy modifications ",
       data: error,
     });
     console.log(error);
@@ -91,63 +93,19 @@ export async function fetchExtensionsByProperty(req: any, res: any) {
 
 
 // create a property
-export async function createExtension(req: any, res: any) {
+export async function createTenancyModification(req: any, res: any) {
   try {
-    const { tenant } = req.body;
-    const requiredFields = ["tenant"];
-
-    const includesAllFields = requiredFields.every((field) => {
-      return !!req.body[field];
-    });
-    console.log("required fields is", includesAllFields);
-
-    if (!includesAllFields) {
-      return res.status(400).json({
-        success: false,
-        msg: "Please supply all required fields",
-        requiredFields,
-      });
-    }
-
-    const extension = new Extensions({
+    const tenancyModification = new TenancyModification({
       ...req.body,
     });
 
-    try {
-      const newExtension = await extension.save();
+    const newTicket = await tenancyModification.save();
 
-      try {
-        const bill = await Bills.findById(req.body.bill);
-
-        bill.extended = true;
-
-        console.log("UPDATED BILL", bill);
-
-        await Bills.findByIdAndUpdate(req.body.bill, bill, {
-          new: true,
-        });
-      } catch (error) {
-        console.log(error);
-        res.status(400).json({
-          success: false,
-          msg: "Failed to update bill",
-          data: error,
-        });
-      }
-
-      return res.json({
-        success: true,
-        msg: "New extension created",
-        data: newExtension,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(400).json({
-        success: false,
-        msg: "Failed to update bill",
-        data: error,
-      });
-    }
+    return res.json({
+      success: true,
+      msg: "New tenancy modification created successfully",
+      data: newTicket,
+    });
   } catch (error: any) {
     console.log(error);
     return res.status(500).json({
@@ -202,30 +160,39 @@ export async function updateProperty(req: any, res: any) {
 }
 
 // Accept an extension
-export async function acceptExtension(req: any, res: any) {
-  const {extensionId} = req.body;
+export async function acceptTenancyModification(req: any, res: any) {
+  const {tenancyModificationId} = req.body;
   try {
-    let extension = await Extensions.findById(extensionId);
+    let tenancyModification = await TenancyModification.findById(tenancyModificationId);
 
     const data = {
-      ...extension._doc,
+      ...tenancyModification._doc,
       status: "ACCEPTED"
     };
 
-    extension = await Extensions.findByIdAndUpdate(extensionId, data, {
+
+
+    tenancyModification = await TenancyModification.findByIdAndUpdate(tenancyModificationId, data, {
       new: true,
     });
 
-    // FIND AND UPDATE BILL
+    // FIND AND UPDATE TENANT
     try {
-      const bill = await Bills.findById(extension.bill.toString());
+      const tenant = await Tenant.findById(tenancyModification.tenant.toString());
+
+      console.log("TENANT", tenant)
+      console.log("NEW END DATE", tenancyModification.newDate)
       
-      const billData = {
-        ...bill,
-        pay_by: extension.pay_by,
+      const tenantData = {
+        ...tenant._doc,
+        endDate: tenancyModification.newDate,
       }
 
-      await Bills.findByIdAndUpdate(extension.bill, billData, {
+      console.log("TENANT DATA", tenantData)
+
+      console.log("TENANT ID", tenancyModification.tenant.toString())
+
+      await Tenant.findByIdAndUpdate(tenancyModification.tenant.toString(), tenantData, {
         new: true,
       });
 
@@ -233,20 +200,20 @@ export async function acceptExtension(req: any, res: any) {
       console.log(error);
       res.status(400).json({
         success: false,
-        msg: "Failed to update bill",
+        msg: "Failed to update tenant",
         data: error,
       });
     }
 
     return res.status(200).json({
       success: true,
-      msg: "Extension accepted successfully",
-      data: extension,
+      msg: "Tenancy modification accepted successfully",
+      data: tenancyModification,
     });
   } catch (error) {
     return res.status(400).json({
       success: false,
-      msg: "Failed to accept extension",
+      msg: "Failed to accept tenancy modification",
       data: error,
     });
   }

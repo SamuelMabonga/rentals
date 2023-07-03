@@ -13,6 +13,7 @@ import currencyFormatter from 'Components/Common/currencyFormatter';
 import moment from 'moment';
 import fetchExtensions from 'apis/property/fetchExtensions';
 import AlertDialog from 'Components/Common/AlertDialog';
+import fetchTenancyModifications from 'apis/property/fetchTenancyModifications';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -29,11 +30,11 @@ type Item = {
     actions: any;
 }
 
-export const ExtensionsTable = <T extends object>({ property }: ReactTableProps<T>) => {
+export const TenancyExtensionsTable = <T extends object>({ property }: ReactTableProps<T>) => {
     // SESSION
     const session: any = useSession()
     const token = session?.data?.accessToken
-    const { data }: any = useQuery({ queryKey: ['extensions', token, property], queryFn: () => fetchExtensions(token, property) })
+    const { data }: any = useQuery({ queryKey: ['tenancy-extensions', token, property], queryFn: () => fetchTenancyModifications(token, property) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
@@ -59,17 +60,12 @@ export const ExtensionsTable = <T extends object>({ property }: ReactTableProps<
                 // accessorKey: 'name',
             },
             {
-                header: 'Amount',
-                cell: (row: any) => currencyFormatter(row?.row?.original?.bill?.amount, "UGX"),
-                accessorKey: 'price',
-            },
-            {
-                header: 'Deadline',
+                header: 'Current End Date',
                 cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
-                accessorKey: 'bill.pay_by',
+                accessorKey: 'tenant.endDate',
             },
             {
-                header: 'New Deadline',
+                header: 'New End Date',
                 cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
                 accessorKey: 'newDate',
             },
@@ -95,11 +91,11 @@ export const ExtensionsTable = <T extends object>({ property }: ReactTableProps<
 
                         <AlertDialog
                             // hide={row.row.original.status === "PAID"}
-                            disabled={row.row.original.status !== "PENDING"}
+                            // disabled={row.row.original.status !== "PENDING"}
                             buttonLabel="Accept"
                             buttonVariant="contained"
-                            title="Bill payment extension request"
-                            content="Are you sure you want to extend the deadline for this bill?"
+                            title="Tenancy extension request"
+                            content="Are you sure you want to extend the end date of this tenancy?"
                             // setAgreeing={setAccepting}
                             // agreeing={accepting}
                             onAgree={async (event: any) => {
@@ -107,18 +103,18 @@ export const ExtensionsTable = <T extends object>({ property }: ReactTableProps<
                                 event.stopPropagation()
 
                                 try {
-                                    const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/extension/accept`, {
+                                    const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/tenancyModification/accept`, {
                                         method: "POST",
                                         headers: {
                                             Authorization: `Bearer ${token}`,
                                             'Content-Type': 'application/json',
                                         },
                                         body: JSON.stringify({
-                                            extensionId: row.row.original._id,
+                                            tenancyModificationId: row.row.original._id,
                                         })
                                     })
 
-                                    const {data: {_id}} = await res.json()
+                                    await res.json()
             
                                     // setAccepting(false)
                                 } catch (error) {

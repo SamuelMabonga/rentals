@@ -38,39 +38,9 @@ export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) =
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
             {
-                header: 'Image',
-                cell: (row) => {
-                    return (
-                        <Avatar
-                            src={row.row.original.image}
-                            alt="Avatar"
-                            sx={{
-                                width: "3rem",
-                                height: "3rem"
-                            }}
-                        />
-                    )
-                },
-            },
-            {
                 header: 'Name',
                 cell: (row) => row.renderValue(),
                 accessorKey: 'name',
-            },
-            {
-                header: 'Price',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'price',
-            },
-            {
-                header: 'Rate',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'rate',
-            },
-            {
-                header: 'Rate',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'dateAdded',
             },
             {
                 header: 'Actions',

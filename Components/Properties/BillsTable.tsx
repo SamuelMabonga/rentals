@@ -79,8 +79,7 @@ export const BillsTable = <T extends object>({ }: ReactTableProps<T>) => {
             status: "Not Paid"
         },
     ]
-        
-
+       
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [

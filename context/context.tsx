@@ -97,6 +97,10 @@ const CollectionsProvider = ({children}: any) => {
     const [ openTicketForm, setOpenTicketForm ] = useState(false)
     const [ ticketToEdit, setTicketToEdit ] = useState(false)
 
+    // REQUEST TENANCY EXTENSION
+    const [ openRequestTenancyExtension, setOpenRequestTenancyExtension ] = useState(false)
+    
+
 
     return (
         <CollectionsContext.Provider value={{
@@ -192,6 +196,10 @@ const CollectionsProvider = ({children}: any) => {
             setOpenTicketForm,
             ticketToEdit,
             setTicketToEdit,
+
+            // REQUEST TENANCY EXTENSION
+            openRequestTenancyExtension,
+            setOpenRequestTenancyExtension,
 
         }}>
             {children}

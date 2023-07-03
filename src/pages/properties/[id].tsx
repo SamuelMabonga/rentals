@@ -23,6 +23,7 @@ import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 import fetchPropertyUnits from "apis/property/fetchPropertyUnits"
 import { ExtensionsTable } from "Components/Properties/ExtensionsTable"
+import { TenancyExtensionsTable } from "Components/Properties/TenancyExtensionsTable"
 // import { fetchAllPropertyFeatures } from "controllers/propertyFeatures"
 
 type PageProps = {
@@ -51,6 +52,9 @@ function TableSwitch({ activeTab, property }: any) {
 
                 case "extensions":
             return <ExtensionsTable property={property} />
+
+            case "tenancyExtensions":
+                return <TenancyExtensionsTable property={property} />
 
         case "propertyFeatures":
             return <PropertyFeaturesTable property={property} />
@@ -164,7 +168,8 @@ export default function Property({
                     <Tab label="Units" value="units" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Tenants" value="tenants" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Bookings" value="bookings" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
-                    <Tab label="Extensions" value="extensions" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
+                    <Tab label="Bill Extensions" value="extensions" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
+                    <Tab label="Tenancy Extensions" value="tenancyExtensions" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Staff" value="staff" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Unit Types" value="unitTypes" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />
                     <Tab label="Tickets" value="tickets" sx={{ textTransform: "capitalize", fontFamily: "Satoshi", fontWeight: "600" }} />

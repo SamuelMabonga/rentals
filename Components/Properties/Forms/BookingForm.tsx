@@ -275,7 +275,7 @@ export default function BookingForm({
         >
             <LinearProgress sx={{ display: isLoading ? "block" : "none" }} />
             <DialogTitle sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Typography fontWeight="600">Choose a unit to book</Typography>
+                <Typography fontWeight="600">Create a booking</Typography>
                 <IconButton onClick={() => {
                     setToEdit({})
                     setIsOpen(false)

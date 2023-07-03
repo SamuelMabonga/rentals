@@ -15,6 +15,7 @@ import fetchBills from "apis/tenant/fetchBills"
 import { PaymentsTable } from "Components/Tenants/PaymentsTable"
 import { TicketsTable } from "Components/Tenants/TicketsTable"
 import TicketForm from "Components/Tenants/Forms/TicketForm"
+import RequestTenancyExtension from "Components/Tenants/Forms/RequestTenancyExtension"
 
 type PageProps = {
     // data: any;
@@ -114,7 +115,8 @@ export default function Rental({
         setOpenUnitForm,
         setOpenBookingForm,
         paymentConfig,
-        setOpenTicketForm
+        setOpenTicketForm,
+        setOpenRequestTenancyExtension
     }: any = useContext(CollectionsContext)
 
     // SESSION
@@ -215,7 +217,7 @@ export default function Rental({
                     <Button
                         variant="contained"
                         sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], }}
-                        // onClick={() => setOpenRenewalForm(true)}
+                        onClick={() => setOpenRequestTenancyExtension(true)}
                     >
                         Renew your tenancy
                     </Button>
@@ -282,6 +284,7 @@ export default function Rental({
             </Box>
             <PaymentsForm tenant={id} />
             <TicketForm tenant={data?.data} />
+            <RequestTenancyExtension tenant={data?.data} />
         </>
     )
 }

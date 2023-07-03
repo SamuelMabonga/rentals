@@ -283,7 +283,6 @@ export async function acceptBooking(req: any, res: any) {
 
   try {
     //UPDATE booking status to accepted
-    // let booking = await Booking.findById(req.body.id);
     let booking = await Booking.findByIdAndUpdate(
       id,
       {
@@ -319,8 +318,6 @@ export async function acceptBooking(req: any, res: any) {
         msg: "Booking not found",
       });
     }
-
-    console.log("BOOKING", booking);
 
     try {
       //CREATE a new tenant
@@ -422,8 +419,25 @@ export async function acceptBooking(req: any, res: any) {
         return res.status(400).json({ error: "Failed to create rent bill" });
       }
 
+
+      // UPDATE UNIT STATUS
+      try {
+        await Unit.findByIdAndUpdate(
+          booking?.unit?._id,
+          {
+            status: "OCCUPIED",
+          },
+          {
+            new: true,
+          }
+        );
+      } catch (error) {
+        console.log("UPDATE UNIT STATUS ERROR", error);
+        return res.status(400).json({ error: "Failed to update unit status" });
+      }
+
       // Return a success response
-      res.status(200).json({ message: "Bills created successfully" });
+      res.status(200).json({ message: "Booking accepted successfully" });
     } catch (error) {
       console.log(error);
       res.status(400).json({ error: "Failed to create bills" });

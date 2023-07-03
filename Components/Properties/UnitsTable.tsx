@@ -40,21 +40,6 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
     })
 
     const columns: any = [
-        // {
-        //     header: 'Image',
-        //     cell: (row: any) => {
-        //         return (
-        //             <Avatar
-        //                 src={row.row.original.image}
-        //                 alt="Avatar"
-        //                 sx={{
-        //                     width: "3rem",
-        //                     height: "3rem"
-        //                 }}
-        //             />
-        //         )
-        //     },
-        // },
         {
             header: 'Name',
             cell: (row: any) => row.renderValue(),
@@ -67,7 +52,20 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
         },
         {
             header: 'Status',
-            cell: (row: any) => <Chip label={row.row.original.status} color="primary" size="small" />,
+            cell: (row: any) =>
+                <Chip
+                    label={row.row.original.status}
+                    // color="inherit"
+                    size="small"
+                    sx={{
+                        fontSize: "0.75rem",
+                        // color: row.row.original.status === "AVAILABLE" ? "limegreen" : "error.main",
+                        bgcolor: row.row.original.status === "AVAILABLE" ? "limegreen" : "error.main",
+                        borderColor: row.row.original.status === "AVAILABLE" ? "limegreen" : "error.main",
+                        color: "white",
+                    }}
+                    variant="outlined"
+                />,
             accessorKey: 'status',
         },
         {
@@ -87,21 +85,21 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
                     }}
                 >
                     <Box width="1.5rem" height="1.5rem">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-                    </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
+                        </svg>
                     </Box>
                     Add Tenant
-                </Button> : 
-                <Button variant="outlined" disabled color="primary" size="small" sx={{ fontSize: "0.875rem", lineHeight: "100%", whiteSpace: "nowrap" }} >
-                <Box width="1.5rem" height="1.5rem">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-                </svg>
-                </Box>
-                Ocuppied
-            </Button>
-                ,
+                </Button> :
+                <Button variant="outlined" color="primary" size="small" sx={{ fontSize: "0.875rem", lineHeight: "100%", whiteSpace: "nowrap" }} >
+                    <Box width="1.5rem" height="1.5rem">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
+                        </svg>
+                    </Box>
+                    Book for later
+                </Button>
+            ,
             accessorKey: 'tenant.user.first_name',
         },
         {
@@ -139,7 +137,7 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
             pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
+                console.log("Unit clicked")
             }}
             loading={isLoading}
         />

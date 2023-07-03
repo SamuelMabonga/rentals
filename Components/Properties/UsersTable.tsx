@@ -98,7 +98,7 @@ export const UsersTable = <T extends object>({ }: ReactTableProps<T>) => {
             data={data?.data}
             pageInfo={data?.pageInfo}
             columns={columns} onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
+                console.log("User clicked")
             }} />
     );
 };
