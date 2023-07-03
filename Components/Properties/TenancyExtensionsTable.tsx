@@ -2,7 +2,7 @@ import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCel
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
-import Image from "next/image"
+// import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/Common/TableRenderer';
 import { useQuery } from '@tanstack/react-query';

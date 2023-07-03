@@ -179,18 +179,11 @@ export async function acceptTenancyModification(req: any, res: any) {
     // FIND AND UPDATE TENANT
     try {
       const tenant = await Tenant.findById(tenancyModification.tenant.toString());
-
-      console.log("TENANT", tenant)
-      console.log("NEW END DATE", tenancyModification.newDate)
       
       const tenantData = {
         ...tenant._doc,
         endDate: tenancyModification.newDate,
       }
-
-      console.log("TENANT DATA", tenantData)
-
-      console.log("TENANT ID", tenancyModification.tenant.toString())
 
       await Tenant.findByIdAndUpdate(tenancyModification.tenant.toString(), tenantData, {
         new: true,
