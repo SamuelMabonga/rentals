@@ -15,11 +15,11 @@ import {
     req: NextApiRequest,
     res: NextApiResponse
   ) {
-    const {
-      query: { id, searchQuery },
-    }: any = req;
+    // const {
+    //   query: { id, searchQuery },
+    // }: any = req;
   
-    const decodedToken = authenticateUser(req, res);
+    // const decodedToken = authenticateUser(req, res);
   
     try {
       await mongoose
@@ -28,9 +28,9 @@ import {
         )
         .then(() => {
           // USER
-          const { _id, role } = decodedToken.user;
+        //   const { _id, role } = decodedToken.user;
   
-          const { method } = req;
+        //   const { method } = req;
 
           createCronBills(req, res);
 

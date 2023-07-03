@@ -93,6 +93,13 @@ function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
     }
 }
 
+const buttonLabels: any = {
+    bills: "Pay Bills",
+    payments: "Make Payment",
+    messages: "Send Message",
+    tickets: "Create Ticket",
+}
+
 export default function Rental({
     // data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -124,7 +131,8 @@ export default function Rental({
         unit,
         _id,
         startDate,
-        endDate
+        endDate,
+        status: rentalStatus,
     } = data?.data || {}
 
 
@@ -202,7 +210,7 @@ export default function Rental({
                     />
                 </Box>
 
-                <Box display={["flex"]} flexDirection={["column", "row"]} sx={{ mt: "1.5rem" }} gap="1rem">
+                <Box display={rentalStatus === "ACTIVE" ? "flex" : ["none"]} flexDirection={["column", "row"]} sx={{ mt: "1.5rem" }} gap="1rem">
                     <Button variant="outlined" sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], ml: "auto" }} color="error" >Terminate tenancy</Button>
                     <Button
                         variant="contained"
@@ -210,6 +218,17 @@ export default function Rental({
                         // onClick={() => setOpenRenewalForm(true)}
                     >
                         Renew your tenancy
+                    </Button>
+                </Box>
+
+                <Box display={rentalStatus === "PENDING" ? "flex" : ["none"]} flexDirection={["column",]} sx={{ mt: "1.5rem" }} gap="1rem">
+                    <Typography fontWeight="600" color="grey">Clear all your initial bills to activate your tenancy</Typography>
+                    <Button
+                        variant="contained"
+                        sx={{ height: "fit-content", padding: "1rem", borderRadius: "0.5rem", width: ["100%", "fit-content"], }}
+                        // onClick={() => setOpenRenewalForm(true)}
+                    >
+                        Pay Bills
                     </Button>
                 </Box>
             </Box>
@@ -240,7 +259,6 @@ export default function Rental({
                         sx={{ ml: ["auto"] }}
                         onClick={() => {
                             if (activeTab === "bills") {
-
                                 return setOpenPaymentForm(true)
                             }
 
@@ -257,7 +275,7 @@ export default function Rental({
                             }
                         }}
                     >
-                        Create New
+                        {buttonLabels[activeTab]}
                     </Button>
                 </Box>
                 <TableSwitch activeTab={activeTab} tenant={data?.data} openFlutterwave={openFlutterwave} />

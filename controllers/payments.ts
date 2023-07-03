@@ -1,6 +1,7 @@
 import { getPageInfo } from "helpers/page_info";
 import Bills from "models/bills";
 import Payments from "models/payments";
+import Tenant from "models/tenant";
 
 // get all payments
 export async function fetchAllPayments(req: any, res: any) {
@@ -125,20 +126,55 @@ export async function updatePayments(req: any, res: any) {
 }
 
 export async function flutterwaveWebhook(req: any, res: any) {
-  // If you specified a secret hash, check for the signature
   const secretHash = process.env.NEXT_PUBLIC_FW_HASH;
   const signature = req.headers["verif-hash"];
   if (!signature || signature !== secretHash) {
-    // This request isn't from Flutterwave; discard
-    res.status(401).end();
+    return res.status(401).end();
   }
 
   const payload = req.body;
 
   try {
-    let payment = await Payments.findById(payload.data.tx_ref).populate(
-      "bills"
-    );
+    let payment = await Payments.findById(payload.data.tx_ref).populate("bills");
+
+    console.log("PAYMENT", payment);
+
+    const {
+      tenant: tenantId
+    } = payment._doc;
+
+    // Check if the user has made any previous payments
+    if (payload.data.status === "successful") {
+      const userPaymentsCount = await Bills.countDocuments({ tenant: tenantId, type: "RENT", status: "PAID" });
+
+      try {
+        if (userPaymentsCount === 0) {
+          const tenant = await Tenant.findById(tenantId);
+
+          const tenantData = {
+            ...tenant._doc,
+            status: "ACTIVE",
+          }
+
+          console.log("TENANT DATA", tenantData);
+
+          await Tenant.findByIdAndUpdate(tenantId, tenantData, {
+            new: true,
+          });
+
+        }
+
+      } catch (error) {
+        console.log("ERROR", error);
+        return res.status(400).json({
+          success: false,
+          msg: "Failed to update tenant",
+          error: error,
+        });
+      }
+
+    }
+
 
     const data = {
       ...payment._doc,
@@ -146,76 +182,75 @@ export async function flutterwaveWebhook(req: any, res: any) {
       amountPaid: payload.data.amount,
     };
 
-    console.log("DATA", data);
+    const updated = await Payments.findByIdAndUpdate(payload.data.tx_ref, data, {
+      new: true,
+    });
 
-    const updated = await Payments.findByIdAndUpdate(
-      payload.data.tx_ref,
-      data,
-      {
-        new: true,
-      }
-    );
+    if (payload.data.status === "successful") {
 
-    if (payment.amount <= payload.data.amount) {
-      for (let i = 0; i < payment.bills.length; i++) {
-        const bill = payment.bills[i];
-        bill.status = "PAID";
-        await bill.save();
-      }
-    } else {
-      let amountLeft = payload.data.amount;
-      for (let i = 0; i < payment.bills.length; i++) {
-        const bill = payment.bills[i];
-        if (amountLeft <= bill.amount) {
-          bill.status = "PARTIAL";
-          bill.amountPaid = amountLeft;
-          try {
-            await Bills.findByIdAndUpdate(bill._id, bill, {
-              new: true,
-            });
-          } catch (error) {
-            console.log("ERROR", error);
-            res.status(400).json({
-              success: false,
-              msg: "Failed to update bill",
-              data: error,
-            });
-          }
-          break;
-        } else {
+      if (payment.amount <= payload.data.amount) {
+        for (let i = 0; i < payment.bills.length; i++) {
+          const bill = payment.bills[i];
           bill.status = "PAID";
-          bill.amountPaid = bill.amount;
-          try {
-            await Bills.findByIdAndUpdate(bill._id, bill, {
-              new: true,
-            });
-            amountLeft = amountLeft - bill.amount;
-          } catch (error) {
-            console.log("ERROR", error);
-            res.status(400).json({
-              success: false,
-              msg: "Failed to update bill",
-              data: error,
-            });
+          await bill.save();
+        }
+      } else {
+        let amountLeft = payload.data.amount;
+        for (let i = 0; i < payment.bills.length; i++) {
+          const bill = payment.bills[i];
+          if (amountLeft <= bill.amount) {
+            bill.status = "PARTIAL";
+            bill.amountPaid = amountLeft;
+            try {
+              await Bills.findByIdAndUpdate(bill._id, bill, {
+                new: true,
+              });
+            } catch (error) {
+              console.log("ERROR", error);
+              return res.status(400).json({
+                success: false,
+                msg: "Failed to update bill",
+                error: error,
+              });
+            }
+            break;
+          } else {
+            bill.status = "PAID";
+            bill.amountPaid = bill.amount;
+            try {
+              await Bills.findByIdAndUpdate(bill._id, bill, {
+                new: true,
+              });
+              amountLeft = amountLeft - bill.amount;
+            } catch (error) {
+              console.log("ERROR", error);
+              return res.status(400).json({
+                success: false,
+                msg: "Failed to update bill",
+                error: error,
+              });
+            }
           }
         }
       }
+
+      return res.json({
+        success: true,
+        msg: "Payment updated",
+        data: updated,
+      });
     }
 
-    return res.json({
-      success: true,
-      msg: "Payment updated",
-      data: updated,
-    });
   } catch (error) {
     console.log("ERROR", error);
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       msg: "Failed to update payment",
-      data: error,
+      error: error,
     });
   }
 }
+
 
 //delete a Payments
 export async function deletePayment(req: any, res: any) {
