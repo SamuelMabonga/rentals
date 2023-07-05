@@ -27,7 +27,8 @@ function HouseType({ src, alt, title }: any) {
 
 function UnitCard({ src, alt, title, subtitle, rent, features, location }: any) {
   return (
-    <Box width="100%" borderRadius="1rem" border="1px solid gray" overflow="hidden">
+    <Link href="/marketplace/hdkjhej">
+        <Box width="100%" borderRadius="1rem" border="1px solid gray" overflow="hidden">
       <Box width="100%">
         <Image
           src={src}
@@ -44,6 +45,7 @@ function UnitCard({ src, alt, title, subtitle, rent, features, location }: any) 
         <Typography variant="body2" fontWeight="500" letterSpacing={-0.5} color="gray" lineHeight="100%">{features}</Typography>
       </Box>
     </Box>
+    </Link>
   )
 }
 
@@ -62,12 +64,12 @@ export default function Marketplace() {
             <Typography fontSize="1.125rem" fontWeight="600" width="fit-content">Rent It</Typography>
 
             <Box display="flex" gap="4rem" ml="auto" alignItems="center" width="fit-content" >
-              <Button variant="outlined" sx={{ whiteSpace: "nowrap", width: "fit-content"}}>
+              {/* <Button variant="outlined" sx={{ whiteSpace: "nowrap", width: "fit-content" }}>
                 I am a tenant
-              </Button>
-              <Box display="flex" gap="1rem">
-              <Link href="/login">Login</Link>
-              <Link href="/signup">Sign Up</Link>
+              </Button> */}
+              <Box display="flex" gap="2rem" >
+                <Link href="/login"><Typography fontWeight="600">Login</Typography></Link>
+                <Link href="/signup"><Typography fontWeight="600">Sign Up</Typography></Link>
               </Box>
             </Box>
           </Box>
@@ -139,7 +141,7 @@ export default function Marketplace() {
 
 
         <footer style={{ width: "100%", }}>
-          <Box width="100%" padding={["8rem 1rem", "8rem 2rem", "8rem 2rem"]}>
+          <Box width="100%" padding={["8rem 1rem", "8rem 2rem", "8rem 12rem"]}>
 
             <Box display="flex" flexDirection={["column", "column", "row"]} gap="1rem" justifyContent="space-between" alignItems="center" width="100%">
               <Typography>Rent It</Typography>

@@ -64,7 +64,7 @@ function TableSwitch({ activeTab, property }: any) {
     }
 }
 
-function Detail() {
+export function Detail() {
     return (
         <Box display="flex" alignItems="center" color="gray" flexDirection="row" gap="0.25rem">
             <Box width="1.25rem" height="1.25rem">

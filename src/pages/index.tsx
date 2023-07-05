@@ -9,19 +9,21 @@ const inter = Inter({ subsets: ['latin'] })
 
 function HouseType({ src, alt, title }: any) {
   return (
-    <Box display="flex" gap="0.5rem" alignItems="center" border="1px solid lightgrey" padding="1rem" borderRadius="0.5rem">
-      <Box width="3rem">
-        <Image
-          src={src}
-          alt={alt}
-          width={0}
-          height={0}
-          layout="responsive"
-        />
-      </Box>
+    <Link href={"/marketplace"}>
+      <Box display="flex" gap="0.5rem" alignItems="center" border="1px solid lightgrey" padding="1rem" borderRadius="0.5rem">
+        <Box width="6rem">
+          <Image
+            src={src}
+            alt={alt}
+            width={0}
+            height={0}
+            layout="responsive"
+          />
+        </Box>
 
-      <Typography variant="h6" fontWeight="600" letterSpacing={-0.5}>{title}</Typography>
-    </Box>
+        <Typography variant="h5" fontWeight="600" letterSpacing={-0.5}>{title}</Typography>
+      </Box>
+    </Link>
   )
 }
 
@@ -62,12 +64,12 @@ export default function Home() {
             <Typography fontSize="1.125rem" fontWeight="600" width="fit-content">Rent It</Typography>
 
             <Box display="flex" gap="4rem" ml="auto" alignItems="center" width="fit-content" >
-              <Button variant="outlined" sx={{ whiteSpace: "nowrap", width: "fit-content"}}>
+              {/* <Button variant="outlined" sx={{ whiteSpace: "nowrap", width: "fit-content" }}>
                 I am a tenant
-              </Button>
-              <Box display="flex" gap="1rem">
-              <Link href="/login">Login</Link>
-              <Link href="/signup">Sign Up</Link>
+              </Button> */}
+              <Box display="flex" gap="2rem" >
+                <Link href="/login"><Typography fontWeight="600">Login</Typography></Link>
+                <Link href="/signup"><Typography fontWeight="600">Sign Up</Typography></Link>
               </Box>
             </Box>
           </Box>
@@ -75,6 +77,15 @@ export default function Home() {
 
         <section style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column" }}>
           <Box maxWidth="fit-content" margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem">
+            <Box width="100%" maxWidth="50rem" mt="8rem">
+              <Image
+                src="https://res.cloudinary.com/dfmoqlbyl/image/upload/v1688575640/RentIt/building-types/Group_j4ijw4.svg"
+                alt="illustration"
+                width={0}
+                height={0}
+                layout="responsive"
+              />
+            </Box>
             <Typography variant="h2" fontWeight="600" letterSpacing={-3}>Rental hunting made easy</Typography>
             <Typography variant="h6" letterSpacing={-0.5} color="gray">Find your next Condo, Appartment, house or room within seconds without a hustle</Typography>
             <TextField
@@ -226,7 +237,7 @@ export default function Home() {
 
 
         <footer style={{ width: "100%", }}>
-          <Box width="100%" padding={["1rem", "2rem", "8rem 2rem"]}>
+          <Box width="100%" padding={["8rem 1rem", "8rem 2rem", "8rem 12rem"]}>
 
             <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
               <Typography>Rent It</Typography>
