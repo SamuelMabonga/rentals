@@ -4,6 +4,7 @@ import { Box, Button, TextField, Typography } from '@mui/material'
 import { Facebook, Instagram, Search, Twitter, YouTube } from '@mui/icons-material'
 import Image from 'next/image'
 import Link from 'next/link'
+import MobileDrawer from 'Components/Common/MobileDrawer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -11,7 +12,7 @@ function HouseType({ src, alt, title }: any) {
   return (
     <Link href={"/marketplace"}>
       <Box display="flex" gap="0.5rem" alignItems="center" border="1px solid lightgrey" padding="1rem" borderRadius="0.5rem">
-        <Box width="6rem">
+        <Box width={["4rem", "6rem"]}>
           <Image
             src={src}
             alt={alt}
@@ -30,32 +31,33 @@ function HouseType({ src, alt, title }: any) {
 export function UnitCard({ src, alt, title, subtitle, rent, features, location }: any) {
   return (
     <Link href="/marketplace/jjwhfw">
-        <Box
-      width="100%"
-      borderRadius="1rem"
-      border="1px solid gray"
-      overflow="hidden"
-      sx={{
-        boxShadow: "0px 0px 30px 0px #D0CCD4",
-        border: "1px solid #DDD5E4"
-      }}
-    >
-      <Box width="100%">
-        <Image
-          src={src}
-          alt={alt}
-          width={0}
-          height={0}
-          layout="responsive"
-        />
+      <Box
+        width="100%"
+        borderRadius="1rem"
+        border="1px solid gray"
+        overflow="hidden"
+        bgcolor="white"
+        sx={{
+          boxShadow: "0px 0px 30px 0px #D0CCD4",
+          border: "1px solid #DDD5E4"
+        }}
+      >
+        <Box width="100%">
+          <Image
+            src={src}
+            alt={alt}
+            width={0}
+            height={0}
+            layout="responsive"
+          />
+        </Box>
+        <Box padding="1rem" display="flex" flexDirection="column" gap="0.375rem">
+          <Typography variant="body2" fontWeight="600" letterSpacing={-0.5} lineHeight="100%" color="primary">{rent}</Typography>
+          <Typography variant="h6" fontWeight="600" letterSpacing={-0.5} lineHeight="100%">{title}</Typography>
+          <Typography variant="body1" fontWeight="500" letterSpacing={-0.5} color="gray" lineHeight="100%">{location}</Typography>
+          <Typography variant="body2" fontWeight="500" letterSpacing={-0.5} color="gray" lineHeight="100%">{features}</Typography>
+        </Box>
       </Box>
-      <Box padding="0.875rem" display="flex" flexDirection="column" gap="0.375rem">
-        <Typography variant="body2" fontWeight="600" letterSpacing={-0.5} lineHeight="100%" color="primary">{rent}</Typography>
-        <Typography variant="h6" fontWeight="600" letterSpacing={-0.5} lineHeight="100%">{title}</Typography>
-        <Typography variant="body1" fontWeight="500" letterSpacing={-0.5} color="gray" lineHeight="100%">{location}</Typography>
-        <Typography variant="body2" fontWeight="500" letterSpacing={-0.5} color="gray" lineHeight="100%">{features}</Typography>
-      </Box>
-    </Box>
     </Link>
   )
 }
@@ -69,27 +71,28 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ width: '100vw', minHeight: "100vh", color: "black", backgroundColor: "white" }}>
-        <nav style={{ width: "100%", position: "fixed", top: 0, left: 0, backgroundColor: "white" }}>
-          <Box width="100%" padding={["1rem", "2rem", "2rem 4rem", "2rem 8rem", "2rem 12rem"]} display="flex" alignItems="center">
+      <main style={{ width: '100vw', minHeight: "100vh", color: "black", backgroundColor: "#F2EEF6" }}>
+        <nav style={{ width: "100%", position: "fixed", top: 0, left: 0, backgroundColor: "white", zIndex: 10 }}>
+          <Box width="100%" padding={["1rem", "2rem", "2rem 4rem", "2rem 8rem", "2rem 12rem"]} display="flex" alignItems="center" borderBottom="1px solid #DDD5E4">
             <Typography fontSize="1.125rem" fontWeight="600" width="fit-content">Rent It</Typography>
 
             <Box display="flex" gap="4rem" ml="auto" alignItems="center" width="fit-content" >
               {/* <Button variant="outlined" sx={{ whiteSpace: "nowrap", width: "fit-content" }}>
                 I am a tenant
               </Button> */}
-              <Box display="flex" gap="2rem" >
+              <Box display={["none", "flex"]} gap="2rem" >
                 <Link href="/"><Typography fontWeight="600">Home</Typography></Link>
                 <Link href="/marketplace"><Typography fontWeight="600">Marketplace</Typography></Link>
                 <Link href="/login"><Typography fontWeight="600">Login</Typography></Link>
                 <Link href="/signup"><Typography fontWeight="600">Sign Up</Typography></Link>
               </Box>
+              <MobileDrawer />
             </Box>
           </Box>
         </nav>
 
-        <section style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column" }}>
-          <Box maxWidth="fit-content" margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem">
+        <section style={{ width: "100%", display: "flex", flexDirection: "column" }}>
+          <Box minHeight="100vh" maxWidth="fit-content" margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem" padding={["4rem 1rem", "8rem 2rem"]}>
             <Box width="100%" maxWidth="50rem" mt="8rem">
               <Image
                 src="https://res.cloudinary.com/dfmoqlbyl/image/upload/v1688575640/RentIt/building-types/Group_j4ijw4.svg"
@@ -99,7 +102,7 @@ export default function Home() {
                 layout="responsive"
               />
             </Box>
-            <Typography variant="h2" fontWeight="600" letterSpacing={-3}>Rental hunting made easy</Typography>
+            <Typography variant={"h2"} fontWeight="600" letterSpacing={-3}>Rental hunting made easy</Typography>
             <Typography variant="h6" letterSpacing={-0.5} color="gray">Find your next Condo, Appartment, house or room within seconds without a hustle</Typography>
             <TextField
               variant="outlined"
@@ -109,11 +112,11 @@ export default function Home() {
           </Box>
         </section>
 
-        <section style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column" }}>
-          <Box maxWidth="100%" margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem">
+        <section style={{ width: "100%", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+          <Box maxWidth="100%" margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem" padding={["6rem 1rem", "8rem 2rem"]}>
             <Typography variant="h3" fontWeight="600" letterSpacing={-3}>All types of rentals, in one place</Typography>
             <Typography variant="h6" letterSpacing={-0.5} color="gray">Whether it is for business or for your persona use, we have the right space for you!</Typography>
-            <Box display="grid" gridTemplateColumns={"1fr 1fr 1fr"} gap="1rem" mt="2rem" width="100%">
+            <Box display="grid" gridTemplateColumns={["1fr", "1fr 1fr 1fr"]} gap="1rem" mt="2rem" width="100%">
               <HouseType
                 src="https://res.cloudinary.com/dfmoqlbyl/image/upload/v1688483081/RentIt/building-types/House-Home-Property-Building-Rental_z5dqy2.svg"
                 alt="Housing Units"
@@ -136,10 +139,10 @@ export default function Home() {
         </section>
 
         <section style={{ width: "100%", display: "flex", flexDirection: "column" }}>
-          <Box width="100%" minHeight="100vh" maxWidth="72rem" padding={["1rem", "2rem", "8rem 2rem"]} margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem">
+          <Box width="100%" minHeight="100vh" maxWidth="72rem" padding={["6rem 1rem", "8rem 2rem", "8rem 2rem"]} margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem">
             <Typography variant="h3" fontWeight="600" letterSpacing={-3}>Check out our most popular spaces</Typography>
             <Typography variant="h6" letterSpacing={-0.5} color="gray">Discover the most popular rental spaces in your dream neighborhood, with the best deals. </Typography>
-            <Box display="grid" gridTemplateColumns={"1fr 1fr 1fr"} gap={["1rem", "1rem", "2rem"]} mt="2rem" width="100%">
+            <Box display="grid" gridTemplateColumns={["1fr", "1fr 1fr 1fr"]} gap={["1rem", "1rem", "2rem"]} mt="2rem" width="100%">
               <UnitCard
                 src="/Frame30.png"
                 alt="Housing Units"
@@ -190,16 +193,16 @@ export default function Home() {
               />
             </Box>
 
-            <Button variant="contained" sx={{ mt: "2rem" }}>View More</Button>
+            <Button variant="contained" sx={{ mt: "2rem", p: "1rem", borderRadius: "0.5rem" }}>View More</Button>
           </Box>
         </section>
 
 
         <section style={{ width: "100%", display: "flex", flexDirection: "column" }}>
-          <Box width="100%" minHeight="100vh" maxWidth="72rem" padding={["1rem", "2rem", "8rem 2rem"]} margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem">
+          <Box width="100%" minHeight="100vh" maxWidth="72rem" padding={["6rem 1rem", "2rem", "8rem 2rem"]} margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem">
             <Typography variant="h3" fontWeight="600" letterSpacing={-3}>Get your favorite space in a few steps</Typography>
             <Typography variant="h6" letterSpacing={-0.5} color="gray">Discover the most popular rental spaces in your dream neighborhood, with the best deals. </Typography>
-            <Box display="grid" gridTemplateColumns={"1fr 1fr 1fr"} gap={["1rem", "1rem", "2rem"]} mt="2rem" width="100%">
+            <Box display="grid" gridTemplateColumns={["1fr", "1fr 1fr 1fr"]} gap={["1rem", "1rem", "2rem"]} mt="2rem" width="100%">
               <Box width="15rem" display="flex" flexDirection="column" alignItems="center" mx="auto">
                 <Box width="4rem">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -244,22 +247,22 @@ export default function Home() {
             </Box>
 
 
-            <Button variant="contained" sx={{ mt: "2rem", mx: "auto" }}>Find Your Rental Today</Button>
+            <Button variant="contained" sx={{ mt: "2rem", mx: "auto", padding: "1rem", borderRadius: "0.5rem" }}>Find Your Rental Today</Button>
           </Box>
         </section>
 
 
-        <footer style={{ width: "100%", }}>
-          <Box width="100%" padding={["8rem 1rem", "8rem 2rem", "8rem 12rem"]}>
+        <footer style={{ width: "100%", backgroundColor: "white" }}>
+          <Box width="100%" padding={["6rem 1rem", "8rem 2rem", "8rem 12rem"]}>
 
-            <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+            <Box display={["flex"]} flexDirection="column" gap="2rem" justifyContent="space-between" alignItems="center" width="100%">
               <Typography>Rent It</Typography>
 
-              <Box display="flex" gap="1rem">
-                <Link href="/about"><Typography whiteSpace={"nowrap"}>Home</Typography></Link>
-                <Link href="/about"><Typography whiteSpace={"nowrap"}>Market Place</Typography></Link>
-                <Link href="/about"><Typography>Login</Typography></Link>
-                <Link href="/about"><Typography>Signup</Typography></Link>
+              <Box display="flex" gap="1rem" width="100%" justifyContent={"space-between"}>
+                <Link href="/about"><Typography whiteSpace={"nowrap"} color="primary" fontWeight="600">Home</Typography></Link>
+                <Link href="/about"><Typography whiteSpace={"nowrap"} color="primary" fontWeight="600">Market Place</Typography></Link>
+                <Link href="/about"><Typography color="primary" fontWeight="600">Login</Typography></Link>
+                <Link href="/about"><Typography color="primary" fontWeight="600">Signup</Typography></Link>
               </Box>
 
               <Box height="100%" my="auto" display="flex" flexDirection="row" gap="1rem">

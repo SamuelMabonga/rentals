@@ -5,6 +5,7 @@ import { Facebook, Instagram, Search, Twitter, YouTube } from '@mui/icons-materi
 import Image from 'next/image'
 import Link from 'next/link'
 import { UnitCard } from '..'
+import MobileDrawer from 'Components/Common/MobileDrawer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -45,12 +46,13 @@ export default function Marketplace() {
               {/* <Button variant="outlined" sx={{ whiteSpace: "nowrap", width: "fit-content" }}>
                 I am a tenant
               </Button> */}
-              <Box display="flex" gap="2rem" >
+              <Box display={["none", "flex"]} gap="2rem" >
                 <Link href="/"><Typography fontWeight="600">Home</Typography></Link>
                 <Link href="/marketplace"><Typography fontWeight="600">Marketplace</Typography></Link>
                 <Link href="/login"><Typography fontWeight="600">Login</Typography></Link>
                 <Link href="/signup"><Typography fontWeight="600">Sign Up</Typography></Link>
               </Box>
+              <MobileDrawer />
             </Box>
           </Box>
         </nav>
@@ -120,17 +122,17 @@ export default function Marketplace() {
         </section>
 
 
-        <footer style={{ width: "100%", }}>
-          <Box width="100%" padding={["8rem 1rem", "8rem 2rem", "8rem 12rem"]}>
+        <footer style={{ width: "100%", backgroundColor: "white" }}>
+          <Box width="100%" padding={["6rem 1rem", "8rem 2rem", "8rem 12rem"]}>
 
-            <Box display="flex" flexDirection={["column", "column", "row"]} gap="1rem" justifyContent="space-between" alignItems="center" width="100%">
+            <Box display={["flex"]} flexDirection="column" gap="2rem" justifyContent="space-between" alignItems="center" width="100%">
               <Typography>Rent It</Typography>
 
-              <Box display="flex" gap="1rem">
-                <Link href="/about"><Typography whiteSpace={"nowrap"}>Home</Typography></Link>
-                <Link href="/about"><Typography whiteSpace={"nowrap"}>Market Place</Typography></Link>
-                <Link href="/about"><Typography>Login</Typography></Link>
-                <Link href="/about"><Typography>Signup</Typography></Link>
+              <Box display="flex" gap="1rem" width="100%" justifyContent={"space-between"}>
+                <Link href="/about"><Typography whiteSpace={"nowrap"} color="primary" fontWeight="600">Home</Typography></Link>
+                <Link href="/about"><Typography whiteSpace={"nowrap"} color="primary" fontWeight="600">Market Place</Typography></Link>
+                <Link href="/about"><Typography color="primary" fontWeight="600">Login</Typography></Link>
+                <Link href="/about"><Typography color="primary" fontWeight="600">Signup</Typography></Link>
               </Box>
 
               <Box height="100%" my="auto" display="flex" flexDirection="row" gap="1rem">
