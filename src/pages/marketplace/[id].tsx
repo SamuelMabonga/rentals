@@ -66,10 +66,12 @@ export default function Marketplace() {
                             {/* <Button variant="outlined" sx={{ whiteSpace: "nowrap", width: "fit-content" }}>
                                 I am a tenant
                             </Button> */}
-                            <Box display="flex" gap="2rem" >
-                                <Link href="/login"><Typography fontWeight="600">Login</Typography></Link>
-                                <Link href="/signup"><Typography fontWeight="600">Sign Up</Typography></Link>
-                            </Box>
+              <Box display="flex" gap="2rem" >
+                <Link href="/"><Typography fontWeight="600">Home</Typography></Link>
+                <Link href="/marketplace"><Typography fontWeight="600">Marketplace</Typography></Link>
+                <Link href="/login"><Typography fontWeight="600">Login</Typography></Link>
+                <Link href="/signup"><Typography fontWeight="600">Sign Up</Typography></Link>
+              </Box>
                         </Box>
                     </Box>
                 </nav>

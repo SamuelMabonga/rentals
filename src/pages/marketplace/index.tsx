@@ -4,6 +4,7 @@ import { Box, Button, TextField, Typography } from '@mui/material'
 import { Facebook, Instagram, Search, Twitter, YouTube } from '@mui/icons-material'
 import Image from 'next/image'
 import Link from 'next/link'
+import { UnitCard } from '..'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -25,29 +26,6 @@ function HouseType({ src, alt, title }: any) {
   )
 }
 
-function UnitCard({ src, alt, title, subtitle, rent, features, location }: any) {
-  return (
-    <Link href="/marketplace/hdkjhej">
-        <Box width="100%" borderRadius="1rem" border="1px solid gray" overflow="hidden">
-      <Box width="100%">
-        <Image
-          src={src}
-          alt={alt}
-          width={0}
-          height={0}
-          layout="responsive"
-        />
-      </Box>
-      <Box padding="0.875rem" display="flex" flexDirection="column" gap="0.375rem">
-        <Typography variant="body2" fontWeight="600" letterSpacing={-0.5} lineHeight="100%" color="primary">{rent}</Typography>
-        <Typography variant="h6" fontWeight="600" letterSpacing={-0.5} lineHeight="100%">{title}</Typography>
-        <Typography variant="body1" fontWeight="500" letterSpacing={-0.5} color="gray" lineHeight="100%">{location}</Typography>
-        <Typography variant="body2" fontWeight="500" letterSpacing={-0.5} color="gray" lineHeight="100%">{features}</Typography>
-      </Box>
-    </Box>
-    </Link>
-  )
-}
 
 export default function Marketplace() {
   return (
@@ -68,6 +46,8 @@ export default function Marketplace() {
                 I am a tenant
               </Button> */}
               <Box display="flex" gap="2rem" >
+                <Link href="/"><Typography fontWeight="600">Home</Typography></Link>
+                <Link href="/marketplace"><Typography fontWeight="600">Marketplace</Typography></Link>
                 <Link href="/login"><Typography fontWeight="600">Login</Typography></Link>
                 <Link href="/signup"><Typography fontWeight="600">Sign Up</Typography></Link>
               </Box>

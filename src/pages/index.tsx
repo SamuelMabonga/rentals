@@ -27,9 +27,19 @@ function HouseType({ src, alt, title }: any) {
   )
 }
 
-function UnitCard({ src, alt, title, subtitle, rent, features, location }: any) {
+export function UnitCard({ src, alt, title, subtitle, rent, features, location }: any) {
   return (
-    <Box width="100%" borderRadius="1rem" border="1px solid gray" overflow="hidden">
+    <Link href="/marketplace/jjwhfw">
+        <Box
+      width="100%"
+      borderRadius="1rem"
+      border="1px solid gray"
+      overflow="hidden"
+      sx={{
+        boxShadow: "0px 0px 30px 0px #D0CCD4",
+        border: "1px solid #DDD5E4"
+      }}
+    >
       <Box width="100%">
         <Image
           src={src}
@@ -46,6 +56,7 @@ function UnitCard({ src, alt, title, subtitle, rent, features, location }: any) 
         <Typography variant="body2" fontWeight="500" letterSpacing={-0.5} color="gray" lineHeight="100%">{features}</Typography>
       </Box>
     </Box>
+    </Link>
   )
 }
 
@@ -68,6 +79,8 @@ export default function Home() {
                 I am a tenant
               </Button> */}
               <Box display="flex" gap="2rem" >
+                <Link href="/"><Typography fontWeight="600">Home</Typography></Link>
+                <Link href="/marketplace"><Typography fontWeight="600">Marketplace</Typography></Link>
                 <Link href="/login"><Typography fontWeight="600">Login</Typography></Link>
                 <Link href="/signup"><Typography fontWeight="600">Sign Up</Typography></Link>
               </Box>
