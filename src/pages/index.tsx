@@ -6,7 +6,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import MobileDrawer from 'Components/Common/MobileDrawer'
 
-const inter = Inter({ subsets: ['latin'] })
+import { Plus_Jakarta_Sans } from 'next/font/google'
+
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
 
 function HouseType({ src, alt, title }: any) {
   return (
@@ -71,7 +73,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ width: '100vw', minHeight: "100vh", color: "black", backgroundColor: "#F2EEF6" }}>
+      <main className={jakarta.className} style={{ width: '100vw', minHeight: "100vh", color: "black", backgroundColor: "#F2EEF6" }}>
         <nav style={{ width: "100%", position: "fixed", top: 0, left: 0, backgroundColor: "white", zIndex: 10 }}>
           <Box width="100%" padding={["1rem", "2rem", "2rem 4rem", "2rem 8rem", "2rem 12rem"]} display="flex" alignItems="center" borderBottom="1px solid #DDD5E4">
             <Typography fontSize="1.125rem" fontWeight="600" width="fit-content">Rent It</Typography>

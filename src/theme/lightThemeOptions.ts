@@ -1,5 +1,8 @@
 import { ThemeOptions } from '@mui/material/styles';
 // import { Satoshi } from 'next/font/google';
+import { Plus_Jakarta_Sans } from 'next/font/google'
+
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
 
 const lightThemeOptions: ThemeOptions = {
   palette: {
@@ -20,29 +23,29 @@ const lightThemeOptions: ThemeOptions = {
   },
   typography: {
     h1: {
-      fontFamily: "Satoshi",
+      fontFamily: jakarta.style.fontFamily,
       color: "primary.main"
     },
     h2: {
-      fontFamily: "Satoshi"
+      fontFamily: jakarta.style.fontFamily,
     },
     h3: {
-      fontFamily: "Satoshi"
+      fontFamily: jakarta.style.fontFamily,
     },
     h4: {
-      fontFamily: "Satoshi"
+      fontFamily: jakarta.style.fontFamily,
     },
     h5: {
-      fontFamily: "Satoshi"
+      fontFamily: jakarta.style.fontFamily,
     },
     h6: {
-      fontFamily: "Satoshi"
+      fontFamily: jakarta.style.fontFamily,
     },
     body1: {
-      fontFamily: "Satoshi"
+      fontFamily: jakarta.style.fontFamily,
     },
     body2: {
-      fontFamily: "Satoshi"
+      fontFamily: jakarta.style.fontFamily,
     }
   },
   components: {
