@@ -55,7 +55,7 @@ const lightThemeOptions: ThemeOptions = {
           props: { variant: "contained" },
           style: {
             backgroundColor: "primary.main",
-            fontFamily: "Satoshi",
+            fontFamily: jakarta.style.fontFamily,
             fontWeight: "900",
             fontSize: "1rem",
             textTransform: "capitalize"
@@ -66,7 +66,7 @@ const lightThemeOptions: ThemeOptions = {
           props: { variant: "outlined" },
           style: {
             borderColor: "primary.main",
-            fontFamily: "Satoshi",
+            fontFamily: jakarta.style.fontFamily,
             fontWeight: "900",
             fontSize: "1rem",
             textTransform: "capitalize"
@@ -77,7 +77,7 @@ const lightThemeOptions: ThemeOptions = {
           props: { variant: "text" },
           style: {
             borderColor: "primary.main",
-            fontFamily: "Satoshi",
+            fontFamily: jakarta.style.fontFamily,
             fontWeight: "900",
             fontSize: "1rem",
             textTransform: "capitalize",
