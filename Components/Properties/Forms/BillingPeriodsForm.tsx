@@ -17,10 +17,12 @@ export default function BillingPeriodsForm() {
     const {
         openBillingPeriodsForm: open,
         setOpenBillingPeriodsForm: setIsOpen,
-        billingPeriodsToEdit: toEdit,
-        setBillingPeriodsToEdit: setToEdit,
+        billingPeriodToEdit: toEdit,
+        setBillingPeriodToEdit: setToEdit,
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
+
+    console.log("toEdit", toEdit)
 
     const session: any = useSession()
 
@@ -40,7 +42,6 @@ export default function BillingPeriodsForm() {
     useEffect(() => {
         if (toEdit?.name) {
             setValue("name", toEdit.name)
-            setValue("price", toEdit.price)
             return
         }
 
@@ -53,7 +54,6 @@ export default function BillingPeriodsForm() {
 
         const data = {
             name: values.name,
-            price: values.price
         }
 
 
@@ -77,7 +77,17 @@ export default function BillingPeriodsForm() {
                 console.log(response)
                 setIsLoading(false)
                 setIsOpen(false)
-                return
+                setSnackbarMessage({
+                    open: true,
+                    vertical: 'top',
+                    horizontal: 'center',
+                    message: response.msg,
+                    icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </Box>
+                })
             } catch (error) {
                 setIsLoading(false)
                 console.log(error)

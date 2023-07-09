@@ -1,6 +1,8 @@
 import { yupResolver } from "@hookform/resolvers/yup"
 import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
+import { useQuery } from "@tanstack/react-query"
 import FileInput from "Components/FileInput"
+import fetchFeatures from "apis/fetchFeatures"
 import { CollectionsContext } from "context/context"
 import { useSession } from "next-auth/react"
 import React, { useContext, useEffect, useState } from "react"
@@ -9,7 +11,7 @@ import * as yup from "yup"
 
 const formSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
-    price: yup.string().required("Price is required"),
+    // price: yup.string().required("Price is required"),
 })
 
 export default function FeaturesForm() {
@@ -21,10 +23,16 @@ export default function FeaturesForm() {
         featureToEdit: toEdit,
         setFeatureToEdit: setToEdit,
 
+        featuresPage: page,
+        setFeaturesPage: setPage,
+
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
+    const token = session?.data?.accessToken
+
+    const { data, refetch }: any = useQuery({ queryKey: ['features', token, page], queryFn: () => fetchFeatures(token, page) })
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -55,30 +63,40 @@ export default function FeaturesForm() {
 
         const data = {
             name: values.name,
-            price: values.price
         }
 
 
         // EDIT A PROPERTY
-        if (toEdit?.name) {
+        if (toEdit?._id) {
             const edited = {
                 ...toEdit,
                 name: values.name,
-                price: values.price
             }
             try {
                 const res = await fetch(`/api/feature?id=${toEdit._id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${session.data.accessToken}`,
+                        Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({ ...edited })
                 })
                 const response = await res.json();
                 console.log(response)
                 setIsLoading(false)
-                return
+                setIsOpen(false)
+                setSnackbarMessage({
+                    open: true,
+                    vertical: 'top',
+                    horizontal: 'center',
+                    message: response.msg,
+                    icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </Box>
+                })
+                return refetch()
             } catch (error) {
                 setIsLoading(false)
                 console.log(error)
@@ -86,13 +104,13 @@ export default function FeaturesForm() {
             }
         }
 
-        // POST A PROPERTY
+        // POST A feature
         try {
             const res = await fetch('/api/feature', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${session.data.accessToken}`,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({ ...data })
             })
@@ -111,6 +129,7 @@ export default function FeaturesForm() {
                     </svg>
                 </Box>
             })
+            return refetch()
         } catch (error) {
             setIsLoading(false)
             console.log(error)
@@ -152,29 +171,6 @@ export default function FeaturesForm() {
                         />
                         <FormHelperText>{errors?.name?.message}</FormHelperText>
                     </FormControl>
-                    <FormControl>
-                        <FormLabel>Price</FormLabel>
-                        <TextField
-                            placeholder=""
-                            {...register("price")}
-                            // value={}
-                        />
-                        <FormHelperText>{errors?.name?.message}</FormHelperText>
-                    </FormControl>
-                    <FormControl>
-                        <FormLabel>Rate</FormLabel>
-                        <Autocomplete
-                            // {...register("features")}
-                            options={[{ label: "Yes", value: "Yes" }]}
-                            renderInput={(params) =>
-                                <TextField
-                                    {...params}
-                                    placeholder=""
-                                />
-                            }
-                        />
-                    </FormControl>
-                    <FileInput />
                 </form>
             </DialogContent>
             <DialogActions sx={{ padding: "1.5rem" }}>

@@ -49,22 +49,29 @@ const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
       <CollectionsProvider>
         <ThemeProvider theme={lightTheme}>
           <CssBaseline />
-          <SessionProvider session={session}>
-            {Component.auth ? (
-              <Auth>
-                <QueryClientProvider client={queryClient}>
-                  <Hydrate state={pageProps.dehydratedState}>
-                    <DashboardLayout>
-                      <Component {...pageProps} />
-                    </DashboardLayout>
-                  </Hydrate>
-                  <ReactQueryDevtools initialIsOpen={false} />
-                </QueryClientProvider>
-              </Auth>
-            ) : (
-              <Component {...pageProps} />
-            )}
-          </SessionProvider>
+          <QueryClientProvider client={queryClient}>
+            <Hydrate state={pageProps.dehydratedState}>
+              <SessionProvider session={session}>
+                {Component.auth ? (
+                  <Auth>
+                    {/* <QueryClientProvider client={queryClient}>
+                      <Hydrate state={pageProps.dehydratedState}> */}
+                        <DashboardLayout>
+                          <Component {...pageProps} />
+                        </DashboardLayout>
+                      {/* </Hydrate>
+                      <ReactQueryDevtools initialIsOpen={false} />
+                    </QueryClientProvider> */}
+                  </Auth>
+                ) : (
+                  <Component {...pageProps} />
+                )}
+              </SessionProvider>
+            </Hydrate>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </QueryClientProvider>
+
+
         </ThemeProvider>
       </CollectionsProvider>
     </CacheProvider>

@@ -6,6 +6,20 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Detail } from '../properties/[id]'
 import MobileDrawer from 'Components/Common/MobileDrawer'
+import BookingForm from 'Components/Marketplace/Forms/BookingForm'
+import { GetServerSideProps } from 'next'
+import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query'
+import fetchARental from 'apis/fetchARental'
+import fetchAProperty from 'apis/fetchAProperty'
+import { useRouter } from 'next/router'
+import fetchPropertyFeatures from 'apis/property/fetchPropertyFeatures'
+import fetchPropertyUnitTypes from 'apis/property/fetchPropertyUnitTypes'
+import currencyFormatter from 'Components/Common/currencyFormatter'
+
+
+type PageProps = {
+    // data: any;
+};
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -49,7 +63,15 @@ function UnitCard({ src, alt, title, subtitle, rent, features, location }: any) 
     )
 }
 
-export default function Marketplace() {
+export default function Property() {
+    const router = useRouter()
+    const { id }: any = router.query
+    const { data }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(id) })
+    const { data: features }: any = useQuery({ queryKey: ['propertyFeatures', id], queryFn: () => fetchPropertyFeatures(id) })
+    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', id], queryFn: () => fetchPropertyUnitTypes(id) })
+    console.log(data)
+    console.log(features)
+    console.log(unitTypes)
     return (
         <>
             <Head>
@@ -59,21 +81,21 @@ export default function Marketplace() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main style={{ width: '100vw', minHeight: "100vh", color: "black", backgroundColor: "#F2EEF6" }}>
-                <nav style={{ width: "100%", position: "fixed", top: 0, left: 0, zIndex: 10 }}>
-                    <Box width="100%" padding={["1rem", "2rem", "2rem 4rem", "2rem 8rem", "2rem 12rem"]} display="flex" alignItems="center">
+                <nav style={{ width: "100%", position: "fixed", top: 0, left: 0, backgroundColor: "white", zIndex: 10 }}>
+                    <Box width="100%" padding={["1rem", "2rem", "2rem 4rem", "2rem 8rem", "2rem 12rem"]} display="flex" alignItems="center" borderBottom="1px solid #DDD5E4">
                         <Typography fontSize="1.125rem" fontWeight="600" width="fit-content">Rent It</Typography>
 
                         <Box display="flex" gap="4rem" ml="auto" alignItems="center" width="fit-content" >
                             {/* <Button variant="outlined" sx={{ whiteSpace: "nowrap", width: "fit-content" }}>
-                                I am a tenant
-                            </Button> */}
-              <Box display={["none", "flex"]} gap="2rem" >
-                <Link href="/"><Typography fontWeight="600">Home</Typography></Link>
-                <Link href="/marketplace"><Typography fontWeight="600">Marketplace</Typography></Link>
-                <Link href="/login"><Typography fontWeight="600">Login</Typography></Link>
-                <Link href="/signup"><Typography fontWeight="600">Sign Up</Typography></Link>
-              </Box>
-              <MobileDrawer />
+                I am a tenant
+              </Button> */}
+                            <Box display={["none", "flex"]} gap="2rem" >
+                                <Link href="/"><Typography fontWeight="600">Home</Typography></Link>
+                                <Link href="/marketplace"><Typography fontWeight="600">Marketplace</Typography></Link>
+                                <Link href="/login"><Typography fontWeight="600">Login</Typography></Link>
+                                <Link href="/signup"><Typography fontWeight="600">Sign Up</Typography></Link>
+                            </Box>
+                            <MobileDrawer />
                         </Box>
                     </Box>
                 </nav>
@@ -82,6 +104,7 @@ export default function Marketplace() {
                     <Box
                         width="100%"
                         position="relative"
+                        border="1px solid red"
                         sx={{
                             letterSpacing: 0,
                             wordSpacing: 0,
@@ -89,6 +112,7 @@ export default function Marketplace() {
                             // aspectRatio: "16/9",
                             height: "70vh",
                             overflow: "hidden",
+                            mt: "5rem"
                         }}
                     >
                         <Image
@@ -129,7 +153,9 @@ export default function Marketplace() {
                     <Box width="100%" minHeight="100vh" maxWidth="72rem" padding={["1rem", "2rem", "8rem 2rem"]} margin="auto" display="flex" flexDirection="column" gap="1rem">
                         <Box width="100%" display="flex" gap="2rem">
                             <Box display="flex" alignItems="baseline" width="100%">
-                                <Typography variant="h3" fontWeight="600" letterSpacing={-2}>Polo Apartments</Typography>
+                                <Typography variant="h3" fontWeight="600" letterSpacing={-2}>
+                                    {data?.data?.name}
+                                </Typography>
                                 <Box display="flex" alignItems="baseline" gap="0.5rem" ml="auto">
                                     <Typography variant="h4" fontWeight="600" letterSpacing={-2}>300k - 900k</Typography>
                                     <Typography variant="body1" color="gray" fontWeight="600" letterSpacing={-0.5}>/month</Typography>
@@ -154,42 +180,25 @@ export default function Marketplace() {
                             <Typography variant="h4" fontWeight="600" letterSpacing={-2}>Features</Typography>
 
                             <Box pt="1rem">
-                                <Box display="flex" gap="1rem">
-                                    <Box display="flex" flexDirection="column" alignItems="center" border="1px solid #DDD5E4" borderRadius="0.5rem" padding="1rem" minWidth="8rem" bgcolor="white">
-                                        <WaterDropOutlined sx={{ width: "3rem", height: "3rem", color: "gray" }} />
-                                        <Typography fontWeight="600" color="gray" >Water</Typography>
-                                    </Box>
-
-
-                                    <Box display="flex" flexDirection="column" alignItems="center" border="1px solid #DDD5E4" borderRadius="0.5rem" padding="1rem" minWidth="8rem" bgcolor="white">
-                                        <WaterDropOutlined sx={{ width: "3rem", height: "3rem", color: "gray" }} />
-                                        <Typography fontWeight="600" color="gray" >Water</Typography>
-                                    </Box>
-
-                                    <Box display="flex" flexDirection="column" alignItems="center" border="1px solid #DDD5E4" borderRadius="0.5rem" padding="1rem" minWidth="8rem" bgcolor="white">
-                                        <WaterDropOutlined sx={{ width: "3rem", height: "3rem", color: "gray" }} />
-                                        <Typography fontWeight="600" color="gray" >Water</Typography>
-                                    </Box>
-
-                                    <Box display="flex" flexDirection="column" alignItems="center" border="1px solid #DDD5E4" borderRadius="0.5rem" padding="1rem" minWidth="8rem" bgcolor="white">
-                                        <WaterDropOutlined sx={{ width: "3rem", height: "3rem", color: "gray" }} />
-                                        <Typography fontWeight="600" color="gray" >Water</Typography>
-                                    </Box>
-
-                                    <Box display="flex" flexDirection="column" alignItems="center" border="1px solid #DDD5E4" borderRadius="0.5rem" padding="1rem" minWidth="8rem" bgcolor="white">
-                                        <WaterDropOutlined sx={{ width: "3rem", height: "3rem", color: "gray" }} />
-                                        <Typography fontWeight="600" color="gray" >Water</Typography>
-                                    </Box>
-
-                                    <Box display="flex" flexDirection="column" alignItems="center" border="1px solid #DDD5E4" borderRadius="0.5rem" padding="1rem" minWidth="8rem" bgcolor="white">
-                                        <WaterDropOutlined sx={{ width: "3rem", height: "3rem", color: "gray" }} />
-                                        <Typography fontWeight="600" color="gray" >Water</Typography>
-                                    </Box>
-
-                                    <Box display="flex" flexDirection="column" alignItems="center" border="1px solid #DDD5E4" borderRadius="0.5rem" padding="1rem" minWidth="8rem" bgcolor="white">
-                                        <WaterDropOutlined sx={{ width: "3rem", height: "3rem", color: "gray" }} />
-                                        <Typography fontWeight="600" color="gray" >Water</Typography>
-                                    </Box>
+                                <Box display={["column", "flex"]} gap="1rem">
+                                    {
+                                        features?.data?.map((feature: any, index: number) => (
+                                            <Box
+                                                key={index}
+                                                display="flex"
+                                                flexDirection="column"
+                                                alignItems="center"
+                                                border="1px solid #DDD5E4"
+                                                borderRadius="0.5rem"
+                                                padding="1rem"
+                                                minWidth="8rem"
+                                                bgcolor="white"
+                                            >
+                                                <WaterDropOutlined sx={{ width: "3rem", height: "3rem", color: "gray" }} />
+                                                <Typography fontWeight="600" color="gray">{feature?.feature?.name}</Typography>
+                                            </Box>
+                                        ))
+                                    }
                                 </Box>
                             </Box>
                         </Box>
@@ -197,217 +206,60 @@ export default function Marketplace() {
 
                         <Box width="100%" mt="4rem">
                             <Typography variant="h4" fontWeight="600" letterSpacing={-2}>Unit Types</Typography>
-                            <Box display="grid" gridTemplateColumns={"1fr 1fr 1fr"} gap="1.25rem" pt="1rem">
-                                <Box
-                                    padding="0.75rem"
-                                    border="1px solid #DDD5E4"
-                                    borderRadius="1rem"
-                                    bgcolor="white"
-                                    boxShadow="0px 0px 30px 0px #D0CCD4"
-                                >
-                                    <Box
-                                        borderRadius="0.75rem"
-                                        color="white"
-                                        sx={{
-                                            letterSpacing: 0,
-                                            wordSpacing: 0,
-                                            fontSize: 0,
-                                            overflow: "hidden",
-                                        }}>
-                                        <Image
-                                            src="/Frame30.png"
-                                            alt="Image"
-                                            width={0}
-                                            height={0}
-                                            layout="responsive"
-                                        />
-                                    </Box>
+                            <Box display="grid" gridTemplateColumns={["1fr", "1fr 1fr 1fr"]} gap="1.25rem" pt="1rem">
 
-                                    <Box display="flex" width="100%" mt="0.5rem">
-                                        <Typography fontWeight="600" fontSize="1.25rem" letterSpacing={-1}>Platinum</Typography>
-                                        <Box display="flex" alignItems="baseline" gap="0.5rem" ml="auto">
-                                            <Typography variant="h6" fontWeight="600" letterSpacing={-1}>900k</Typography>
-                                            <Typography variant="body1" color="gray" fontWeight="600" letterSpacing={-0.5}>/month</Typography>
+                                {
+                                    unitTypes?.data?.map((unitType: any, index: number) => (
+                                        <Box
+                                            key={index}
+                                            padding="0.75rem"
+                                            border="1px solid #DDD5E4"
+                                            borderRadius="1rem"
+                                            bgcolor="white"
+                                            boxShadow="0px 0px 30px 0px #D0CCD4"
+                                        >
+                                            <Box
+                                                borderRadius="0.75rem"
+                                                color="white"
+                                                sx={{
+                                                    letterSpacing: 0,
+                                                    wordSpacing: 0,
+                                                    fontSize: 0,
+                                                    overflow: "hidden",
+                                                }}>
+                                                <Image
+                                                    src="/Frame30.png"
+                                                    alt="Image"
+                                                    width={0}
+                                                    height={0}
+                                                    layout="responsive"
+                                                />
+                                            </Box>
+
+                                            <Box display="flex" width="100%" mt="0.5rem">
+                                                <Typography fontWeight="600" fontSize="1.125rem" letterSpacing={-1}>
+                                                    {unitType.name}
+                                                </Typography>
+                                                <Box display="flex" alignItems="baseline" gap="0.5rem" ml="auto">
+                                                    <Typography fontSize="1.125rem" fontWeight="600" letterSpacing={-1}>
+                                                        {currencyFormatter(unitType.price, "UGX")}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="gray" fontWeight="600" letterSpacing={-0.5}>
+                                                        {unitType?.billingPeriod?.name}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                </Box>
+                                    ))
+                                }
 
-                                <Box
-                                    padding="0.75rem"
-                                    border="1px solid #DDD5E4"
-                                    borderRadius="1rem"
-                                    bgcolor="white"
-                                    boxShadow="0px 0px 30px 0px #D0CCD4"
-                                >
-                                    <Box
-                                        borderRadius="0.75rem"
-                                        color="white"
-                                        sx={{
-                                            letterSpacing: 0,
-                                            wordSpacing: 0,
-                                            fontSize: 0,
-                                            overflow: "hidden",
-                                        }}>
-                                        <Image
-                                            src="/Frame30.png"
-                                            alt="Image"
-                                            width={0}
-                                            height={0}
-                                            layout="responsive"
-                                        />
-                                    </Box>
-
-                                    <Box display="flex" width="100%" mt="0.5rem">
-                                        <Typography fontWeight="600" fontSize="1.25rem" letterSpacing={-1}>Platinum</Typography>
-                                        <Box display="flex" alignItems="baseline" gap="0.5rem" ml="auto">
-                                            <Typography variant="h6" fontWeight="600" letterSpacing={-1}>900k</Typography>
-                                            <Typography variant="body1" color="gray" fontWeight="600" letterSpacing={-0.5}>/month</Typography>
-                                        </Box>
-                                    </Box>
-                                </Box>
-
-                                <Box
-                                    padding="0.75rem"
-                                    border="1px solid #DDD5E4"
-                                    borderRadius="1rem"
-                                    bgcolor="white"
-                                    boxShadow="0px 0px 30px 0px #D0CCD4"
-                                >
-                                    <Box
-                                        borderRadius="0.75rem"
-                                        color="white"
-                                        sx={{
-                                            letterSpacing: 0,
-                                            wordSpacing: 0,
-                                            fontSize: 0,
-                                            overflow: "hidden",
-                                        }}>
-                                        <Image
-                                            src="/Frame30.png"
-                                            alt="Image"
-                                            width={0}
-                                            height={0}
-                                            layout="responsive"
-                                        />
-                                    </Box>
-
-                                    <Box display="flex" width="100%" mt="0.5rem">
-                                        <Typography fontWeight="600" fontSize="1.25rem" letterSpacing={-1}>Platinum</Typography>
-                                        <Box display="flex" alignItems="baseline" gap="0.5rem" ml="auto">
-                                            <Typography variant="h6" fontWeight="600" letterSpacing={-1}>900k</Typography>
-                                            <Typography variant="body1" color="gray" fontWeight="600" letterSpacing={-0.5}>/month</Typography>
-                                        </Box>
-                                    </Box>
-                                </Box>
-
-                                <Box
-                                    padding="0.75rem"
-                                    border="1px solid #DDD5E4"
-                                    borderRadius="1rem"
-                                    bgcolor="white"
-                                    boxShadow="0px 0px 30px 0px #D0CCD4"
-                                >
-                                    <Box
-                                        borderRadius="0.75rem"
-                                        color="white"
-                                        sx={{
-                                            letterSpacing: 0,
-                                            wordSpacing: 0,
-                                            fontSize: 0,
-                                            overflow: "hidden",
-                                        }}>
-                                        <Image
-                                            src="/Frame30.png"
-                                            alt="Image"
-                                            width={0}
-                                            height={0}
-                                            layout="responsive"
-                                        />
-                                    </Box>
-
-                                    <Box display="flex" width="100%" mt="0.5rem">
-                                        <Typography fontWeight="600" fontSize="1.25rem" letterSpacing={-1}>Platinum</Typography>
-                                        <Box display="flex" alignItems="baseline" gap="0.5rem" ml="auto">
-                                            <Typography variant="h6" fontWeight="600" letterSpacing={-1}>900k</Typography>
-                                            <Typography variant="body1" color="gray" fontWeight="600" letterSpacing={-0.5}>/month</Typography>
-                                        </Box>
-                                    </Box>
-                                </Box>
-
-                                <Box
-                                    padding="0.75rem"
-                                    border="1px solid #DDD5E4"
-                                    borderRadius="1rem"
-                                    bgcolor="white"
-                                    boxShadow="0px 0px 30px 0px #D0CCD4"
-                                >
-                                    <Box
-                                        borderRadius="0.75rem"
-                                        color="white"
-                                        sx={{
-                                            letterSpacing: 0,
-                                            wordSpacing: 0,
-                                            fontSize: 0,
-                                            overflow: "hidden",
-                                        }}>
-                                        <Image
-                                            src="/Frame30.png"
-                                            alt="Image"
-                                            width={0}
-                                            height={0}
-                                            layout="responsive"
-                                        />
-                                    </Box>
-
-                                    <Box display="flex" width="100%" mt="0.5rem">
-                                        <Typography fontWeight="600" fontSize="1.25rem" letterSpacing={-1}>Platinum</Typography>
-                                        <Box display="flex" alignItems="baseline" gap="0.5rem" ml="auto">
-                                            <Typography variant="h6" fontWeight="600" letterSpacing={-1}>900k</Typography>
-                                            <Typography variant="body1" color="gray" fontWeight="600" letterSpacing={-0.5}>/month</Typography>
-                                        </Box>
-                                    </Box>
-                                </Box>
-
-                                <Box
-                                    padding="0.75rem"
-                                    border="1px solid #DDD5E4"
-                                    borderRadius="1rem"
-                                    bgcolor="white"
-                                    boxShadow="0px 0px 30px 0px #D0CCD4"
-                                >
-                                    <Box
-                                        borderRadius="0.75rem"
-                                        color="white"
-                                        sx={{
-                                            letterSpacing: 0,
-                                            wordSpacing: 0,
-                                            fontSize: 0,
-                                            overflow: "hidden",
-                                        }}>
-                                        <Image
-                                            src="/Frame30.png"
-                                            alt="Image"
-                                            width={0}
-                                            height={0}
-                                            layout="responsive"
-                                        />
-                                    </Box>
-
-                                    <Box display="flex" width="100%" mt="0.5rem">
-                                        <Typography fontWeight="600" fontSize="1.25rem" letterSpacing={-1}>Platinum</Typography>
-                                        <Box display="flex" alignItems="baseline" gap="0.5rem" ml="auto">
-                                            <Typography variant="h6" fontWeight="600" letterSpacing={-1}>900k</Typography>
-                                            <Typography variant="body1" color="gray" fontWeight="600" letterSpacing={-0.5}>/month</Typography>
-                                        </Box>
-                                    </Box>
-                                </Box>
                             </Box>
                         </Box>
 
 
-                        <Box width="100%" mt="4rem">
+                        <Box width="100%" my="6rem">
                             <Typography variant="h4" fontWeight="600" letterSpacing={-2}>Gallery</Typography>
-                            <Box display="grid" gridTemplateColumns={"1fr 1fr 1fr"} gap="1.5rem" pt="1rem">
+                            <Box display="grid" gridTemplateColumns={["1fr", "1fr 1fr 1fr"]} gap="1.5rem" pt="1rem">
                                 <Box borderRadius="0.75rem" sx={{
                                     letterSpacing: 0,
                                     wordSpacing: 0,
@@ -501,29 +353,53 @@ export default function Marketplace() {
 
 
                 <footer style={{ width: "100%", backgroundColor: "white" }}>
-          <Box width="100%" padding={["6rem 1rem", "8rem 2rem", "8rem 12rem"]}>
+                    <Box width="100%" padding={["6rem 1rem", "8rem 2rem", "8rem 12rem"]}>
 
-            <Box display={["flex"]} flexDirection="column" gap="2rem" justifyContent="space-between" alignItems="center" width="100%">
-              <Typography>Rent It</Typography>
+                        <Box display={["flex"]} flexDirection="column" gap="2rem" justifyContent="space-between" alignItems="center" width="100%">
+                            <Typography>Rent It</Typography>
 
-              <Box display="flex" gap="1rem" width="100%" justifyContent={"space-between"}>
-                <Link href="/about"><Typography whiteSpace={"nowrap"} color="primary" fontWeight="600">Home</Typography></Link>
-                <Link href="/about"><Typography whiteSpace={"nowrap"} color="primary" fontWeight="600">Market Place</Typography></Link>
-                <Link href="/about"><Typography color="primary" fontWeight="600">Login</Typography></Link>
-                <Link href="/about"><Typography color="primary" fontWeight="600">Signup</Typography></Link>
-              </Box>
+                            <Box display="flex" gap="1rem" width="100%" justifyContent={"space-between"}>
+                                <Link href="/about"><Typography whiteSpace={"nowrap"} color="primary" fontWeight="600">Home</Typography></Link>
+                                <Link href="/about"><Typography whiteSpace={"nowrap"} color="primary" fontWeight="600">Market Place</Typography></Link>
+                                <Link href="/about"><Typography color="primary" fontWeight="600">Login</Typography></Link>
+                                <Link href="/about"><Typography color="primary" fontWeight="600">Signup</Typography></Link>
+                            </Box>
 
-              <Box height="100%" my="auto" display="flex" flexDirection="row" gap="1rem">
-                <Instagram />
-                <Twitter />
-                <Facebook />
-                <YouTube />
-              </Box>
-            </Box>
+                            <Box height="100%" my="auto" display="flex" flexDirection="row" gap="1rem">
+                                <Instagram />
+                                <Twitter />
+                                <Facebook />
+                                <YouTube />
+                            </Box>
+                        </Box>
 
-          </Box>
-        </footer>
+                    </Box>
+                </footer>
             </main>
+            {/* <BookingForm /> */}
         </>
     )
 }
+
+
+export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
+
+    const { query }: any = context
+    const { id } = query;
+
+    // REACT QUERY
+    const queryClient = new QueryClient()
+
+    await Promise.all([
+        await queryClient.prefetchQuery(['property', id], () => fetchAProperty(id)),
+        await queryClient.prefetchQuery(['propertyFeatures', id], () => fetchPropertyFeatures(id)),
+        await queryClient.prefetchQuery(['property-unitTypes', id], () => fetchPropertyUnitTypes(id)),
+        // await queryClient.prefetchQuery(['tenant-bills', id], () => fetchBills(accessToken, id)),
+    ])
+
+    return {
+        props: {
+            dehydratedState: dehydrate(queryClient),
+        },
+    };
+};

@@ -15,7 +15,7 @@ import {
     req: NextApiRequest,
     res: NextApiResponse
   ) {
-    authenticateUser(req, res);
+    // authenticateUser(req, res);
   
     connectToMongoDB().catch((err) => res.json(err));
     //type of request
@@ -26,7 +26,7 @@ import {
         break;
         // case "GET":
         //   fetchSingleUnitType(req, res);
-        break;
+        // break;
       case "POST":
         createUnitType(req, res);
         break;

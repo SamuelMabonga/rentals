@@ -24,7 +24,8 @@ const lightThemeOptions: ThemeOptions = {
   typography: {
     h1: {
       fontFamily: jakarta.style.fontFamily,
-      color: "primary.main"
+      color: "primary.main",
+      
     },
     h2: {
       fontFamily: jakarta.style.fontFamily,

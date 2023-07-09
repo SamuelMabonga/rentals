@@ -7,11 +7,10 @@ import { CollectionsContext } from "context/context"
 import { useSession } from "next-auth/react"
 import React, { useContext, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import * as yup from "yup"
+
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-// import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -19,6 +18,8 @@ import StepLabel from '@mui/material/StepLabel';
 import moment from "moment"
 import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
+import { formSchema, formSchema2 } from "./Schema/BookingForm"
+import currencyFormatter from "Components/Common/currencyFormatter"
 
 // const steps = [
 //     'Select a tenant',
@@ -40,55 +41,6 @@ function HorizontalStepper({ step, steps }: any) {
         </Box>
     );
 }
-
-
-const formSchema = yup.object().shape({
-    userSearchTerm: yup.string().required(),
-    user: yup.object().shape({
-        _id: yup.string().required("Required"),
-        first_name: yup.string().required("Required"),
-        last_name: yup.string().required("Required")
-    }),
-    unitType: yup.object().shape({
-        _id: yup.string().required("Required"),
-        name: yup.string().required("Required")
-    }),
-    unit: yup.object().shape({
-        _id: yup.string().required("Required"),
-        name: yup.string().required("Required")
-    }),
-    additionalFeatures: yup.array().of(
-        yup.object().shape({
-            _id: yup.string().required("Required"),
-            feature: yup.object().shape({
-                _id: yup.string().required("Required"),
-                name: yup.string().required("Required")
-            }),
-        })
-    ),
-    startDate: yup.string().required("Required"),
-    endDate: yup.string().required("Required")
-})
-
-const formSchema2 = yup.object().shape({
-    userSearchTerm: yup.string().required(),
-    user: yup.object().shape({
-        _id: yup.string().required("Required"),
-        first_name: yup.string().required("Required"),
-        last_name: yup.string().required("Required")
-    }),
-    additionalFeatures: yup.array().of(
-        yup.object().shape({
-            _id: yup.string().required("Required"),
-            feature: yup.object().shape({
-                _id: yup.string().required("Required"),
-                name: yup.string().required("Required")
-            }),
-        })
-    ),
-    startDate: yup.string().required("Required"),
-    endDate: yup.string().required("Required")
-})
 
 export default function BookingForm({
     property,
@@ -122,7 +74,7 @@ export default function BookingForm({
         queryFn: () => fetchPropertyUnitTypes(token, property),
     })
 
-    const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
+    const { handleSubmit, register, watch, setValue, setError, reset, formState: { errors } }: any = useForm({
         defaultValues: {
             userSearchTerm: "",
             user: {
@@ -253,7 +205,7 @@ export default function BookingForm({
     const [step, setStep] = useState(0)
 
     useEffect(() => {
-        if (unit) {
+        if (unit?._id) {
             setSteps([
                 'Select a tenant',
                 'Tenancy details',
@@ -433,7 +385,8 @@ export default function BookingForm({
                                                     bgcolor={selectedUnit?._id === item._id ? "primary.light" : "transparent"}
                                                     borderRadius="0.5rem"
                                                     sx={{ cursor: "pointer" }}
-                                                    onClick={() => {
+                                                    onClick={async () => {
+                                                        await setError("unit", null)
                                                         setSelectedUnit(item)
                                                         setValue("unit", item)
                                                     }}
@@ -475,7 +428,7 @@ export default function BookingForm({
                                 // {...register("features")}
                                 multiple
                                 options={features?.data || []}
-                                getOptionLabel={(option: any) => option.feature.name}
+                                getOptionLabel={(option: any) => `${option.feature.name} - ${currencyFormatter(option.price, "UGX")}`}
                                 onChange={(event, value: any) => {
                                     setSelectedUnit(null)
                                     if (value?.length < 1) {
@@ -497,7 +450,9 @@ export default function BookingForm({
                                 <FormLabel>When would you like to start</FormLabel>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
+                                        disablePast
                                         onChange={(event: any) => setValue("startDate", moment(event.$d).format("YYYY-MM-DD"))}
+                                        // minDate={watch("unit")?.}
                                     />
                                 </LocalizationProvider>
                             </FormControl>
@@ -506,6 +461,7 @@ export default function BookingForm({
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
                                         // label="Basic date picker"
+                                        disablePast
                                         onChange={(event: any) => setValue("endDate", moment(event.$d).format("YYYY-MM-DD"))}
                                     />
                                 </LocalizationProvider>
@@ -528,23 +484,28 @@ export default function BookingForm({
                     sx={{ ml: "auto" }}
                     type="submit"
                     form="booking-form"
-                    onClick={() => {
-                        console.log("ERROR", errors)
-
+                    onClick={async () => {
+                        console.log("errors", errors)
+                        // await handleSubmit(onSubmit)(); // Run form validation and submission
                         if (step === 0) {
-                            if (watch("user")?._id !== "" && !errors?.user) {
-                                return setStep((prev) => prev + 1)
+                            if (watch("user")?._id !== "") {
+                                setStep((prev) => prev + 1);
                             }
                         }
-
                         if (step === 1) {
-                            if (!errors.unit) {
-                                return setStep((prev) => prev + 1)
+                            if (unit?._id) return
+
+                            if (watch("unit")?._id !== "") {
+                                setStep((prev) => prev + 1);
                             }
                         }
                     }}
                 >
-                    {Object.keys(unit).length > 0 && step === 1 ? `Submit Booking` : step === 2 ? `Submit Booking` : `Next`}
+                    {Object.keys(unit).length > 0 && step === 1
+                        ? `Submit Booking`
+                        : step === 2
+                            ? `Submit Booking`
+                            : `Next`}
                 </Button>
                 {/* <Button
                     variant="contained"

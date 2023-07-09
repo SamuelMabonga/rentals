@@ -39,6 +39,7 @@ export async function fetchAllUserTenancies(req: any, res: any, id: string) {
       Tenant.find({ user: id })
         .populate("user")
         .populate("unit")
+        .populate("property")
         .skip((page - 1) * limit)
         .limit(limit),
       Tenant.countDocuments(),

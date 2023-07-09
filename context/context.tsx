@@ -34,12 +34,13 @@ const CollectionsProvider = ({children}: any) => {
     const [propertyToEdit, setPropertyToEdit] = useState()
 
     // FEATURE FORM
+    const [featuresPage, setFeaturesPage] = useState(1)
     const [openFeaturesForm, setOpenFeaturesForm] = useState(false)
     const [featureToEdit, setFeatureToEdit] = useState()
 
     // BILLING PERIODS FORM
     const [openBillingPeriodsForm, setOpenBillingPeriodsForm] = useState(false)
-    const [billingPeriodToEdit, setBillingPeriodToEdit] = useState(false)
+    const [billingPeriodToEdit, setBillingPeriodToEdit] = useState({})
 
     // PROPERTY FEATURES FORM
     const [openPropertyFeaturesForm, setOpenPropertyFeaturesForm] = useState(false)
@@ -99,6 +100,10 @@ const CollectionsProvider = ({children}: any) => {
 
     // REQUEST TENANCY EXTENSION
     const [ openRequestTenancyExtension, setOpenRequestTenancyExtension ] = useState(false)
+
+
+    // RENTALS
+    const [rentalsPage, setRentalsPage] = useState(1)
     
 
 
@@ -127,6 +132,8 @@ const CollectionsProvider = ({children}: any) => {
             setOpenFeaturesForm,
             featureToEdit,
             setFeatureToEdit,
+            featuresPage,
+            setFeaturesPage,
 
             // Billing Periods
             openBillingPeriodsForm,
@@ -200,6 +207,10 @@ const CollectionsProvider = ({children}: any) => {
             // REQUEST TENANCY EXTENSION
             openRequestTenancyExtension,
             setOpenRequestTenancyExtension,
+
+            // RENTALS
+            rentalsPage,
+            setRentalsPage,
 
         }}>
             {children}

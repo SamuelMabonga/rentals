@@ -30,8 +30,9 @@ export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) =
     // CONTEXT
     const {setOpenBillingPeriodsForm, setBillingPeriodToEdit}: any = useContext(CollectionsContext)
     // SESSION
-    const { status, data: session }: any = useSession()
-    const { data }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods(session.accessToken) })
+    const session: any = useSession()
+    const token = session?.data?.accessToken
+    const { data }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
 
     console.log(data)
     const router = useRouter()
@@ -49,6 +50,7 @@ export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) =
                         <IconButton
                             onClick={(event) => {
                                 event.stopPropagation()
+                                console.log(row.row.original)
                                 setBillingPeriodToEdit(row.row.original)
                                 setOpenBillingPeriodsForm(true)
                             }}

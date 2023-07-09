@@ -6,6 +6,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { UnitCard } from '..'
 import MobileDrawer from 'Components/Common/MobileDrawer'
+import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/react'
+import fetchProperties from 'apis/fetchProperties'
+import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query'
+
+type PageProps = {
+  // data: any;
+};
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,6 +37,8 @@ function HouseType({ src, alt, title }: any) {
 
 
 export default function Marketplace() {
+  const { data }: any = useQuery({ queryKey: ['all-properties'], queryFn: () => fetchProperties() })
+  console.log(data)
   return (
     <>
       <Head>
@@ -37,9 +47,9 @@ export default function Marketplace() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main style={{ width: '100vw', minHeight: "100vh", color: "black", backgroundColor: "white" }}>
-        <nav style={{ width: "100%", position: "fixed", top: 0, left: 0, backgroundColor: "white" }}>
-          <Box width="100%" padding={["1rem", "2rem", "2rem 4rem", "2rem 8rem", "2rem 12rem"]} display="flex" alignItems="center">
+      <main style={{ width: '100vw', minHeight: "100vh", color: "black", backgroundColor: "#F2EEF6" }}>
+        <nav style={{ width: "100%", position: "fixed", top: 0, left: 0, backgroundColor: "white", zIndex: 10 }}>
+          <Box width="100%" padding={["1rem", "2rem", "2rem 4rem", "2rem 8rem", "2rem 12rem"]} display="flex" alignItems="center" borderBottom="1px solid #DDD5E4">
             <Typography fontSize="1.125rem" fontWeight="600" width="fit-content">Rent It</Typography>
 
             <Box display="flex" gap="4rem" ml="auto" alignItems="center" width="fit-content" >
@@ -57,66 +67,41 @@ export default function Marketplace() {
           </Box>
         </nav>
 
-        <section style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column" }}>
-          <Box maxWidth="fit-content" margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem">
+        <section style={{ width: "100%", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <Box width="100%" maxWidth="40rem">
+            <Image
+              src="https://res.cloudinary.com/dfmoqlbyl/image/upload/v1688744270/RentIt/Illustrations/house-for-rent_nynufw.svg"
+              width={0}
+              height={0}
+              alt="house for rent"
+              layout="responsive"
+            />
+          </Box>
+          <Box maxWidth="fit-content" display="flex" flexDirection="column" alignItems="center">
             <Typography variant="h2" fontWeight="600" letterSpacing={-3}>Marketplace</Typography>
-            <Typography variant="h6" letterSpacing={-0.5} color="gray">Browse, find and move into your preferred rental</Typography>
+            <Typography variant="h6" letterSpacing={-0.5} color="gray" textAlign="center">Browse, find and move into your preferred rental</Typography>
           </Box>
         </section>
 
         <section style={{ width: "100%", display: "flex", flexDirection: "column" }}>
-          <Box width="100%" minHeight="100vh" maxWidth="72rem" padding={["1rem", "2rem", "8rem 2rem"]} margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem">
-            <Typography variant="h3" fontWeight="600" letterSpacing={-3}>Check out our most popular spaces</Typography>
-            <Typography variant="h6" letterSpacing={-0.5} color="gray">Discover the most popular rental spaces in your dream neighborhood, with the best deals. </Typography>
+          <Box width="100%" minHeight="100vh" maxWidth="72rem" padding={["6rem 1rem", "6rem 2rem", "8rem 2rem"]} margin="auto" display="flex" flexDirection="column" alignItems={["flex-start", "center"]} gap="1rem">
+            <Typography variant="h3" fontWeight="600" letterSpacing={-3}>Properties</Typography>
+            <Typography variant="h6" letterSpacing={-0.5} color="gray">Discover the most popular rental spaces in your dream neighborhood, with the best deals.</Typography>
             <Box display="grid" gridTemplateColumns={["1fr", "1fr 1fr", "1fr 1fr 1fr"]} gap={["1rem", "1rem", "2rem"]} mt="2rem" width="100%">
-              <UnitCard
-                src="/Frame30.png"
-                alt="Housing Units"
-                title="Housing Units"
-                rent="UGX 1,000,000"
-                location="Kampala, Uganda"
-                features="3 bedrooms, 2 bathrooms"
-              />
-              <UnitCard
-                src="/Frame30.png"
-                alt="Housing Units"
-                title="Housing Units"
-                rent="UGX 1,000,000"
-                location="Kampala, Uganda"
-                features="3 bedrooms, 2 bathrooms"
-              />
-              <UnitCard
-                src="/Frame30.png"
-                alt="Housing Units"
-                title="Housing Units"
-                rent="UGX 1,000,000"
-                location="Kampala, Uganda"
-                features="3 bedrooms, 2 bathrooms"
-              />
-              <UnitCard
-                src="/Frame30.png"
-                alt="Housing Units"
-                title="Housing Units"
-                rent="UGX 1,000,000"
-                location="Kampala, Uganda"
-                features="3 bedrooms, 2 bathrooms"
-              />
-              <UnitCard
-                src="/Frame30.png"
-                alt="Housing Units"
-                title="Housing Units"
-                rent="UGX 1,000,000"
-                location="Kampala, Uganda"
-                features="3 bedrooms, 2 bathrooms"
-              />
-              <UnitCard
-                src="/Frame30.png"
-                alt="Housing Units"
-                title="Housing Units"
-                rent="UGX 1,000,000"
-                location="Kampala, Uganda"
-                features="3 bedrooms, 2 bathrooms"
-              />
+              {
+                data?.data?.map((property: any) => (
+                  <UnitCard
+                    key={property._id}
+                    id={property._id}
+                    src="/Frame30.png"
+                    alt={property.name}
+                    title={property.name}
+                    rent="UGX 1,000,000"
+                    location="Kampala, Uganda"
+                    features="3 bedrooms, 2 bathrooms"
+                  />
+                ))
+              }
             </Box>
           </Box>
         </section>
@@ -149,3 +134,18 @@ export default function Marketplace() {
     </>
   )
 }
+
+
+export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
+
+  // REACT QUERY
+  const queryClient = new QueryClient()
+
+  await queryClient.prefetchQuery(['all-properties'], () => fetchProperties())
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+};
+

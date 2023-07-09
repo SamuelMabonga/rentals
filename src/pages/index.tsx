@@ -13,7 +13,7 @@ const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
 function HouseType({ src, alt, title }: any) {
   return (
     <Link href={"/marketplace"}>
-      <Box display="flex" gap="0.5rem" alignItems="center" border="1px solid lightgrey" padding="1rem" borderRadius="0.5rem">
+      <Box display="flex" gap="0.5rem" alignItems="center" border="1px solid" borderColor="primary.main" padding="1rem" borderRadius="0.5rem" bgcolor="white">
         <Box width={["4rem", "6rem"]}>
           <Image
             src={src}
@@ -30,9 +30,9 @@ function HouseType({ src, alt, title }: any) {
   )
 }
 
-export function UnitCard({ src, alt, title, subtitle, rent, features, location }: any) {
+export function UnitCard({ id, src, alt, title, subtitle, rent, features, location }: any) {
   return (
-    <Link href="/marketplace/jjwhfw">
+    <Link href={`/marketplace/${id}`}>
       <Box
         width="100%"
         borderRadius="1rem"
@@ -41,7 +41,7 @@ export function UnitCard({ src, alt, title, subtitle, rent, features, location }
         bgcolor="white"
         sx={{
           boxShadow: "0px 0px 30px 0px #D0CCD4",
-          border: "1px solid #DDD5E4"
+          border: "1px solid #DDD5E4",
         }}
       >
         <Box width="100%">
@@ -104,7 +104,7 @@ export default function Home() {
                 layout="responsive"
               />
             </Box>
-            <Typography variant={"h2"} fontWeight="600" letterSpacing={-3}>Rental hunting made easy</Typography>
+            <Typography variant={"h2"} fontWeight="700" letterSpacing={-3}>Rental hunting made easy</Typography>
             <Typography variant="h6" letterSpacing={-0.5} color="gray">Find your next Condo, Appartment, house or room within seconds without a hustle</Typography>
             <TextField
               variant="outlined"
@@ -204,9 +204,9 @@ export default function Home() {
           <Box width="100%" minHeight="100vh" maxWidth="72rem" padding={["6rem 1rem", "2rem", "8rem 2rem"]} margin="auto" display="flex" flexDirection="column" alignItems="center" gap="1rem">
             <Typography variant="h3" fontWeight="600" letterSpacing={-3}>Get your favorite space in a few steps</Typography>
             <Typography variant="h6" letterSpacing={-0.5} color="gray">Discover the most popular rental spaces in your dream neighborhood, with the best deals. </Typography>
-            <Box display="grid" gridTemplateColumns={["1fr", "1fr 1fr 1fr"]} gap={["1rem", "1rem", "2rem"]} mt="2rem" width="100%">
+            <Box display="grid" gridTemplateColumns={["1fr", "1fr 1fr 1fr"]} gap={["1.5rem", "1rem", "2rem"]} mt="2rem" width="100%">
               <Box width="15rem" display="flex" flexDirection="column" alignItems="center" mx="auto">
-                <Box width="4rem">
+                <Box width="4rem" >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>

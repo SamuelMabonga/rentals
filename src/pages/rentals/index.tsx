@@ -23,6 +23,9 @@ export default function Rentals({
     // CONTEXT
     const {
         setShowPropertyForm,
+
+        rentalsPage: page,
+        setRentalsPage: setPage,
     }: any = useContext(CollectionsContext)
 
     // SESSION
@@ -31,7 +34,7 @@ export default function Rentals({
 
     const [openCreateForm, setOpenCreateForm] = useState(false)
 
-    const { data }: any = useQuery({ queryKey: ['tenancies', token], queryFn: () => fetchUserTenancies(token) })
+    const { data }: any = useQuery({ queryKey: ['tenancies', token, page], queryFn: () => fetchUserTenancies(token, page) })
 
     return (
         <>
@@ -74,7 +77,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // REACT QUERY
     const queryClient = new QueryClient()
 
-    await queryClient.prefetchQuery(['tenancies', accessToken], () => fetchUserTenancies(accessToken))
+    await queryClient.prefetchQuery(['tenancies', accessToken], () => fetchUserTenancies(accessToken, 1))
     return {
         props: {
             dehydratedState: dehydrate(queryClient),

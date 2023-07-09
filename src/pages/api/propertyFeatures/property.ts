@@ -18,7 +18,7 @@ export default async function handler(
     query: { id, searchQuery },
   }: any = req;
 
-  authenticateUser(req, res);
+  // authenticateUser(req, res);
 
   connectToMongoDB().catch((err) => res.json(err));
 

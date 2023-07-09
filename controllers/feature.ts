@@ -92,26 +92,24 @@ export async function fetchSingleFeature(req: any, res: any) {
 //update a feature
 export async function updateFeature(req: any, res: any) {
   try {
-    let feature = await Feature.findById(req.params.id);
+    let feature = await Feature.findById(req.query.id);
 
     const data = {
       name: req.body.name || feature.name,
-      image: req.body.image || feature.image,
-      rate: req.body.rate || feature.rate,
-      price: req.body.price || feature.price,
     };
-    feature = await feature.findByIdAndUpdate(req.params.id, data, {
+    feature = await Feature.findByIdAndUpdate(req.query.id, data, {
       new: true,
     });
     res.status(200).json({
       success: true,
-      msg: "feature updated successfully",
+      msg: "Feature updated successfully",
       data: feature,
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json({
       success: false,
-      msg: "failed to update feature",
+      msg: "Failed to update feature",
       data: error,
     });
   }

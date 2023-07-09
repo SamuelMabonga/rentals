@@ -13,21 +13,16 @@ interface ReactTableProps<T extends object> {
     onRowClick: (obj: any) => void;
     loading?: boolean;
     pageInfo: any;
+    setPage?: (obj: any) => void;
 }
 
-export const TableRenderer = <T extends object>({ data, pageInfo, columns, onRowClick, loading = false }: ReactTableProps<T>) => {
+export const TableRenderer = <T extends object>({ data, pageInfo, columns, onRowClick, loading = false, setPage }: ReactTableProps<T>) => {
 
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
     });
-
-    const {
-        activePropertiesTab: activeTab,
-        setActivePropertiesTab: setActiveTab,
-        setShowUnitTypeForm
-    }: any = useContext(CollectionsContext)
 
     return (
         <Box width="100%" sx={{ overflowX: "scroll" }}>
@@ -108,7 +103,7 @@ export const TableRenderer = <T extends object>({ data, pageInfo, columns, onRow
                                 ))}
                             </TableBody>
                         </Table>
-                        <PaginationRounded pageInfo={pageInfo} />
+                        <PaginationRounded pageInfo={pageInfo} setPage={setPage}  />
                     </Box>
                 ) : (
                     <Box maxWidth="20rem" mx="auto" my="5rem">

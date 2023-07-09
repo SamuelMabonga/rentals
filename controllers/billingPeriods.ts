@@ -72,7 +72,7 @@ export async function createBillingPeriod(req: any, res: any) {
 //fetch staff role by id
 export async function fetchSingleBillingPeriod(req: any, res: any) {
   try {
-    let billingPeriod = await BillingPeriods.findById(req.params.id);
+    let billingPeriod = await BillingPeriods.findById(req.query.id);
     res.status(200).json({
       success: true,
       msg: "Billing period fetched successfully",
@@ -91,13 +91,13 @@ export async function fetchSingleBillingPeriod(req: any, res: any) {
 //update a staff role
 export async function updateBillingPeriod(req: any, res: any) {
   try {
-    let billingPeriod = await BillingPeriods.findById(req.params.id);
+    let billingPeriod = await BillingPeriods.findById(req.query.id);
 
     const data = {
       name: req.body.name || billingPeriod.name,
     };
     billingPeriod = await BillingPeriods.findByIdAndUpdate(
-      req.params.id,
+      req.query.id,
       data,
       {
         new: true,

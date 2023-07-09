@@ -22,14 +22,14 @@ export default async function handler(
     query: { id, searchQuery },
   }: any = req;
 
-  const decodedToken = authenticateUser(req, res);
+  // const decodedToken = authenticateUser(req, res);
 
-  if (!decodedToken?.user?._id) {
-    return res.status(401).json({
-      success: false,
-      msg: "Not Authorized",
-    });
-  }
+  // if (!decodedToken?.user?._id) {
+  //   return res.status(401).json({
+  //     success: false,
+  //     msg: "Not Authorized",
+  //   });
+  // }
 
   try {
     await mongoose
@@ -39,7 +39,7 @@ export default async function handler(
       )
       .then(() => {
         // USER
-        const { _id, role } = decodedToken.user;
+        // const { _id, role } = decodedToken.user;
 
         const { method } = req;
         switch (method) {
@@ -51,15 +51,15 @@ export default async function handler(
             } else fetchAllProperties(req, res);
 
             break;
-          case "POST":
-            createProperty(req, res, _id);
-            break;
-          case "PUT":
-            updateProperty(req, res);
-            break;
-          case "DELETE":
-            deleteProperty(req, res);
-            break;
+          // case "POST":
+          //   createProperty(req, res, _id);
+          //   break;
+          // case "PUT":
+          //   updateProperty(req, res);
+          //   break;
+          // case "DELETE":
+          //   deleteProperty(req, res);
+          //   break;
           default:
             //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);
             res.status(405).end(`Method ${method} not Allowed`);

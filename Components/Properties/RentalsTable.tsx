@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
+import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useContext, useMemo } from 'react';
@@ -27,7 +27,10 @@ export const RentalsTable = <T extends object>({ data, pageInfo }: ReactTablePro
     // CONTEXT
     const {
         setShowPropertyForm,
-        setPropertyToEdit
+        setPropertyToEdit,
+
+        rentalsPage: page,
+        setRentalsPage: setPage,
     }: any = useContext(CollectionsContext)
         
 
@@ -49,15 +52,34 @@ export const RentalsTable = <T extends object>({ data, pageInfo }: ReactTablePro
                     )
                 },
             },
+            // {
+            //     header: 'Name',
+            //     cell: (row) => row.renderValue(),
+            //     accessorKey: 'user.first_name',
+            // },
             {
-                header: 'Name',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'user.first_name',
-            },
-            {
-                header: 'unit',
+                header: 'Unit',
                 cell: (row) => row.renderValue(),
                 accessorKey: 'unit.name',
+            },
+            {
+                header: 'Property',
+                cell: (row) => row.renderValue(),
+                accessorKey: 'property.name',
+            },
+            {
+                header: 'Status',
+                cell: (row) => <Chip
+                                    label={row.row.original.status}
+                                    // color={row.row.original.status === "PENDING" ? "warning" : "limegreen"}
+                                    size="small"
+                                    sx={{
+                                        fontSize: "0.75rem",
+                                        bgcolor: row.row.original.status === "PENDING" ? "warning.main" : "limegreen",
+                                        color: "white",
+                                    }}
+                                />,
+                accessorKey: 'status',
             },
             {
                 header: 'Start Date',
@@ -69,43 +91,43 @@ export const RentalsTable = <T extends object>({ data, pageInfo }: ReactTablePro
                 cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
                 accessorKey: 'endDate',
             },
-            {
-                header: 'Actions',
-                cell: (row) => (
-                    <Box display="flex" gap="1rem" >
-                        <IconButton>
-                            <Box width="1.5rem" height="1.5rem">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </Box>
-                        </IconButton>
+            // {
+            //     header: 'Actions',
+            //     cell: (row) => (
+            //         <Box display="flex" gap="1rem" >
+            //             <IconButton>
+            //                 <Box width="1.5rem" height="1.5rem">
+            //                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+            //                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+            //                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            //                     </svg>
+            //                 </Box>
+            //             </IconButton>
 
-                        <IconButton onClick={(event) => {
-                            event.stopPropagation()
-                            setPropertyToEdit(row.row.original)
-                            setShowPropertyForm(true)
-                            return
-                        }}>
-                            <Box width="1.5rem" height="1.5rem">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                </svg>
-                            </Box>
-                        </IconButton>
+            //             <IconButton onClick={(event) => {
+            //                 event.stopPropagation()
+            //                 setPropertyToEdit(row.row.original)
+            //                 setShowPropertyForm(true)
+            //                 return
+            //             }}>
+            //                 <Box width="1.5rem" height="1.5rem">
+            //                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+            //                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            //                     </svg>
+            //                 </Box>
+            //             </IconButton>
 
-                        <IconButton>
-                            <Box width="1.5rem" height="1.5rem">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </Box>
-                        </IconButton>
-                    </Box>
-                ),
-            },
+            //             <IconButton>
+            //                 <Box width="1.5rem" height="1.5rem">
+            //                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+            //                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+            //                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            //                     </svg>
+            //                 </Box>
+            //             </IconButton>
+            //         </Box>
+            //     ),
+            // },
         ],
         []
     );
@@ -116,6 +138,7 @@ export const RentalsTable = <T extends object>({ data, pageInfo }: ReactTablePro
             pageInfo={pageInfo}
             columns={columns}
             onRowClick={(row: any) => router.push(`/rentals/${row._id}`)}
+            setPage={setPage}
         />
     );
 };
