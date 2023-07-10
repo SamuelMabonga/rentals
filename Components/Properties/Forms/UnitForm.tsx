@@ -37,7 +37,7 @@ export default function UnitForm({property}: any) {
     // SESSION
     const session: any = useSession()
     const token = session?.data?.accessToken
-    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', token, id], queryFn: () => fetchPropertyUnitTypes(token, id) })
+    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', token, id], queryFn: () => fetchPropertyUnitTypes(id) })
     // const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
     // const { data: unitTypes }: any = useQuery({ queryKey: ['unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
 

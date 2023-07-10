@@ -20,12 +20,12 @@ export default async function handler(
         query: { id, searchQuery },
     }: any = req;
 
-    const decodedToken = authenticateUser(req, res);
+    // const decodedToken = authenticateUser(req, res);
 
     try {
         await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_SRV || "mongodb://localhost:27017/test_db").then(() => {
             // USER
-            const { _id, role } = decodedToken.user;
+            // const { _id, role } = decodedToken.user;
 
             const { method } = req;
             switch (method) {

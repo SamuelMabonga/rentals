@@ -31,7 +31,7 @@ export const UnitTypesTable = <T extends object>({ property }: ReactTableProps<T
 
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-unitTypes', property], queryFn: () => fetchPropertyUnitTypes(session.accessToken, property) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-unitTypes', property], queryFn: () => fetchPropertyUnitTypes(property) })
 
 
     const router = useRouter()

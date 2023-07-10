@@ -104,6 +104,9 @@ const CollectionsProvider = ({children}: any) => {
 
     // RENTALS
     const [rentalsPage, setRentalsPage] = useState(1)
+
+    // PUBLIC BOOKING 
+    const [openPublicBooking, setOpenPublicBooking] = useState(false)
     
 
 
@@ -211,6 +214,10 @@ const CollectionsProvider = ({children}: any) => {
             // RENTALS
             rentalsPage,
             setRentalsPage,
+
+            // PUBLIC BOOKING
+            openPublicBooking,
+            setOpenPublicBooking
 
         }}>
             {children}

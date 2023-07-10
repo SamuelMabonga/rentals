@@ -15,13 +15,13 @@ import { useRouter } from 'next/router'
 import fetchPropertyFeatures from 'apis/property/fetchPropertyFeatures'
 import fetchPropertyUnitTypes from 'apis/property/fetchPropertyUnitTypes'
 import currencyFormatter from 'Components/Common/currencyFormatter'
+import { CollectionsContext } from 'context/context'
+import { useContext } from 'react'
 
 
 type PageProps = {
     // data: any;
 };
-
-const inter = Inter({ subsets: ['latin'] })
 
 function HouseType({ src, alt, title }: any) {
     return (
@@ -72,6 +72,12 @@ export default function Property() {
     console.log(data)
     console.log(features)
     console.log(unitTypes)
+
+    const {
+        setOpenPublicBooking
+    }: any = useContext(CollectionsContext)
+
+
     return (
         <>
             <Head>
@@ -161,7 +167,13 @@ export default function Property() {
                                     <Typography variant="body1" color="gray" fontWeight="600" letterSpacing={-0.5}>/month</Typography>
                                 </Box>
                             </Box>
-                            <Button variant="contained" sx={{ minWidth: "8rem" }}>Book</Button>
+                            <Button
+                                variant="contained"
+                                sx={{ minWidth: "8rem" }}
+                                onClick={() => setOpenPublicBooking(true)}
+                            >
+                                Book
+                            </Button>
                         </Box>
                         <Box display="flex" gap="0.25rem">
                             <Detail />
@@ -376,7 +388,7 @@ export default function Property() {
                     </Box>
                 </footer>
             </main>
-            {/* <BookingForm /> */}
+            <BookingForm />
         </>
     )
 }

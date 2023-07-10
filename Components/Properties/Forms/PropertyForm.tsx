@@ -30,7 +30,7 @@ export default function PropertyForm() {
     const session: any = useSession()
 
     const [isLoading, setIsLoading] = useState(false)
-    
+
     const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
         defaultValues: {
             name: "",
@@ -70,19 +70,19 @@ export default function PropertyForm() {
                 details: values.description
             }
             try {
-                const res = await fetch(`/api/property?id=${toEdit._id}`,{
+                const res = await fetch(`/api/property?id=${toEdit._id}`, {
                     method: 'PUT',
-                    headers:{
-                        'Content-Type':'application/json',
+                    headers: {
+                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${session.data.accessToken}`,
                     },
-                    body: JSON.stringify({...edited})
+                    body: JSON.stringify({ ...edited })
                 })
                 const response = await res.json();
                 console.log(response)
                 setIsLoading(false)
                 return
-            } catch(error) {
+            } catch (error) {
                 setIsLoading(false)
                 console.log(error)
                 return
@@ -91,13 +91,13 @@ export default function PropertyForm() {
 
         // POST A PROPERTY
         try {
-            const res = await fetch('/api/property',{
+            const res = await fetch('/api/property', {
                 method: 'POST',
-                headers:{
-                    'Content-Type':'application/json',
+                headers: {
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${session.data.accessToken}`,
                 },
-                body: JSON.stringify({...data})
+                body: JSON.stringify({ ...data })
             })
             const response = await res.json();
             console.log(response)
@@ -109,9 +109,9 @@ export default function PropertyForm() {
                     horizontal: 'center',
                     message: "Failed to create property",
                     icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" style={{color: "red"}}>
-  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-</svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" style={{ color: "red" }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
 
                     </Box>
                 })
@@ -123,12 +123,12 @@ export default function PropertyForm() {
                 horizontal: 'center',
                 message: "Property created successfully",
                 icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </Box>
             })
-        } catch(error) {
+        } catch (error) {
             setIsLoading(false)
             console.log(error)
         }
@@ -140,7 +140,7 @@ export default function PropertyForm() {
             fullWidth
             maxWidth="sm"
         >
-                                    <LinearProgress sx={{display: isLoading ? "block" : "none"}} />
+            <LinearProgress sx={{ display: isLoading ? "block" : "none" }} />
             <DialogTitle sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Typography fontWeight="600">Create new property</Typography>
                 <IconButton onClick={() => {
@@ -165,7 +165,7 @@ export default function PropertyForm() {
                         <TextField
                             placeholder=""
                             {...register("name")}
-                            // value={}
+                        // value={}
                         />
                         <FormHelperText>{errors?.name?.message}</FormHelperText>
                     </FormControl>
@@ -192,11 +192,11 @@ export default function PropertyForm() {
                             }
                         />
                     </FormControl> */}
-                    <FileInput />
-                    <FileInput />
+                    {/* <FileInput />
+                    <FileInput /> */}
                 </form>
             </DialogContent>
-            <DialogActions sx={{padding: "1.5rem"}}>
+            <DialogActions sx={{ padding: "1.5rem" }}>
                 <Button
                     variant="contained"
                     type="submit"

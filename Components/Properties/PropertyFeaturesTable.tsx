@@ -31,7 +31,7 @@ export const PropertyFeaturesTable = <T extends object>({ property }: ReactTable
     const {setPropertyFeatureToEdit, setOpenPropertyFeaturesForm}: any = useContext(CollectionsContext)
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-features', property], queryFn: () => fetchPropertyFeatures(session.accessToken, property) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-features', property], queryFn: () => fetchPropertyFeatures(property) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(

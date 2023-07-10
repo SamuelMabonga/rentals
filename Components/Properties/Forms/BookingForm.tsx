@@ -65,13 +65,13 @@ export default function BookingForm({
     const [isLoading, setIsLoading] = useState(false)
 
     const { data: features, isLoading: featuresLoading }: any = useQuery({
-        queryKey: ['property-features', token, property],
-        queryFn: () => fetchPropertyFeatures(token, property),
+        queryKey: ['property-features', property],
+        queryFn: () => fetchPropertyFeatures(property),
     })
 
     const { data: unitTypes, isLoading: unitTypesLoading }: any = useQuery({
-        queryKey: ['property-unitTypes', token, property],
-        queryFn: () => fetchPropertyUnitTypes(token, property),
+        queryKey: ['property-unitTypes', property],
+        queryFn: () => fetchPropertyUnitTypes(property),
     })
 
     const { handleSubmit, register, watch, setValue, setError, reset, formState: { errors } }: any = useForm({
