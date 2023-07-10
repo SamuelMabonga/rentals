@@ -40,7 +40,7 @@ export default function UnitTypeForm({
     const session: any = useSession()
     const token = session?.data?.accessToken
 
-    const { data: features }: any = useQuery({ queryKey: ['property-features', token, property], queryFn: () => fetchPropertyFeatures(token, property) })
+    const { data: features }: any = useQuery({ queryKey: ['property-features', token, property], queryFn: () => fetchPropertyFeatures(property) })
     const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
 
     const [isLoading, setIsLoading] = useState(false)
