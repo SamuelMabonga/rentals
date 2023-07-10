@@ -74,7 +74,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // REACT QUERY
     const queryClient = new QueryClient()
 
-    await queryClient.prefetchQuery(['features'], () => fetchFeatures(accessToken))
+    await queryClient.prefetchQuery(['features'], () => fetchFeatures(accessToken, null))
     return {
         props: {
             dehydratedState: dehydrate(queryClient),
