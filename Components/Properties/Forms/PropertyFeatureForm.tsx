@@ -29,7 +29,7 @@ export default function PropertyFeatureForm({property}: any) {
 
     const session: any = useSession()
     const token = session?.data?.accessToken
-    const { data: features }: any = useQuery({ queryKey: ['features', token], queryFn: () => fetchFeatures(token) })
+    const { data: features }: any = useQuery({ queryKey: ['features', token], queryFn: () => fetchFeatures(token, null) })
     const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
 
     const [isLoading, setIsLoading] = useState(false)
