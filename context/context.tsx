@@ -28,6 +28,8 @@ const CollectionsProvider = ({children}: any) => {
 
     // FORMS
     const [showUnitTypeForm, setShowUnitTypeForm] = useState(false)
+    const [unitTypeToEdit, setUnitTypeToEdit] = useState({})
+    const [unitTypesPage, setUnitTypesPage] = useState(1)
     
     // PROPERTY FORM
     const [showPropertyForm, setShowPropertyForm] = useState(false)
@@ -45,6 +47,7 @@ const CollectionsProvider = ({children}: any) => {
     // PROPERTY FEATURES FORM
     const [openPropertyFeaturesForm, setOpenPropertyFeaturesForm] = useState(false)
     const [propertyFeatureToEdit, setPropertyFeatureToEdit] = useState({})
+    const [propertyFeaturesPage, setPropertyFeaturesPage] = useState(1)
 
     // UNIT FORM
     const [openUnitForm, setOpenUnitForm] = useState(false)
@@ -93,6 +96,7 @@ const CollectionsProvider = ({children}: any) => {
 
     // VIEW TENANT
     const [ openViewTenant, setOpenViewTenant ] = useState(false)
+    const [tenantsPage, setTenantsPage] = useState(1)
 
     // TICKET FORM
     const [ openTicketForm, setOpenTicketForm ] = useState(false)
@@ -123,6 +127,10 @@ const CollectionsProvider = ({children}: any) => {
             // FORMS
             showUnitTypeForm,
             setShowUnitTypeForm,
+            unitTypeToEdit,
+            setUnitTypeToEdit,
+            unitTypesPage,
+            setUnitTypesPage,
 
             // Property form
             showPropertyForm,
@@ -150,6 +158,8 @@ const CollectionsProvider = ({children}: any) => {
             setOpenPropertyFeaturesForm,
             propertyFeatureToEdit,
             setPropertyFeatureToEdit,
+            propertyFeaturesPage,
+            setPropertyFeaturesPage,
 
             // Unit Form
             openUnitForm,
@@ -200,6 +210,8 @@ const CollectionsProvider = ({children}: any) => {
             // VIEW TENANT
             openViewTenant,
             setOpenViewTenant,
+            tenantsPage,
+            setTenantsPage,
 
             // TICKET FORM
             openTicketForm,

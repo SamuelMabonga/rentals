@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import FileInput from "Components/FileInput"
 import fetchBillingPeriods from "apis/fetchBillingPeriods"
 import fetchFeatures from "apis/fetchFeatures"
+import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
 import { CollectionsContext } from "context/context"
 import { useSession } from "next-auth/react"
 import React, { useContext, useEffect, useState } from "react"
@@ -29,6 +30,7 @@ export default function PropertyFeatureForm({property}: any) {
 
     const session: any = useSession()
     const token = session?.data?.accessToken
+    const { data, refetch }: any = useQuery({ queryKey: ['property-features', property], queryFn: () => fetchPropertyFeatures(property, null) })
     const { data: features }: any = useQuery({ queryKey: ['features', token], queryFn: () => fetchFeatures(token, null) })
     const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
 
@@ -60,7 +62,7 @@ export default function PropertyFeatureForm({property}: any) {
         setValue("billingPeriod", null)
         return
 
-    }, [toEdit?.feature])
+    }, [toEdit?.feature, open])
 
     async function onSubmit(values: any) {
         setIsLoading(true)
@@ -92,6 +94,7 @@ export default function PropertyFeatureForm({property}: any) {
                 })
                 await res.json();
 
+                refetch()
                 setIsLoading(false)
                 setToEdit({})
                 reset()
@@ -127,6 +130,7 @@ export default function PropertyFeatureForm({property}: any) {
             })
             await res.json();
 
+            refetch()
             setIsLoading(false)
             setIsOpen(false)
             setSnackbarMessage({
@@ -154,7 +158,7 @@ export default function PropertyFeatureForm({property}: any) {
         >
             <LinearProgress sx={{ display: isLoading ? "block" : "none" }} />
             <DialogTitle sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Typography fontWeight="600">Create new property feature</Typography>
+                <Typography fontWeight="600">{`${toEdit?._id ? "Edit" : "Create new"} property feature`}</Typography>
                 <IconButton onClick={() => {
                     setToEdit({})
                     setIsOpen(false)
@@ -223,7 +227,7 @@ export default function PropertyFeatureForm({property}: any) {
                     form="property-features-form"
                     onClick={() => console.log(errors)}
                 >
-                    {toEdit?.name ? `Edit Property Feature` : `Create Property Feature`}
+                    {toEdit?._id ? `Edit Property Feature` : `Create Property Feature`}
                 </Button>
             </DialogActions>
         </Dialog>

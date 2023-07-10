@@ -6,6 +6,7 @@ import fetchAProperty from "apis/fetchAProperty"
 import fetchBillingPeriods from "apis/fetchBillingPeriods"
 import fetchFeatures from "apis/fetchFeatures"
 import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
+import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 // import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
 import { CollectionsContext } from "context/context"
 import { fetchAllBillingPeriods } from "controllers/billingPeriods"
@@ -31,7 +32,9 @@ export default function UnitTypeForm({
         setShowUnitTypeForm: setIsOpen,
         unitTypeToEdit: toEdit,
         setUnitTypeToEdit: setToEdit,
-        setSnackbarMessage
+        setSnackbarMessage,
+        unitTypesPage: page,
+        setUnitTypesPage: setPage,
     }: any = useContext(CollectionsContext)
 
     const router = useRouter()
@@ -40,8 +43,9 @@ export default function UnitTypeForm({
     const session: any = useSession()
     const token = session?.data?.accessToken
 
-    const { data: features }: any = useQuery({ queryKey: ['property-features', token, property], queryFn: () => fetchPropertyFeatures(property) })
+    const { data: features }: any = useQuery({ queryKey: ['property-features', token, property], queryFn: () => fetchPropertyFeatures(property, null) })
     const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
+    const { data, refetch }: any = useQuery({ queryKey: ['property-unitTypes', property, page], queryFn: () => fetchPropertyUnitTypes(property, page) })
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -49,7 +53,9 @@ export default function UnitTypeForm({
         defaultValues: {
             name: "",
             description: "",
-            features: ""
+            features: [],
+            price: null,
+            billingPeriod: {}
         },
         mode: "onChange",
         reValidateMode: "onChange",
@@ -57,15 +63,18 @@ export default function UnitTypeForm({
     });
 
     useEffect(() => {
-        if (toEdit?.name) {
+        if (toEdit?._id) {
             setValue("name", toEdit.name)
-            setValue("description", toEdit.details)
+            setValue("description", toEdit.description)
+            setValue("features", toEdit.defaultFeatures)
+            setValue("price", toEdit.price)
+            setValue("billingPeriod", toEdit.billingPeriod)
             return
         }
 
         reset()
 
-    }, [toEdit])
+    }, [toEdit?._id, open])
 
     async function onSubmit(values: any) {
         setIsLoading(true)
@@ -73,7 +82,7 @@ export default function UnitTypeForm({
         const data = {
             ...values,
             details: values.description,
-            features: values?.features ? values.features.map((item: any) => item._id) : null,
+            defaultFeatures: values?.features ? values.features.map((item: any) => item._id) : null,
             billingPeriod: values.billingPeriod._id,
             property: property
         }
@@ -81,32 +90,49 @@ export default function UnitTypeForm({
         console.log(data)
 
 
-        // // EDIT A PROPERTY
-        // if (toEdit?.name) {
-        //     const edited = {
-        //         ...toEdit,
-        //         name: values.name,
-        //         details: values.description
-        //     }
-        //     try {
-        //         const res = await fetch(`/api/property?id=${toEdit._id}`,{
-        //             method: 'PUT',
-        //             headers:{
-        //                 'Content-Type':'application/json',
-        //                 Authorization: `Bearer ${session.data.accessToken}`,
-        //             },
-        //             body: JSON.stringify({...edited})
-        //         })
-        //         const response = await res.json();
-        //         console.log(response)
-        //         setIsLoading(false)
-        //         return
-        //     } catch(error) {
-        //         setIsLoading(false)
-        //         console.log(error)
-        //         return
-        //     }
-        // }
+        // EDIT A PROPERTY
+        if (toEdit?.name) {
+            const edited = {
+                ...toEdit,
+                name: values.name,
+                description: values.description,
+                defaultFeatures: values?.features ? values.features.map((item: any) => item._id) : null,
+                billingPeriod: values.billingPeriod._id,
+                price: values.price,
+            }
+            try {
+                const res = await fetch(`/api/unitTypes?id=${toEdit._id}`,{
+                    method: 'PUT',
+                    headers:{
+                        'Content-Type':'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({...edited})
+                })
+                const response = await res.json();
+                console.log(response)
+                refetch()
+
+                setIsLoading(false)
+                setIsOpen(false)
+                setSnackbarMessage({
+                    open: true,
+                    vertical: 'top',
+                    horizontal: 'center',
+                    message: "Unit type editted successfully",
+                    icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </Box>
+                })
+                return
+            } catch(error) {
+                setIsLoading(false)
+                console.log(error)
+                return
+            }
+        }
 
         // POST A PROPERTY
         try {
@@ -119,7 +145,8 @@ export default function UnitTypeForm({
                 body: JSON.stringify({ ...data })
             })
             const response = await res.json();
-            console.log(response)
+
+            refetch()
             setIsLoading(false)
             setIsOpen(false)
             setSnackbarMessage({
@@ -189,6 +216,7 @@ export default function UnitTypeForm({
                         <FormLabel>Features</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
+                            value={watch("features")}
                             options={features?.data || []}
                             multiple
                             getOptionLabel={(option: any) => option.feature.name}
@@ -214,6 +242,7 @@ export default function UnitTypeForm({
                         <FormLabel>Billing Period</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
+                            value={watch("billingPeriod")}
                             options={billingPeriods?.data || []}
                             getOptionLabel={(option: any) => option.name}
                             onChange={(event, value) => setValue("billingPeriod", value)}

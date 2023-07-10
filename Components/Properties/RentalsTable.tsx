@@ -11,6 +11,7 @@ import moment from 'moment';
 interface ReactTableProps<T extends object> {
     data: T[];
     pageInfo: any;
+    loading: boolean
     // columns: ColumnDef<T>[];
 }
 
@@ -23,7 +24,7 @@ type Item = {
     actions: any;
 }
 
-export const RentalsTable = <T extends object>({ data, pageInfo }: ReactTableProps<T>) => {
+export const RentalsTable = <T extends object>({ data, pageInfo, loading }: ReactTableProps<T>) => {
     // CONTEXT
     const {
         setShowPropertyForm,
@@ -139,6 +140,7 @@ export const RentalsTable = <T extends object>({ data, pageInfo }: ReactTablePro
             columns={columns}
             onRowClick={(row: any) => router.push(`/rentals/${row._id}`)}
             setPage={setPage}
+            loading={loading}
         />
     );
 };

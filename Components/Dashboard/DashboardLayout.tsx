@@ -79,44 +79,44 @@ export default function DashboardLayout({ children }: any) {
 
     // const router = useRouter();
 
-// Listen for route changes
-useEffect(() => {
-  const handleRouteChangeStart = () => {
-    // Set loading state to true when route change starts
+    // Listen for route changes
+    useEffect(() => {
+        const handleRouteChangeStart = () => {
+            // Set loading state to true when route change starts
 
-    setSnackbarMessage({
-        open: true,
-        vertical: 'top',
-        horizontal: 'center',
-        message: "Loading...",
-        icon: <Box color="white"><CircularProgress size={24} color="inherit" /></Box>
-    })
-  };
+            setSnackbarMessage({
+                open: true,
+                vertical: 'top',
+                horizontal: 'center',
+                message: "Loading...",
+                icon: <Box color="white"><CircularProgress size={24} color="inherit" /></Box>
+            })
+        };
 
-  const handleRouteChangeComplete = () => {
-    // Set loading state to false when route change completes
-    setSnackbarMessage({
-        open: false,
-        vertical: 'top',
-        horizontal: 'center',
-        message: "",
-        icon: <CircularProgress size={24} />
-    })
+        const handleRouteChangeComplete = () => {
+            // Set loading state to false when route change completes
+            setSnackbarMessage({
+                open: false,
+                vertical: 'top',
+                horizontal: 'center',
+                message: "",
+                icon: <CircularProgress size={24} />
+            })
 
-    // Scroll to top on route change
-    window.scrollTo(0, 0);
-  };
+            // Scroll to top on route change
+            window.scrollTo(0, 0);
+        };
 
-  // Add event listeners for route changes
-  router.events.on('routeChangeStart', handleRouteChangeStart);
-  router.events.on('routeChangeComplete', handleRouteChangeComplete);
+        // Add event listeners for route changes
+        router.events.on('routeChangeStart', handleRouteChangeStart);
+        router.events.on('routeChangeComplete', handleRouteChangeComplete);
 
-  // Clean up the event listeners on unmount
-  return () => {
-    router.events.off('routeChangeStart', handleRouteChangeStart);
-    router.events.off('routeChangeComplete', handleRouteChangeComplete);
-  };
-}, []);
+        // Clean up the event listeners on unmount
+        return () => {
+            router.events.off('routeChangeStart', handleRouteChangeStart);
+            router.events.off('routeChangeComplete', handleRouteChangeComplete);
+        };
+    }, []);
 
 
     return (
@@ -292,11 +292,11 @@ useEffect(() => {
                             display="flex"
                             justifyContent={"space-between"}
                             alignItems="center"
-                            // sx={{
-                            //     boxShadow: ["0px 4px 20px rgba(211, 205, 218, 0.25)", "none", ],
-                            //     border: ["solid rgba(211, 205, 218, 0.7)", ],
-                            //     borderWidth: ["0px 0px 1px 0px"]
-                            // }}
+                        // sx={{
+                        //     boxShadow: ["0px 4px 20px rgba(211, 205, 218, 0.25)", "none", ],
+                        //     border: ["solid rgba(211, 205, 218, 0.7)", ],
+                        //     borderWidth: ["0px 0px 1px 0px"]
+                        // }}
                         >
                             <Box display={["flex", "none"]} flexDirection="row" alignItems={"center"} gap="0.25rem">
                                 <MobileDrawer />
@@ -340,8 +340,8 @@ useEffect(() => {
                             bgcolor={"primary.light"}
                             borderRadius="1rem"
                             sx={{
-                                boxShadow: ["inset 0px 4px 20px rgba(211, 205, 218, 1)", "none", ],
-                                border: ["1px solid rgba(211, 205, 218, 0.7)", "0px", ],
+                                boxShadow: ["inset 0px 4px 20px rgba(211, 205, 218, 1)", "none",],
+                                border: ["1px solid rgba(211, 205, 218, 0.7)", "0px",],
                             }}
                         // sx={{
                         //     overflowY: ["hidden", "scroll"]
@@ -375,10 +375,10 @@ useEffect(() => {
                         left: "100%"
                     }}
                 >
-                    
+
                     <MTypo
-                        initial={{opacity: 0}}
-                        animate={{opacity: 1}}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         transition={{
                             ease: "easeInOut",
                             duration: 1

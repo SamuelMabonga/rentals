@@ -69,7 +69,7 @@ export async function fetchPropertyUnitTypes(req: any, res: any) {
     const [unitTypes, unitTypesCount] = await Promise.all([
       UnitType.find({ property: propertyId })
         .populate("billingPeriod")
-        .populate("defaultFeatures")
+        .populate({path: "defaultFeatures", populate: {path: "feature"}})
         .skip((page - 1) * limit)
         .limit(limit),
       UnitType.countDocuments(),
@@ -160,28 +160,31 @@ export async function fetchSingleUnitType(req: any, res: any) {
 //update a unit_type
 export async function updateUnitType(req: any, res: any) {
   try {
-    let unit_type = await UnitType.findById(req.params.id);
+    let unit_type = await UnitType.findById(req.query.id);
 
     const data = {
+      ...unit_type._doc,
       name: req.body.name || unit_type.name,
+      description: req.body.description || unit_type.description,
       image: req.body.image || unit_type.image,
-      rate: req.body.rate || unit_type.rate,
-      created_at: req.body.created_at || unit_type.created_at,
+      billingPeriod: req.body.billingPeriod || unit_type.billingPeriod,
       price: req.body.price || unit_type.price,
-      units: req.body.units || unit_type.units,
+      defaultFeatures: req.body.defaultFeatures || unit_type.defaultFeatures,
     };
-    unit_type = await unit_type.findByIdAndUpdate(req.params.id, data, {
+    console.log("data is", unit_type.name);
+    unit_type = await UnitType.findByIdAndUpdate(req.query.id, data, {
       new: true,
     });
     res.status(200).json({
       success: true,
-      msg: "unit type updated successfully",
+      msg: "Unit type updated successfully",
       data: unit_type,
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json({
       success: false,
-      msg: "failed to update unit_type",
+      msg: "Failed to update unit type",
       data: error,
     });
   }

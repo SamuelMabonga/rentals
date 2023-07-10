@@ -11,6 +11,7 @@ import { useSession } from 'next-auth/react';
 // import fetchPropertyFeatures from 'apis/fetchPropertyFeatures';
 import { CollectionsContext } from 'context/context';
 import fetchPropertyFeatures from 'apis/property/fetchPropertyFeatures';
+import currencyFormatter from 'Components/Common/currencyFormatter';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -28,29 +29,20 @@ type Item = {
 }
 
 export const PropertyFeaturesTable = <T extends object>({ property }: ReactTableProps<T>) => {
-    const {setPropertyFeatureToEdit, setOpenPropertyFeaturesForm}: any = useContext(CollectionsContext)
+    const {
+        setPropertyFeatureToEdit,
+        setOpenPropertyFeaturesForm,
+
+        propertyFeaturesPage: page,
+        setPropertyFeaturesPage: setPage,
+    }: any = useContext(CollectionsContext)
     // SESSION
     const { status, data: session }: any = useSession()
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-features', property], queryFn: () => fetchPropertyFeatures(property) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-features', property, page], queryFn: () => fetchPropertyFeatures(property, page) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
-            {
-                header: 'Image',
-                cell: (row) => {
-                    return (
-                        <Avatar
-                            src={row.row.original.image}
-                            alt="Avatar"
-                            sx={{
-                                width: "3rem",
-                                height: "3rem"
-                            }}
-                        />
-                    )
-                },
-            },
             {
                 header: 'Name',
                 cell: (row) => row.renderValue(),
@@ -58,7 +50,7 @@ export const PropertyFeaturesTable = <T extends object>({ property }: ReactTable
             },
             {
                 header: 'Price',
-                cell: (row) => row.renderValue(),
+                cell: (row) => currencyFormatter(row.renderValue(), "UGX"),
                 accessorKey: 'price',
             },
             {
@@ -103,9 +95,10 @@ export const PropertyFeaturesTable = <T extends object>({ property }: ReactTable
             pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
+                console.log(obj)
             }}
             loading={isLoading}
+            setPage={setPage}
         />
     );
 };

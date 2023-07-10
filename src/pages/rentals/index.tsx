@@ -34,7 +34,7 @@ export default function Rentals({
 
     const [openCreateForm, setOpenCreateForm] = useState(false)
 
-    const { data }: any = useQuery({ queryKey: ['tenancies', token, page], queryFn: () => fetchUserTenancies(token, page) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['tenancies', token, page], queryFn: () => fetchUserTenancies(token, page) })
 
     return (
         <>
@@ -50,7 +50,7 @@ export default function Rentals({
                 />
                 <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setShowPropertyForm(true)}>Create New</Button>
             </Box>
-            <RentalsTable data={data?.data} pageInfo={data?.pageInfo} />
+            <RentalsTable data={data?.data} loading={isLoading} pageInfo={data?.pageInfo} />
             <PropertyForm />
         </>
     )

@@ -12,6 +12,9 @@ const UnitTypeShema = new Schema(
       required: true,
       type: String,
     },
+    description: {
+      type: String,
+    },
     price: {
       type: Number,
     },

@@ -29,16 +29,18 @@ type Item = {
 }
 
 export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>) => {
-    
+
     // CONTEXT
     const {
-        setOpenViewTenant
+        setOpenViewTenant,
+        tenantsPage: page,
+        setTenantsPage: setPage
     }: any = useContext(CollectionsContext)
 
 
     const session: any = useSession()
     const token = session.data.accessToken
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-tenants', token, property], queryFn: () => fetchPropertyTenants(token, property) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-tenants', token, property, page], queryFn: () => fetchPropertyTenants(token, property, page) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
@@ -108,19 +110,26 @@ export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>)
 
     return (
         <>
-                <TableRenderer
-            data={data?.data || []}
-            pageInfo={data?.pageInfo}
-            columns={columns}
-            onRowClick={function (obj: any): void {
-                console.log(obj)
-                setOpenViewTenant(true)
-                setTenantToView(obj)
-            } }
-            loading={isLoading}
-        />
-        <ViewTenant tenant={tenantToView} />
+            <TableRenderer
+                data={data?.data || []}
+                pageInfo={data?.pageInfo}
+                columns={columns}
+                onRowClick={function (obj: any): void {
+                    console.log(obj)
+                    setOpenViewTenant(true)
+                    setTenantToView(obj)
+                }}
+                loading={isLoading}
+                setPage={(data) => {
+                    // setPage
+
+                    console.log(data)
+
+                    setPage(data)
+                }}
+            />
+            <ViewTenant tenant={tenantToView} />
         </>
-            // <h1>Hwey</h1>
+        // <h1>Hwey</h1>
     );
 };
