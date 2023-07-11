@@ -203,25 +203,18 @@ export async function createCronBills(req: any, res: any) {
         startDate,
       } = tenant;
 
-      console.log("TENANT ID", _id)
-
       try {
         let latestRent: any[] = await Bills.find({ tenant: _id.toString(), type: "RENT" })
           .sort({ createdAt: -1 })
           .limit(1);
 
-        console.log("LATEST RENT", latestRent)
-
         if (!latestRent) return
 
         if (moment().isBefore(moment(latestRent[0]?.endDate).format("DD-MM-YYYY"))) return
 
-
-        // if (moment(currentDate).isAfter(latestEndDate)) {
-        console.log("CREATING RENT BILL")
         const newRent = new Bills({
           amount: !customRent ? unit.unitType.price : customRent,
-          startDate: startDate,
+          startDate: latestRent[0]?.endDate,
           endDate: !customBillingPeriod
             ? moment().add(1, unit?.unitType?.billingPeriod?.period)
             : moment().add(1, customBillingPeriod?.period),
@@ -255,9 +248,9 @@ export async function createCronBills(req: any, res: any) {
 
           let newBill = new Bills({
             amount: feature.price,
-            startDate: startDate,
+            startDate: latestBill[0]?.endDate,
             endDate: moment().add(1, feature?.billingPeriod?.period),
-            pay_by: moment(startDate).add(1, feature?.billingPeriod?.period).add(7, "days"),
+            pay_by: moment().add(1, feature?.billingPeriod?.period).add(7, "days"),
             tenant: _id,
             type: "FEATURE",
             propertyFeature: feature._id,
