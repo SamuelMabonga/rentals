@@ -24,10 +24,10 @@ export default function BookingForm() {
     const router = useRouter()
     const { id }: any = router.query
 
-    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', id], queryFn: () => fetchPropertyUnitTypes(id) })
+    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', id], queryFn: () => fetchPropertyUnitTypes(id, null) })
     const { data: features, isLoading: featuresLoading }: any = useQuery({
         queryKey: ['property-features', id],
-        queryFn: () => fetchPropertyUnitTypes(id),
+        queryFn: () => fetchPropertyUnitTypes(id, null),
     })
 
     const [units, setUnits] = useState([])
