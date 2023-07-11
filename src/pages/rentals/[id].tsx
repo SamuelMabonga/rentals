@@ -236,7 +236,7 @@ export default function Rental({
                     </Button>
                 </Box>
 
-                <Box display={rentalStatus === "PENDING" ? "flex" : ["none"]} flexDirection={["column",]} sx={{ mt: "1.5rem" }} gap="1rem">
+                {/* <Box display={rentalStatus === "PENDING" ? "flex" : ["none"]} flexDirection={["column",]} sx={{ mt: "1.5rem" }} gap="1rem">
                     <Typography fontWeight="600" color="grey">Clear all your initial bills to activate your tenancy</Typography>
                     <Button
                         variant="contained"
@@ -245,7 +245,7 @@ export default function Rental({
                     >
                         Pay Bills
                     </Button>
-                </Box>
+                </Box> */}
             </Box>
 
             <Box mt="2rem" width="100%" height="fit-content" overflow="hidden" display="flex" flexDirection="column" gap="1rem">

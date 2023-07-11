@@ -42,7 +42,7 @@ export async function fetchAllUserTenancies(req: any, res: any, id: string) {
         .populate("property")
         .skip((page - 1) * limit)
         .limit(limit),
-      Tenant.countDocuments(),
+      Tenant.countDocuments({ user: id }),
     ]);
     return res.status(200).json({
       success: true,
@@ -77,7 +77,7 @@ export async function fetchAllPropertyTenants(req: any, res: any) {
           })
         .skip((page - 1) * limit)
         .limit(limit),
-      Tenant.countDocuments(),
+      Tenant.countDocuments({ "property": id }),
     ]);
     res.status(200).json({
       success: true,

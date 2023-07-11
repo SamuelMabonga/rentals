@@ -52,11 +52,13 @@ const CollectionsProvider = ({children}: any) => {
     // UNIT FORM
     const [openUnitForm, setOpenUnitForm] = useState(false)
     const [unitToEdit, setUnitToEdit] = useState(false)
+    const [unitsPage, setUnitsPage] = useState(1)
 
     // BOOKING FORM
     const [openBookingForm, setOpenBookingForm] = useState(false)
     const [bookingToEdit, setBookingToEdit] = useState({})
     const [unitToBook, setUnitToBook] = useState({})
+    const [bookingPage, setBookingPage] = useState(1)
 
 
     // IMAGE UPLOADER
@@ -166,6 +168,8 @@ const CollectionsProvider = ({children}: any) => {
             setOpenUnitForm,
             unitToEdit,
             setUnitToEdit,
+            unitsPage,
+            setUnitsPage,
 
             // Bookings form
             openBookingForm, 
@@ -174,6 +178,8 @@ const CollectionsProvider = ({children}: any) => {
             setBookingToEdit,
             unitToBook,
             setUnitToBook,
+            bookingPage,
+            setBookingPage,
 
             // SNACKBAR MESSAGE
             snackbarMessage,

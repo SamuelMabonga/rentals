@@ -20,6 +20,7 @@ import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 import { formSchema, formSchema2 } from "./Schema/BookingForm"
 import currencyFormatter from "Components/Common/currencyFormatter"
+import fetchPropertyBookings from "apis/property/fetchPropertyBookings"
 
 // const steps = [
 //     'Select a tenant',
@@ -56,7 +57,10 @@ export default function BookingForm({
         setBookingToEdit: setToEdit,
 
         unitToBook: unit,
-        setSnackbarMessage
+        setSnackbarMessage,
+
+        bookingsPage: page,
+        setBookingsPage: setPage,
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
@@ -66,13 +70,15 @@ export default function BookingForm({
 
     const { data: features, isLoading: featuresLoading }: any = useQuery({
         queryKey: ['property-features', property],
-        queryFn: () => fetchPropertyFeatures(property),
+        queryFn: () => fetchPropertyFeatures(property, null),
     })
 
     const { data: unitTypes, isLoading: unitTypesLoading }: any = useQuery({
         queryKey: ['property-unitTypes', property],
-        queryFn: () => fetchPropertyUnitTypes(property),
+        queryFn: () => fetchPropertyUnitTypes(property, null),
     })
+
+    const { data, refetch }: any = useQuery({ queryKey: ['property-bookings', token, property, page], queryFn: () => fetchPropertyBookings(token, property, page) })
 
     const { handleSubmit, register, watch, setValue, setError, reset, formState: { errors } }: any = useForm({
         defaultValues: {
@@ -137,13 +143,16 @@ export default function BookingForm({
             })
             await res.json();
 
+            refetch()
             setIsLoading(false)
             setIsOpen(false)
+            reset()
+            setStep(0)
             setSnackbarMessage({
                 open: true,
                 vertical: 'top',
                 horizontal: 'center',
-                message: "Feature feature created successfully",
+                message: "Booking created successfully",
                 icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -193,7 +202,7 @@ export default function BookingForm({
 
     // FETCH UNITS
     const [loadingUnits, setLoadingUnits] = useState(false)
-    const [selectedUnit, setSelectedUnit] = useState<any>()
+    // const [selectedUnit, setSelectedUnit] = useState<any>()
     const [units, setUnits] = useState<any>([])
 
     // STEPPER
@@ -217,7 +226,7 @@ export default function BookingForm({
     // SEARCH
     const [searchingUsers, setSearchingUsers] = useState(false)
     const [searchedUsers, setSearchedUsers] = useState([])
-    const [selectedUser, setSelectedUser] = useState<any>()
+    // const [selectedUser, setSelectedUser] = useState<any>()
 
     return (
         <Dialog
@@ -231,6 +240,10 @@ export default function BookingForm({
                 <IconButton onClick={() => {
                     setToEdit({})
                     setIsOpen(false)
+                    setSearchedUsers([])
+                    setUnits([])
+                    setStep(0)
+                    reset()
                 }}>
                     <Box width="1.5rem" height="1.5rem">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -294,12 +307,12 @@ export default function BookingForm({
                                             gap="0.5rem"
                                             padding="0.75rem"
                                             border="1px solid"
-                                            borderColor={selectedUser?._id === user._id ? "primary.main" : "lightgrey"}
-                                            bgcolor={selectedUser?._id === user._id ? "primary.light" : "transparent"}
+                                            borderColor={watch("user")?._id === user._id ? "primary.main" : "lightgrey"}
+                                            bgcolor={watch("user")?._id === user._id ? "primary.light" : "transparent"}
                                             borderRadius="0.5rem"
                                             sx={{ cursor: "pointer" }}
                                             onClick={() => {
-                                                setSelectedUser(user)
+                                                // setSelectedUser(user)
                                                 setValue("user", user)
 
                                                 console.log("USER", user)
@@ -311,7 +324,7 @@ export default function BookingForm({
                                                 {/* <Chip size="small" label={!user?.tenant ? "Vacant" : "Occupied"} /> */}
                                             </Box>
 
-                                            <Box display={selectedUser?._id === user._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
+                                            <Box display={watch("user")?._id === user._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6" style={{ color: "inherit" }}>
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
@@ -332,7 +345,8 @@ export default function BookingForm({
                                 options={unitTypes?.data || []}
                                 getOptionLabel={(option: any) => option.name}
                                 onChange={async (event, value) => {
-                                    setSelectedUnit(null)
+                                    // setSelectedUnit(null)
+                                    setValue("unit", {})
                                     setValue("unitType", value)
                                     setLoadingUnits(true)
 
@@ -381,13 +395,13 @@ export default function BookingForm({
                                                     gap="1rem"
                                                     padding="0.75rem"
                                                     border="1px solid"
-                                                    borderColor={selectedUnit?._id === item._id ? "primary.main" : "lightgrey"}
-                                                    bgcolor={selectedUnit?._id === item._id ? "primary.light" : "transparent"}
+                                                    borderColor={watch("unit")?._id === item._id ? "primary.main" : "lightgrey"}
+                                                    bgcolor={watch("unit")?._id === item._id ? "primary.light" : "transparent"}
                                                     borderRadius="0.5rem"
                                                     sx={{ cursor: "pointer" }}
                                                     onClick={async () => {
                                                         await setError("unit", null)
-                                                        setSelectedUnit(item)
+                                                        // setSelectedUnit(item)
                                                         setValue("unit", item)
                                                     }}
                                                 >
@@ -406,7 +420,7 @@ export default function BookingForm({
                                                         />
                                                     </Box>
 
-                                                    <Box display={selectedUnit?._id === item._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
+                                                    <Box display={watch("unit")?._id === item._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6" style={{ color: "inherit" }}>
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
@@ -430,7 +444,6 @@ export default function BookingForm({
                                 options={features?.data || []}
                                 getOptionLabel={(option: any) => `${option.feature.name} - ${currencyFormatter(option.price, "UGX")}`}
                                 onChange={(event, value: any) => {
-                                    setSelectedUnit(null)
                                     if (value?.length < 1) {
                                         return setValue("additionalFeatures", [{ _id: "", feature: [{ _id: "", name: "" }] }])
                                     }

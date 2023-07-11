@@ -68,7 +68,7 @@ export async function fetchAllPropertyBookings(req: any, res: any) {
         })
         .skip((page - 1) * limit)
         .limit(limit),
-      Booking.countDocuments(),
+      Booking.countDocuments({ property: id }),
     ]);
 
     res.json({
@@ -281,6 +281,7 @@ export async function acceptBooking(req: any, res: any) {
     return additionalFeatures;
   }
 
+  console.log("BOOKING TO ACCEPT IS", id);
   try {
     //UPDATE booking status to accepted
     let booking = await Booking.findByIdAndUpdate(
@@ -437,7 +438,7 @@ export async function acceptBooking(req: any, res: any) {
       }
 
       // Return a success response
-      res.status(200).json({ message: "Booking accepted successfully" });
+      res.status(200).json({ success: true, message: "Booking accepted successfully" });
     } catch (error) {
       console.log(error);
       res.status(400).json({ error: "Failed to create bills" });
@@ -453,6 +454,37 @@ export async function acceptBooking(req: any, res: any) {
     res.status(400).json({
       success: false,
       msg: "failed to update booking",
+      data: error,
+    });
+  }
+}
+
+// REJECT BOOKING
+export async function rejectBooking(req: any, res: any) {
+  const { id } = req.body;
+
+  try {
+    //UPDATE booking status to accepted
+    let booking = await Booking.findByIdAndUpdate(
+      id,
+      {
+        status: "REJECTED",
+      },
+      {
+        new: true,
+      }
+    )
+
+    res.status(200).json({
+      success: true,
+      msg: "Booking rejected successfully",
+      data: booking,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      success: false,
+      msg: "Failed to reject booking",
       data: error,
     });
   }

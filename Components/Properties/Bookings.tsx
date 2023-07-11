@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Icon, IconButton, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/Common/TableRenderer';
@@ -11,6 +11,9 @@ import { useSession } from 'next-auth/react';
 import moment from 'moment';
 import fetchPropertyBookings from 'apis/property/fetchPropertyBookings';
 import AlertDialog from 'Components/Common/AlertDialog';
+import { CollectionsContext } from 'context/context';
+import { set } from 'mongoose';
+import BookingAlertDialog from './Forms/Components/BookingAlertDialog';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -35,6 +38,13 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
 
     const [declining, setDeclining] = useState(false)
     const [accepting, setAccepting] = useState(false)
+
+    const {
+        bookingPage: page,
+        setBookingPage: setPage,
+    }: any = useContext(CollectionsContext)
+
+    const [openAccept, setOpenAccept] = useState(false)
 
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -71,15 +81,15 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
             {
                 header: 'Status',
                 cell: (row) => <Chip
-                                    label={row.row.original.status}
-                                    // color={row.row.original.status === "PENDING" ? "warning" : "limegreen"}
-                                    size="small"
-                                    sx={{
-                                        fontSize: "0.75rem",
-                                        bgcolor: row.row.original.status === "PENDING" ? "warning.main" : "limegreen",
-                                        color: "white",
-                                    }}
-                                />,
+                    label={row.row.original.status}
+                    // color={row.row.original.status === "PENDING" ? "warning" : "limegreen"}
+                    size="small"
+                    sx={{
+                        fontSize: "0.75rem",
+                        bgcolor: row.row.original.status === "PENDING" ? "warning.main" : row.row.original.status === "ACCEPTED" ? "limegreen" : "error.main",
+                        color: "white",
+                    }}
+                />,
                 accessorKey: 'status',
             },
             {
@@ -91,43 +101,26 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
                 header: 'Actions',
                 cell: (row: any) => (
                     <Box display="flex" gap="1rem">
-                        <AlertDialog
+                        <BookingAlertDialog
+                            data={row.row.original}
                             disabled={row.row.original.status !== "PENDING"}
                             buttonLabel="Accept"
                             buttonVariant="contained"
                             title="Are you sure you want to accept this booking?"
                             content="If you accept, the user that created this booking will become a tenant at your property"
-                            setAgreeing={setAccepting}
-                            agreeing={accepting}
-                            onAgree={async (event: any) => {
-                                event.stopPropagation()
-                                setAccepting(true)
-                                try {
-                                    const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/booking/accept`, {
-                                        method: "POST",
-                                        headers: {
-                                            Authorization: `Bearer ${session.data.accessToken}`,
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({
-                                            status: "ACCEPTED",
-                                            id: row.row.original._id,
-                                            startDate: row.row.original.startDate, 
-                                            endDate: row.row.original.endDate, 
-                                            customRent: null, 
-                                            customBillingPeriod: null
-                                        })
-                                    })
-
-                                    console.log("RES", await res.json())
-                                    setAccepting(false)
-                                } catch (error) {
-                                    setAccepting(false)
-                                    alert("Failed to accept")
-                                }
-                            }}
+                            action="accept"
                         />
-                        <AlertDialog
+                        <BookingAlertDialog
+                            data={row.row.original}
+                            disabled={row.row.original.status !== "PENDING"}
+                            buttonLabel="Reject"
+                            buttonVariant="outlined"
+                            buttonColor="error"
+                            title="Are you sure you want to reject this booking?"
+                            content="If you decline, the user that created this booking will not become a tenant at your property"
+                            action="reject"
+                        />
+                        {/* <AlertDialog
                             disabled={row.row.original.status !== "PENDING"}
                             buttonLabel="Decline"
                             buttonVariant="outlined"
@@ -156,7 +149,7 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
                                     alert("Failed to accept")
                                 }
                             }}
-                        />
+                        /> */}
                     </Box>
                 ),
             },
@@ -165,8 +158,7 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
     );
 
     const token = session.data.accessToken
-    const [bookingsPage, setBookingsPage] = useState(1)
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', token, property], queryFn: () => fetchPropertyBookings(token, property, bookingsPage) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', token, property, page], queryFn: () => fetchPropertyBookings(token, property, page) })
 
     return (
         <TableRenderer
@@ -177,6 +169,7 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
                 console.log("Clicked row")
             }}
             loading={isLoading}
+            setPage={setPage}
         />
     );
 };

@@ -2,6 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import React, { useEffect, useState } from "react";
 
 export default function AlertDialog({
+    data,
     hide,
     buttonLabel,
     buttonVariant,
@@ -9,17 +10,29 @@ export default function AlertDialog({
     title,
     content,
     onAgree,
-    agreeing,
-    setAgreeing,
+    loadingProp,
+    setLoadingProp,
     disabled,
+    open: openProp,
+    setOpen: setOpenProp,
     // onOpen
 }: any) {
     const [open, setOpen] = useState(false);
 
+    useEffect(() => {
+        setOpen(openProp)
+    }, [openProp])
+
     const handleClickOpen = (event: any) => {
         event.stopPropagation()
         event.stopPropagation()
-        setOpen(true);
+        console.log("clicked")
+        setOpen((prev: any) => {
+            console.log("prev", prev)
+
+            return !prev
+            // true
+        });
         // onOpen(event)
     };
 
@@ -31,12 +44,12 @@ export default function AlertDialog({
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        if (agreeing) {
+        if (loadingProp) {
             return setLoading(true)
         }
 
         return setLoading(false)
-    }, [agreeing])
+    }, [loadingProp])
 
     return (
         <div style={{display: hide ? "none" : "block"}}>
@@ -46,16 +59,16 @@ export default function AlertDialog({
             <Dialog
                 open={open}
                 onClose={handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
+                aria-labelledby={`alert-dialog-title-${data?._id}`}
+                aria-describedby={`alert-dialog-title-${data?._id}`}
                 sx={{display: hide ? "none" : "block"}}
             >
                 <LinearProgress sx={{ display: loading ? "flex" : "none" }} />
-                <DialogTitle id="alert-dialog-title">
+                <DialogTitle id={`alert-dialog-title-${data?._id}`}>
                     {title}
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
+                    <DialogContentText id={`alert-dialog-description-${data?._d}`}>
                         {content}
                     </DialogContentText>
                 </DialogContent>

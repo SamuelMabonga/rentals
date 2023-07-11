@@ -8,6 +8,7 @@ import fetchFeatures from "apis/fetchFeatures"
 import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
 import fetchUnitTypes from "apis/fetchUnitTypes"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
+import fetchPropertyUnits from "apis/property/fetchPropertyUnits"
 import { CollectionsContext } from "context/context"
 import { fetchAllBillingPeriods } from "controllers/billingPeriods"
 import { useSession } from "next-auth/react"
@@ -37,7 +38,11 @@ export default function UnitForm({property}: any) {
     // SESSION
     const session: any = useSession()
     const token = session?.data?.accessToken
-    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', token, id], queryFn: () => fetchPropertyUnitTypes(id) })
+    const { data, refetch }: any = useQuery({
+        queryKey: ['property-units', token, property],
+        queryFn: () => fetchPropertyUnits(token, property, null),
+    })
+    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', token, id], queryFn: () => fetchPropertyUnitTypes(id, null) })
     // const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
     // const { data: unitTypes }: any = useQuery({ queryKey: ['unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
 
@@ -46,8 +51,7 @@ export default function UnitForm({property}: any) {
     const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
         defaultValues: {
             name: "",
-            description: "",
-            features: ""
+            unitType: {name: ""}
         },
         mode: "onChange",
         reValidateMode: "onChange",
@@ -57,11 +61,12 @@ export default function UnitForm({property}: any) {
     useEffect(() => {
         if (toEdit?.name) {
             setValue("name", toEdit.name)
-            setValue("description", toEdit.details)
+            setValue("unitType", toEdit.unitType)
             return
         }
 
         reset()
+        setValue("unitType", {name: ""})
 
     }, [toEdit])
 
@@ -75,31 +80,46 @@ export default function UnitForm({property}: any) {
         }
 
         // // EDIT A PROPERTY
-        // if (toEdit?.name) {
-        //     const edited = {
-        //         ...toEdit,
-        //         name: values.name,
-        //         details: values.description
-        //     }
-        //     try {
-        //         const res = await fetch(`/api/property?id=${toEdit._id}`,{
-        //             method: 'PUT',
-        //             headers:{
-        //                 'Content-Type':'application/json',
-        //                 Authorization: `Bearer ${session.data.accessToken}`,
-        //             },
-        //             body: JSON.stringify({...edited})
-        //         })
-        //         const response = await res.json();
-        //         console.log(response)
-        //         setIsLoading(false)
-        //         return
-        //     } catch(error) {
-        //         setIsLoading(false)
-        //         console.log(error)
-        //         return
-        //     }
-        // }
+        if (toEdit?.name) {
+            const edited = {
+                ...toEdit,
+                name: values.name,
+                unitType: values.unitType._id,
+            }
+            try {
+                const res = await fetch(`/api/unit?id=${toEdit._id}`,{
+                    method: 'PUT',
+                    headers:{
+                        'Content-Type':'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({...edited})
+                })
+                const response = await res.json();
+                console.log(response)
+
+                refetch()
+                setSnackbarMessage({
+                    open: true,
+                    vertical: 'top',
+                    horizontal: 'center',
+                    message: "Unit edited successfully",
+                    icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </Box>
+                })
+                setIsLoading(false)
+                setIsOpen(false)
+                reset()
+                return
+            } catch(error) {
+                setIsLoading(false)
+                console.log(error)
+                return
+            }
+        }
 
         // POST A PROPERTY
         try {
@@ -112,7 +132,10 @@ export default function UnitForm({property}: any) {
                 body: JSON.stringify({ ...data })
             })
             const response = await res.json();
-            console.log(response)
+
+            if (!response.success) return
+
+            refetch()
             setSnackbarMessage({
                 open: true,
                 vertical: 'top',
@@ -126,6 +149,7 @@ export default function UnitForm({property}: any) {
             })
             setIsLoading(false)
             setIsOpen(false)
+            reset()
             return
         } catch (error) {
             setIsLoading(false)
@@ -172,6 +196,7 @@ export default function UnitForm({property}: any) {
                         <FormLabel>Unit Type</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
+                            value={watch("unitType")}
                             options={unitTypes?.data || []}
                             getOptionLabel={(option: any) => option.name}
                             onChange={(event, value) => setValue("unitType", value)}

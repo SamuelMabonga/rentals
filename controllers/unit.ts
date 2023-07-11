@@ -63,13 +63,8 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
        })
         .skip((page - 1) * limit)
         .limit(limit),
-      Unit.countDocuments(),
+      Unit.countDocuments({ "property": id }),
     ]);
-
-    // .populate({
-    //   path: "tenant",
-    //   populate: [{ path: "user" }],
-    // })
 
     res.status(200).json({
       success: true,
@@ -78,7 +73,6 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
       pageInfo: getPageInfo(limit, unitsCount, page),
     });
   } catch (error) {
-    console.log("ERROR MSG", error);
     res.status(400).json({
       success: false,
       msg: "Failed to fetch property units",
@@ -193,27 +187,24 @@ export async function fetchSingleUnit(req: any, res: any) {
 //update a unit
 export async function updateUnit(req: any, res: any) {
   try {
-    let unit = await Unit.findById(req.params.id);
+    let unit = await Unit.findById(req.query.id);
 
     const data = {
       name: req.body.name || unit.name,
-      image: req.body.image || unit.image,
-      // tenant: req.body.tenant || unit.tenant,
       unitType: req.body.unitType || unit.unitType,
-      status: req.body.status || unit.status,
     };
-    unit = await Unit.findByIdAndUpdate(req.params.id, data, {
+    unit = await Unit.findByIdAndUpdate(req.query.id, data, {
       new: true,
     });
     res.status(200).json({
       success: true,
-      msg: "unit updated successfully",
+      msg: "Unit updated successfully",
       data: unit,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      msg: "failed to update unit",
+      msg: "Failed to update unit",
       data: error,
     });
   }
