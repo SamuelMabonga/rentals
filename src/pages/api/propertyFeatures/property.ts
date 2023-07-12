@@ -18,24 +18,69 @@ export default async function handler(
     query: { id, searchQuery },
   }: any = req;
 
-  // authenticateUser(req, res);
+
+  const decodedToken = authenticateUser(req, res);
+
+  if (!decodedToken?.user?._id) {
+    return res.status(401).json({
+      success: false,
+      msg: "Not Authorized",
+    });
+  }
 
   connectToMongoDB().catch((err) => res.json(err));
 
   //type of request
   const { method } = req;
+  const property = req.body.property || req.query.id
+
+  if (!property) {
+    return res.status(400).json({
+      success: false,
+      msg: "No property provided",
+    });
+  }
+
+  const userRoles = decodedToken.userRoles
+  const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
+  const permissions = userPropertyRoles?.role?.permissions
+
   switch (method) {
     case "GET":
+      const getPermission = permissions?.find((permission: any) => permission.name === "View property feature")
+      if (!getPermission) {
+        return res.status(401).json({
+          success: false,
+          msg: "Not Authorized",
+        });
+      }
+
       // if (id) {
       //   fetchSinglePropertyFeature(req, res);
       // } else {
-        fetchAllPropertyFeaturesByProperty(req, res);
+      fetchAllPropertyFeaturesByProperty(req, res);
       // }
       break;
     case "POST":
+      const postPermission = permissions.find((permission: any) => permission.name === "Create property feature")
+      if (!postPermission) {
+        return res.status(401).json({
+          success: false,
+          msg: "Not Authorized",
+        });
+      }
+
       createPropertyFeature(req, res);
       break;
     case "PUT":
+      const putPermission = permissions.find((permission: any) => permission.name === "Create property feature")
+      if (!putPermission) {
+        return res.status(401).json({
+          success: false,
+          msg: "Not Authorized",
+        });
+      }
+
       updatePropertyFeature(req, res);
       break;
     case "DELETE":

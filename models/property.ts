@@ -11,10 +11,18 @@ const propertySchema: any = new Schema(
       minlength: 2, // Example validation rule: minimum length of 2 characters
       maxlength: 100, // Example validation rule: maximum length of 100 characters
     },
+    desription: {
+      type: String,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: User,
       required: true,
+    },
+    status: {
+      type: String,
+      enum: ["ACTIVE", "INACTIVE"],
+      default: "INACTIVE"
     },
     cover_photo: {
       type: String,

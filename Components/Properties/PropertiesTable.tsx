@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
+import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useContext, useMemo } from 'react';
@@ -6,6 +6,8 @@ import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/Common/TableRenderer';
 import { CollectionsContext } from 'context/context';
+import { useSession } from 'next-auth/react';
+import moment from 'moment';
 
 interface ReactTableProps<T extends object> {
     data: T[];
@@ -28,6 +30,10 @@ export const PropertiesTable = <T extends object>({ data, pageInfo }: ReactTable
         setShowPropertyForm,
         setPropertyToEdit
     }: any = useContext(CollectionsContext)
+
+    const session: any = useSession()
+
+    console.log(session)
         
 
     const router = useRouter()
@@ -54,19 +60,28 @@ export const PropertiesTable = <T extends object>({ data, pageInfo }: ReactTable
                 accessorKey: 'name',
             },
             {
-                header: 'Status',
+                header: 'Role',
                 cell: (row) => row.renderValue(),
+                accessorKey: 'role.name',
+            },
+            {
+                header: 'Status',
+                cell: (row: any) => <Chip
+                    label={row.renderValue()}
+                    size="small"
+                    color="primary"
+                    sx={{
+                        bgcolor: row.renderValue() === "ACTIVE" ? "limegreen" : "warning.main",
+                        fontWeight: "500",
+                        fontSize: "0.75rem"
+                    }}
+                />,
                 accessorKey: 'status',
             },
             {
-                header: 'Tenants',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'tenants',
-            },
-            {
                 header: 'Date Created',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'dateCreated',
+                cell: (row: any) => moment(row.renderValue()).format('DD-MM-YYYY'),
+                accessorKey: 'createdAt',
             },
             {
                 header: 'Actions',
@@ -94,14 +109,14 @@ export const PropertiesTable = <T extends object>({ data, pageInfo }: ReactTable
                             </Box>
                         </IconButton>
 
-                        <IconButton>
+                        {/* <IconButton>
                             <Box width="1.5rem" height="1.5rem">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                             </Box>
-                        </IconButton>
+                        </IconButton> */}
                     </Box>
                 ),
             },

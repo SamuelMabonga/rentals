@@ -30,7 +30,8 @@ export default function PropertyFeatureForm({property}: any) {
 
     const session: any = useSession()
     const token = session?.data?.accessToken
-    const { data, refetch }: any = useQuery({ queryKey: ['property-features', property], queryFn: () => fetchPropertyFeatures(property, null) })
+    console.log("token", token)
+    const { refetch }: any = useQuery({ queryKey: ['property-features', token, property], queryFn: () => fetchPropertyFeatures(token, property, null) })
     const { data: features }: any = useQuery({ queryKey: ['features', token], queryFn: () => fetchFeatures(token, null) })
     const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
 
@@ -84,7 +85,7 @@ export default function PropertyFeatureForm({property}: any) {
                 billingPeriod: values.billingPeriod._id
             }
             try {
-                const res = await fetch(`/api/propertyFeatures?id=${toEdit._id}`, {
+                const res = await fetch(`/api/propertyFeatures/property?id=${toEdit._id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -120,7 +121,7 @@ export default function PropertyFeatureForm({property}: any) {
 
         // // POST A PROPERTY FEATURE
         try {
-            const res = await fetch('/api/propertyFeatures', {
+            const res = await fetch('/api/propertyFeatures/property', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

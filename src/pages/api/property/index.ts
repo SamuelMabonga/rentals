@@ -51,9 +51,9 @@ export default async function handler(
             } else fetchAllProperties(req, res);
 
             break;
-          // case "POST":
-          //   createProperty(req, res, _id);
-          //   break;
+          case "POST":
+            createProperty(req, res);
+            break;
           // case "PUT":
           //   updateProperty(req, res);
           //   break;

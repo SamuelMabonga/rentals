@@ -3,6 +3,7 @@ import {
   createProperty,
   deleteProperty,
   fetchOwnerProperties,
+  fetchPropertiesByRoles,
   fetchSingleProperty,
   searchProperty,
   updateProperty,
@@ -31,7 +32,9 @@ export default async function handler(
       )
       .then(() => {
         // USER
-        const { _id: owner, role } = decodedToken.user;
+        const { _id: user, role } = decodedToken.user;
+
+        console.log("DECODED TOKEN", decodedToken.userRoles)
 
         const { method } = req;
         switch (method) {
@@ -41,11 +44,11 @@ export default async function handler(
             } else if (searchQuery) {
               searchProperty(req, res, searchQuery);
             } else {
-              fetchOwnerProperties(req, res, owner);
+              fetchPropertiesByRoles(req, res, user);
             }
             break;
           case "POST":
-            createProperty(req, res, owner);
+            createProperty(req, res);
             break;
           case "PUT":
             updateProperty(req, res);

@@ -1,5 +1,7 @@
 import { getPageInfo } from "helpers/page_info";
 import Property from "models/property";
+import Roles from "models/roles";
+import UserRoles from "models/userRoles";
 
 // get all properties
 //none admin fetch properties
@@ -17,14 +19,47 @@ export async function fetchOwnerProperties(req: any, res: any, owner: string) {
 
     res.status(200).json({
       success: true,
-      msg: "properties fetched successfully",
+      msg: "Properties fetched successfully",
       data: properties,
       pageInfo: getPageInfo(limit, propertiesCount, page),
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      msg: "failed to fetch  properties",
+      msg: "Failed to fetch properties",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+
+// get properties byy roles
+//none admin fetch properties
+export async function fetchPropertiesByRoles(req: any, res: any, user: string) {
+  // let ownerId = req.query.ownerId;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+  try {
+    const [properties, propertiesCount] = await Promise.all([
+      UserRoles.find({ user: `${user}` })
+        .populate("property")
+        .populate("role")
+        .skip((page - 1) * limit)
+        .limit(limit),
+      UserRoles.countDocuments({ user: `${user}` }),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      msg: "Properties fetched successfully",
+      data: properties.map((property) => ({...property.property._doc, role: property.role})),
+      pageInfo: getPageInfo(limit, propertiesCount, page),
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch properties",
       data: error,
     });
     console.log(error);
@@ -62,9 +97,9 @@ export async function fetchAllProperties(req: any, res: any) {
 }
 
 // create a property
-export async function createProperty(req: any, res: any, userFetching: string) {
+export async function createProperty(req: any, res: any) {
   try {
-    const { cover_photo, profile_photo, name, details } = req.body;
+    const { name, description } = req.body;
     console.log("It does not fail after line 30");
     const requiredFields = ["name"];
 
@@ -83,10 +118,27 @@ export async function createProperty(req: any, res: any, userFetching: string) {
 
     const property = new Property({
       ...req.body,
-      owner: userFetching,
     });
 
     const newProperty = await property.save();
+
+    // Find owner role
+    const role = await Roles.findOne({ name: "Owner" });
+
+    console.log("ROLE", role)
+    console.log("NEW PROPERTY", newProperty)
+
+    // Create an owner user role for the property owner
+    const ownerRole = new UserRoles({
+      property: newProperty._id,
+      role: role._id,
+      user: req.body.owner
+    });
+
+    // console.log("OWNER ROLE", ownerRole)
+
+    await ownerRole.save();
+
 
     return res.json({
       success: true,

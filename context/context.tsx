@@ -34,6 +34,7 @@ const CollectionsProvider = ({children}: any) => {
     // PROPERTY FORM
     const [showPropertyForm, setShowPropertyForm] = useState(false)
     const [propertyToEdit, setPropertyToEdit] = useState()
+    const [propertiesPage, setPropertiesPage] = useState(1)
 
     // FEATURE FORM
     const [featuresPage, setFeaturesPage] = useState(1)
@@ -113,8 +114,15 @@ const CollectionsProvider = ({children}: any) => {
 
     // PUBLIC BOOKING 
     const [openPublicBooking, setOpenPublicBooking] = useState(false)
-    
 
+
+    // TENANT BILLS
+    const [tenantBillsPage, setTenantBillsPage] = useState(1)
+
+    // ROLES
+    const [rolesPage, setRolesPage] = useState(1)
+    const [roleToEdit, setRoleToEdit] = useState({})
+    const [openRolesForm, setOpenRolesForm] = useState(false)
 
     return (
         <CollectionsContext.Provider value={{
@@ -139,6 +147,8 @@ const CollectionsProvider = ({children}: any) => {
             setShowPropertyForm,
             propertyToEdit,
             setPropertyToEdit,
+            propertiesPage,
+            setPropertiesPage,
 
             // Features form
             openFeaturesForm,
@@ -235,7 +245,21 @@ const CollectionsProvider = ({children}: any) => {
 
             // PUBLIC BOOKING
             openPublicBooking,
-            setOpenPublicBooking
+            setOpenPublicBooking,
+
+            // TENANT BILLS
+            tenantBillsPage,
+            setTenantBillsPage,
+
+
+            // ROLES
+            rolesPage,
+            setRolesPage,
+            roleToEdit,
+            setRoleToEdit,
+            openRolesForm,
+            setOpenRolesForm,
+
 
         }}>
             {children}

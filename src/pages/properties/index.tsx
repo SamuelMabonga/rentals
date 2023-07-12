@@ -6,7 +6,8 @@ import { CollectionsContext } from "context/context"
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import { getSession, useSession } from "next-auth/react"
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
-import fetchProperties from "apis/fetchProperties"
+import fetchProperties from "apis/user/fetchProperties"
+// import fetchProperties from "apis/fetchProperties"
 
 // type Property = {
 //     // name: string;
@@ -32,7 +33,7 @@ export default function Properties({
 
     const [openCreateForm, setOpenCreateForm] = useState(false)
 
-    const { data }: any = useQuery({ queryKey: ['properties'], queryFn: () => fetchProperties() })
+    const { data }: any = useQuery({ queryKey: ['properties', token], queryFn: () => fetchProperties(token, 1) })
 
     return (
         <>
@@ -77,7 +78,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // REACT QUERY
     const queryClient = new QueryClient()
 
-    await queryClient.prefetchQuery(['properties', accessToken], () => fetchProperties())
+    await queryClient.prefetchQuery(['properties', accessToken], () => fetchProperties(accessToken, 1))
 
     return {
         props: {

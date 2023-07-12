@@ -117,13 +117,16 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
         setSnackbarMessage,
 
         paymentConfig,
-        setPaymentConfig
+        setPaymentConfig,
+
+        tenantBillsPage: page,
+        setTenantBillsPage: setPage,
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
     const token = session?.data?.accessToken
     const tenantId = tenant?._id
-    const { data, isLoading, refetch }: any = useQuery({ queryKey: ['tenant-bills', tenantId, token], queryFn: () => fetchBills(token, tenantId) })
+    const { data, isLoading, refetch }: any = useQuery({ queryKey: ['tenant-bills', tenantId, token, page], queryFn: () => fetchBills(token, tenantId, page) })
 
     const { data: user }: any = useSession()
 
@@ -315,6 +318,7 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                 columns={columns}
                 onRowClick={(rowId) => console.log(rowId)}
                 loading={isLoading}
+                setPage={setPage}
             />
             <RequestExtension tenant={tenant} billToExtend={billToExtend} />
         </React.Fragment>

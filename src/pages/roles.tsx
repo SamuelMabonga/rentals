@@ -13,6 +13,9 @@ import { RentalsTable } from "Components/Properties/RentalsTable"
 import fetchBillingPeriods from "apis/fetchBillingPeriods"
 import { BillingPeriodsTable } from "Components/Admin/BillingPeriodsTable"
 import BillingPeriodsForm from "Components/Admin/Forms/BillingPeriodsForm"
+import fetchRoles from "apis/admin/fetchRoles"
+import { RolesTable } from "Components/Admin/RolesTable"
+import RolesForm from "Components/Admin/Forms/RolesForm"
 
 
 type PageProps = {
@@ -20,12 +23,14 @@ type PageProps = {
 };
 
 
-export default function BillingPeriods({
+export default function Roles({
     // data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     // CONTEXT
     const {
-        setOpenBillingPeriodsForm
+        setOpenBillingPeriodsForm,
+
+        setOpenRolesForm,
     }: any = useContext(CollectionsContext)
 
     // SESSION
@@ -33,7 +38,7 @@ export default function BillingPeriods({
 
     return (
         <>
-            <Typography color="black" fontSize="1.5rem" fontWeight="600">Billing Periods</Typography>
+            <Typography color="black" fontSize="1.5rem" fontWeight="600">Roles</Typography>
             <Box width="100%" display={"flex"} flexDirection={["column", "row"]} gap="1rem">
                 <TextField
                     name="search"
@@ -43,21 +48,20 @@ export default function BillingPeriods({
                         width: ["100%", "20rem"]
                     }}
                 />
-                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenBillingPeriodsForm(true)}>Create New</Button>
+                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenRolesForm(true)}>Create New</Button>
             </Box>
-            <BillingPeriodsTable />
-            <BillingPeriodsForm />
+            <RolesTable />
+            <RolesForm />
         </>
     )
 }
 
-BillingPeriods.auth = true
+Roles.auth = true
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
     // Retrieve the access token from the session
     const accessToken = session?.accessToken;
-
 
     if (!session) {
         return {
@@ -71,7 +75,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // REACT QUERY
     const queryClient = new QueryClient()
 
-    await queryClient.prefetchQuery(['billingPeriods'], () => fetchBillingPeriods(accessToken))
+    await queryClient.prefetchQuery(['roles'], () => fetchRoles(accessToken, null))
     return {
         props: {
             dehydratedState: dehydrate(queryClient),

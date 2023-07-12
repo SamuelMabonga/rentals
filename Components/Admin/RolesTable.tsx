@@ -8,15 +8,14 @@ import { TableRenderer } from 'Components/Common/TableRenderer';
 import { useQuery } from '@tanstack/react-query';
 import fetchFeatures from 'apis/fetchFeatures';
 import { useSession } from 'next-auth/react';
-// import fetchPropertyFeatures from 'apis/fetchPropertyFeatures';
+import fetchBillingPeriods from 'apis/fetchBillingPeriods';
 import { CollectionsContext } from 'context/context';
-import fetchPropertyFeatures from 'apis/property/fetchPropertyFeatures';
-import currencyFormatter from 'Components/Common/currencyFormatter';
+import { set } from 'mongoose';
+import fetchRoles from 'apis/admin/fetchRoles';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
-    property: string;
 }
 
 type Item = {
@@ -28,49 +27,39 @@ type Item = {
     actions: any;
 }
 
-export const PropertyFeaturesTable = <T extends object>({ property }: ReactTableProps<T>) => {
-    console.log("PROPERTY", property)
+export const RolesTable = <T extends object>({ }: ReactTableProps<T>) => {
+    // CONTEXT
     const {
-        setPropertyFeatureToEdit,
-        setOpenPropertyFeaturesForm,
-
-        propertyFeaturesPage: page,
-        setPropertyFeaturesPage: setPage,
+        setOpenBillingPeriodsForm,
+        setBillingPeriodToEdit,
+        setRoleToEdit,
+        setOpenRolesForm
     }: any = useContext(CollectionsContext)
     // SESSION
     const session: any = useSession()
     const token = session?.data?.accessToken
-    // console.log("TOKEN", token)
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-features', token, property, page], queryFn: () => fetchPropertyFeatures(token, property, page) })
+    const { data }: any = useQuery({ queryKey: ['roles', token], queryFn: () => fetchRoles(token, null) })
 
-    const router = useRouter()
+    // console.log(data)
+    // const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
             {
                 header: 'Name',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'feature.name',
-            },
-            {
-                header: 'Price',
-                cell: (row) => currencyFormatter(row.renderValue(), "UGX"),
-                accessorKey: 'price',
-            },
-            {
-                header: 'Billing Period',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'billingPeriod.name',
+                accessorKey: 'name',
             },
             {
                 header: 'Actions',
-                cell: (row: any) => (
+                cell: (row) => (
                     <Box display="flex" gap="1rem" >
-                        <IconButton onClick={(event) => {
-                            event.stopPropagation()
-                            setPropertyFeatureToEdit(row.row.original)
-                            setOpenPropertyFeaturesForm(true)
-                            return
-                        }}>
+                        <IconButton
+                            onClick={(event) => {
+                                event.stopPropagation()
+                                setRoleToEdit(row.row.original)
+                                setOpenRolesForm(true)
+                            }}
+                        >
                             <Box width="1.5rem" height="1.5rem">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -95,13 +84,11 @@ export const PropertyFeaturesTable = <T extends object>({ property }: ReactTable
     return (
         <TableRenderer
             data={data?.data}
-            pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
                 console.log(obj)
             }}
-            loading={isLoading}
-            setPage={setPage}
+            pageInfo={data?.pageInfo}
         />
     );
 };

@@ -38,30 +38,40 @@ export async function fetchAllBills(req: any, res: any) {
   }
 }
 
-// get all Tenant's bills
+
+// get tenant's bills
 export async function fetchAllTenantBills(req: any, res: any) {
   const {
     query: { id },
   }: any = req;
+
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    let bills = await Bills.find({ tenant: id })
-      .populate({
-        path: "tenant",
-      })
-      .populate({
-        path: "propertyFeature",
-        populate: [{ path: "feature" }],
-      });
+    const [bills, billsCount] = await Promise.all([
+      Bills.find({ tenant: id })
+        .populate({
+          path: "tenant",
+        })
+        .populate({
+          path: "propertyFeature",
+          populate: [{ path: "feature" }],
+        })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Bills.countDocuments({ tenant: id }),
+    ]);
 
     res.json({
       success: true,
       msg: "Tenant's bills fetched successfully",
       data: bills,
+      pageInfo: getPageInfo(limit, billsCount, page),
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      msg: "Failed to Tenant's fetch bills",
+      msg: "Failed to fetch tenant's bills",
       data: error,
     });
     console.log(error);

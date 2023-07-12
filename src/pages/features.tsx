@@ -11,11 +11,11 @@ import fetchProperties from "apis/fetchProperties"
 import fetchUserTenancies from "apis/fetchUserTenancies"
 import { RentalsTable } from "Components/Properties/RentalsTable"
 import fetchBillingPeriods from "apis/fetchBillingPeriods"
-import { BillingPeriodsTable } from "Components/Properties/BillingPeriodsTable"
-import BillingPeriodsForm from "Components/Properties/Forms/BillingPeriodsForm"
+import { BillingPeriodsTable } from "Components/Admin/BillingPeriodsTable"
+import BillingPeriodsForm from "Components/Admin/Forms/BillingPeriodsForm"
 import fetchFeatures from "apis/fetchFeatures"
-import { FeaturesTable } from "Components/Properties/FeaturesTable"
-import FeaturesForm from "Components/Properties/Forms/FeaturesForm"
+import { FeaturesTable } from "Components/Admin/FeaturesTable"
+import FeaturesForm from "Components/Admin/Forms/FeaturesForm"
 
 
 type PageProps = {
