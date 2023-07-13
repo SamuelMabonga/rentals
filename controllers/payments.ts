@@ -76,7 +76,7 @@ export async function fetchSinglePayment(req: any, res: any) {
 }
 
 // FETCH PAYMENTS BY TENANT
-export async function fetchPaymentsByTenant(req: any, res: any) {
+export async function fetchPaymentsByTenant(req: any, res: any, userId: string) {
   try {
     let payments = await Payments.find({ tenant: req.query.id })
       .populate("bills")
@@ -86,6 +86,14 @@ export async function fetchPaymentsByTenant(req: any, res: any) {
       msg: "Tenant's payments fetched successfully",
       data: payments,
     });
+
+    if (payments[0].tenant.user != userId) {
+      return res.status(403).json({
+        success: false,
+        msg: "You are not authorized to view this tenant's payments",
+      });
+    }
+
   } catch (error) {
     res.status(400).json({
       success: false,

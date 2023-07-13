@@ -1,14 +1,20 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/Common/TableRenderer';
+import { useSession } from 'next-auth/react';
+import { useQuery } from '@tanstack/react-query';
+import fetchStaff from 'apis/property/fetchStaff';
+import { CollectionsContext } from 'context/context';
+import moment from 'moment';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: string;
 }
 
 type Item = {
@@ -20,51 +26,13 @@ type Item = {
     actions: any;
 }
 
-export const StaffTable = <T extends object>({ }: ReactTableProps<T>) => {
-    const data = [
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        role: "string",
-        startDate: "string",
-        endDate: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        role: "string",
-        startDate: "string",
-        endDate: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        role: "string",
-        startDate: "string",
-        endDate: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        role: "string",
-        startDate: "string",
-        endDate: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        role: "string",
-        startDate: "string",
-        endDate: "string",
-    },
-    {
-        image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-        name: "string",
-        role: "string",
-        startDate: "string",
-        endDate: "string",
-    },
-]
+export const StaffTable = <T extends object>({ property }: ReactTableProps<T>) => {
+    // CONTEXT
+    const {
+        staffPage: page,
+        setStaffPage: setPage,
+    }: any = useContext(CollectionsContext)
+
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -85,23 +53,28 @@ export const StaffTable = <T extends object>({ }: ReactTableProps<T>) => {
             },
             {
                 header: 'Name',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'name',
+                cell: (row: any) => `${row.renderValue().first_name} ${row.renderValue().last_name}`,
+                accessorKey: 'user',
+            },
+            {
+                header: 'Email',
+                cell: (row: any) => row.renderValue(),
+                accessorKey: 'user.email',
             },
             {
                 header: 'Role',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'role',
+                accessorKey: 'role.name',
             },
+            // {
+            //     header: 'Start Date',
+            //     cell: (row) => row.renderValue(),
+            //     accessorKey: 'startDate',
+            // },
             {
-                header: 'Start Date',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'startDate',
-            },
-            {
-                header: 'End Date',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'endDate',
+                header: 'Date Added',
+                cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+                accessorKey: 'createdAt',
             },
             {
                 header: 'Actions',
@@ -129,13 +102,20 @@ export const StaffTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
+    const session: any = useSession()
+    const token = session.data.accessToken
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', token, property, page], queryFn: () => fetchStaff(token, property, page) })
+
     return (
         <TableRenderer
-            data={data}
-            pageInfo={{ total: 0, page: 0, pageSize: 0, lastPage: 0 }}
+            data={data?.data}
+            pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
-            } }        />
+                console.log(obj)
+            }}
+            loading={isLoading}
+            setPage={setPage}
+        />
     );
 };

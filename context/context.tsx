@@ -124,6 +124,11 @@ const CollectionsProvider = ({children}: any) => {
     const [roleToEdit, setRoleToEdit] = useState({})
     const [openRolesForm, setOpenRolesForm] = useState(false)
 
+    // STAFF FORM
+    const [openStaffForm, setOpenStaffForm] = useState(false)
+    const [staffToEdit, setStaffToEdit] = useState({})
+    const [staffPage, setStaffPage] = useState(1)
+
     return (
         <CollectionsContext.Provider value={{
             collections,
@@ -259,6 +264,14 @@ const CollectionsProvider = ({children}: any) => {
             setRoleToEdit,
             openRolesForm,
             setOpenRolesForm,
+
+            // STAFF
+            openStaffForm,
+            setOpenStaffForm,
+            staffToEdit,
+            setStaffToEdit,
+            staffPage,
+            setStaffPage,
 
 
         }}>

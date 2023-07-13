@@ -72,7 +72,7 @@ export async function fetchPropertyUnitTypes(req: any, res: any) {
         .populate({path: "defaultFeatures", populate: {path: "feature"}})
         .skip((page - 1) * limit)
         .limit(limit),
-      UnitType.countDocuments(),
+      UnitType.countDocuments({ property: propertyId }),
     ]);
     res.status(200).json({
       success: true,

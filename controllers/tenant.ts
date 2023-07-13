@@ -1,5 +1,6 @@
 import { getPageInfo } from "helpers/page_info";
 import Tenant from "models/tenant";
+import UserRoles from "models/userRoles";
 
 // get all tenants
 export async function fetchAllTenants(req: any, res: any) {
@@ -135,7 +136,8 @@ export async function createTenant(req: any, res: any) {
 }
 
 //fetch tenant by id
-export async function fetchSingleTenant(req: any, res: any) {
+export async function fetchSingleTenant(req: any, res: any, user: string) {
+  const tenant = req.query.id
   try {
     let tenant = await Tenant.findById(req.query.id)
       .populate("user")

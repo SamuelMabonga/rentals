@@ -42,7 +42,7 @@ export default function UnitForm({property}: any) {
         queryKey: ['property-units', token, property],
         queryFn: () => fetchPropertyUnits(token, property, null),
     })
-    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', token, id], queryFn: () => fetchPropertyUnitTypes(id, null) })
+    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', token, id], queryFn: () => fetchPropertyUnitTypes(token, id, null) })
     // const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
     // const { data: unitTypes }: any = useQuery({ queryKey: ['unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
 

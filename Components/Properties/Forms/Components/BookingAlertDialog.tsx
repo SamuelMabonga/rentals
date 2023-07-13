@@ -93,6 +93,7 @@ export default function BookingAlertDialog({
                                         body: JSON.stringify({
                                             status: "ACCEPTED",
                                             id: data._id,
+                                            property: data.property,
                                         })
                                     })
     
@@ -130,6 +131,7 @@ export default function BookingAlertDialog({
                                     body: JSON.stringify({
                                         status: "REJECTED",
                                         id: data._id,
+                                        property: data.property,
                                     })
                                 })
 

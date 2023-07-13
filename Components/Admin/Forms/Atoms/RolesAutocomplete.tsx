@@ -3,9 +3,9 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { FormControl, FormLabel } from '@mui/material';
 
-export default function RolesAutocomplete({value, setValue}: any) {
+export default function RolesAutocomplete({ value, setValue }: any) {
     return (
-        <FormControl sx={{width: "100%"}}>
+        <FormControl sx={{ width: "100%" }}>
             <FormLabel>Permissions</FormLabel>
             <Autocomplete
                 multiple
@@ -37,4 +37,49 @@ const permissions = [
     { name: 'Edit property feature' },
     { name: 'View property feature' },
     { name: 'Delete property feature' },
+
+    // PROPERTY UNIT TYPES
+    { name: 'Create unit type' },
+    { name: 'Edit unit type' },
+    { name: 'View unit type' },
+    { name: 'Delete unit type' },
+
+    // PROPERTY UNITS
+    { name: 'Create unit' },
+    { name: 'Edit unit' },
+    { name: 'View unit' },
+    { name: 'Delete unit' },
+
+    // BOOKING
+    { name: 'Create booking' },
+    { name: 'Edit booking' },
+    { name: 'View bookings' },
+    { name: 'Delete booking' },
+    { name: 'Accept booking' },
+    { name: 'Reject booking' },
+
+    // PROPERTY TENANTS
+    { name: 'Create tenant' },
+    { name: 'Edit tenant' },
+    { name: 'View tenants' },
+    { name: 'Delete tenant' },
+
+
+    // TENANTS
+    { name: 'Create tenant' },
+    { name: 'Edit tenant' },
+    { name: 'View tenants' },
+    { name: 'Delete tenant' },
+
+    // BILLS
+    { name: 'Create bill' },
+    { name: 'Edit bill' },
+    { name: 'View bills' },
+    { name: 'Delete bill' },
+
+    // STAFF
+    { name: 'Create staff' },
+    { name: 'Edit staff' },
+    { name: 'View staff' },
+    { name: 'Delete staff' },
 ];

@@ -24,6 +24,7 @@ import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 import fetchPropertyUnits from "apis/property/fetchPropertyUnits"
 import { ExtensionsTable } from "Components/Properties/ExtensionsTable"
 import { TenancyExtensionsTable } from "Components/Properties/TenancyExtensionsTable"
+import StaffForm from "Components/Properties/Forms/StaffForm"
 // import { fetchAllPropertyFeatures } from "controllers/propertyFeatures"
 
 type PageProps = {
@@ -41,8 +42,8 @@ function TableSwitch({ activeTab, property }: any) {
         case "bookings":
             return <BookingsTable property={property} />
 
-        // case "staff":
-        //     return <StaffTable />
+        case "staff":
+            return <StaffTable property={property} />
 
         case "unitTypes":
             return <UnitTypesTable property={property} />
@@ -92,6 +93,7 @@ export default function Property({
         setOpenPropertyFeaturesForm,
         setOpenUnitForm,
         setOpenBookingForm,
+        setOpenStaffForm
     }: any = useContext(CollectionsContext)
 
     // SESSION
@@ -205,7 +207,7 @@ export default function Property({
                             }
 
                             if (activeTab === "staff") {
-                                return setShowUnitTypeForm(true)
+                                return setOpenStaffForm(true)
                             }
 
                             if (activeTab === "bookings") {
@@ -227,6 +229,7 @@ export default function Property({
             <PropertyFeatureForm property={id} />
             <UnitForm property={id} />
             <BookingForm property={id} />
+            <StaffForm property={id} />
         </>
     )
 }

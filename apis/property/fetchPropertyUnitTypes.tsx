@@ -1,8 +1,8 @@
-export default async function fetchPropertyUnitTypes(property: string, page: any) {
+export default async function fetchPropertyUnitTypes(token: string, property: string, page: any) {
     // if (!property || !token) return
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/unitTypes/property?id=${property}&page=${page}`, {
         headers: {
-            // Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             Accept: 'application/json',
         },
         method: "GET"

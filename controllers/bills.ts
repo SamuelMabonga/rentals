@@ -40,7 +40,7 @@ export async function fetchAllBills(req: any, res: any) {
 
 
 // get tenant's bills
-export async function fetchAllTenantBills(req: any, res: any) {
+export async function fetchAllTenantBills(req: any, res: any, userId: string) {
   const {
     query: { id },
   }: any = req;
@@ -61,6 +61,14 @@ export async function fetchAllTenantBills(req: any, res: any) {
         .limit(limit),
       Bills.countDocuments({ tenant: id }),
     ]);
+
+    if (bills[0].tenant.user != userId) {
+      return res.status(403).json({
+        success: false,
+        msg: "You are not authorized to view this tenant's bills",
+        data: null,
+      });
+    }
 
     res.json({
       success: true,

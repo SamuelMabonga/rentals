@@ -13,8 +13,33 @@ export default async function handler(
 
   //type of request
   const { method } = req;
+
+  // Property ID
+  const property = req.body.property || req.query.id
+
+  // Reject if no property provided
+  if (!property) {
+    return res.status(400).json({
+      success: false,
+      msg: "No property provided",
+    });
+  }
+
+  // Get permissions
+  const userRoles = decodedToken.userRoles
+  const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
+  const permissions = userPropertyRoles?.role?.permissions
+
   switch (method) {
     case "POST":
+      const postPermission = permissions.find((permission: any) => permission.name === "Reject booking")
+      if (!postPermission) {
+        return res.status(401).json({
+          success: false,
+          msg: "Not Authorized",
+        });
+      }
+
       rejectBooking(req, res);
       break;
     default:

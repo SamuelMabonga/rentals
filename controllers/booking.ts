@@ -6,6 +6,8 @@ import { createBill } from "./bills";
 import Bills from "models/bills";
 import moment from "moment";
 import { getPageInfo } from "helpers/page_info";
+import Roles from "models/roles";
+import UserRoles from "models/userRoles";
 
 // get all bookings
 export async function fetchAllBookings(req: any, res: any) {
@@ -435,6 +437,23 @@ export async function acceptBooking(req: any, res: any) {
       } catch (error) {
         console.log("UPDATE UNIT STATUS ERROR", error);
         return res.status(400).json({ error: "Failed to update unit status" });
+      }
+
+      // find tenant role
+      const role = await Roles.findOne({ name: "Tenant" });
+
+      // Create tenant role
+      try {
+        const tenantRole = new UserRoles({
+          user: booking?.user?._id,
+          role: role?._id,
+          property: booking?.unit?.property,
+        })
+
+        await tenantRole.save();
+      } catch (error) {
+        console.log("CREATE TENANT ROLE ERROR", error);
+        return res.status(400).json({ error: "Failed to create tenant role" });
       }
 
       // Return a success response

@@ -30,7 +30,7 @@ export default function PropertyFeatureForm({property}: any) {
 
     const session: any = useSession()
     const token = session?.data?.accessToken
-    console.log("token", token)
+
     const { refetch }: any = useQuery({ queryKey: ['property-features', token, property], queryFn: () => fetchPropertyFeatures(token, property, null) })
     const { data: features }: any = useQuery({ queryKey: ['features', token], queryFn: () => fetchFeatures(token, null) })
     const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })

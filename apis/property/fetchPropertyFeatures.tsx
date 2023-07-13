@@ -1,5 +1,5 @@
 export default async function fetchPropertyFeatures(token: string, property: string, page: any) {
-    // if (!id) return new Error("No property Id")
+    if (!property) return new Error("No property Id")
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/propertyFeatures/property?id=${property}&page=${page}`, {
         headers: {
             Authorization: `Bearer ${token}`,

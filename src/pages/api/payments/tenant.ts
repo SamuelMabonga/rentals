@@ -28,7 +28,7 @@ export default async function handler(
       )
       .then(() => {
         // USER
-        const { _id, role } = decodedToken.user;
+        const { _id: userId, role } = decodedToken.user;
 
         const { method } = req;
         switch (method) {
@@ -36,7 +36,7 @@ export default async function handler(
             // if (id) {
             //   return fetchSinglePayment(req, res);
             // } else
-             fetchPaymentsByTenant(req, res);
+             fetchPaymentsByTenant(req, res, userId);
 
             break;
           case "POST":

@@ -145,7 +145,7 @@ export default function RolesForm() {
         <Dialog
             open={open}
             fullWidth
-            maxWidth="sm"
+            maxWidth="md"
         >
             <LinearProgress sx={{ display: isLoading ? "block" : "none" }} />
             <DialogTitle sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>

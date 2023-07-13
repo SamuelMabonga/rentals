@@ -30,17 +30,27 @@ export async function fetchAllTickets(req: any, res: any) {
 }
 
 // get all Tickets
-export async function fetchTicketsByTenant(req: any, res: any) {
+export async function fetchTicketsByTenant(req: any, res: any, userId: string) {
+  const {id} = req.query
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
     const [tickets, ticketsCount] = await Promise.all([
-      Ticket.find()
+      Ticket.find({tenant: id})
         .populate({ path: "unit" })
+        .populate({ path: "tenant" })
         .skip((page - 1) * limit)
         .limit(limit),
-      Ticket.countDocuments(),
+      Ticket.countDocuments({tenant: id}),
     ]);
+
+    if (tickets[0].tenant.user != userId) {
+      return res.status(403).json({
+        success: false,
+        msg: "You are not authorized to view this tenant's tickets",
+      });
+    }
+
     res.status(200).json({
       success: true,
       msg: "tickets fetched successfully",

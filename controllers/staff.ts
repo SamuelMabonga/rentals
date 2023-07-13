@@ -1,5 +1,6 @@
 import { getPageInfo } from "helpers/page_info";
 import Staff from "models/staff";
+import UserRoles from "models/userRoles";
 
 // get all staffs
 export async function fetchAllStaffs(req: any, res: any) {
@@ -27,6 +28,40 @@ export async function fetchAllStaffs(req: any, res: any) {
     console.log(error);
   }
 }
+
+
+// get all staffs
+export async function fetchAllStaffByProperty(req: any, res: any) {
+  const { id } = req.query;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+  try {
+    const [staffs, staffsCount] = await Promise.all([
+      UserRoles.find({ property: id })
+        .populate("role")
+        .populate("user")
+        .skip((page - 1) * limit)
+        .limit(limit),
+      UserRoles.countDocuments({ property: id }),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      msg: "Staff fetched successfully",
+      data: staffs,
+      pageInfo: getPageInfo(limit, staffsCount, page),
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch  staff",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+
 
 export async function fetchAllStaffsByRoles(req: any, res: any) {
   let roleId = req.query.roleId;
@@ -58,7 +93,7 @@ export async function fetchAllStaffsByRoles(req: any, res: any) {
 // create a staff
 export async function createStaff(req: any, res: any) {
   try {
-    const requiredFields = ["name"];
+    const requiredFields = ["role", "property", "user"];
 
     const includesAllFields = requiredFields.every((field) => {
       return !!req.body[field];
@@ -73,7 +108,7 @@ export async function createStaff(req: any, res: any) {
       });
     }
 
-    const staff = new Staff({
+    const staff = new UserRoles({
       ...req.body,
     });
 
@@ -178,12 +213,12 @@ export async function searchStaff(req: any, res: any, searchQuery: string) {
   try {
     let findParams = searchQuery
       ? {
-          $text: {
-            $search: searchQuery,
-            $caseSensitive: false,
-            $diacriticSensitive: false,
-          },
-        }
+        $text: {
+          $search: searchQuery,
+          $caseSensitive: false,
+          $diacriticSensitive: false,
+        },
+      }
       : {};
 
     const staff = await Staff.find({ ...findParams });

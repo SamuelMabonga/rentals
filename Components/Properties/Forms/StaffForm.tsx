@@ -7,6 +7,7 @@ import { CollectionsContext } from "context/context"
 import { useSession } from "next-auth/react"
 import React, { useContext, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
+import * as yup from "yup";
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -18,9 +19,10 @@ import StepLabel from '@mui/material/StepLabel';
 import moment from "moment"
 import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
-import { formSchema, formSchema2 } from "./Schema/BookingForm"
+// import { formSchema, formSchema2 } from "./Schema/BookingForm"
 import currencyFormatter from "Components/Common/currencyFormatter"
 import fetchPropertyBookings from "apis/property/fetchPropertyBookings"
+import fetchRoles from "apis/admin/fetchRoles"
 
 // const steps = [
 //     'Select a tenant',
@@ -28,6 +30,20 @@ import fetchPropertyBookings from "apis/property/fetchPropertyBookings"
 //     'Tenancy details',
 //     // 'Select your tenancy duration',
 // ];
+
+export const formSchema = yup.object().shape({
+    userSearchTerm: yup.string().required(),
+    user: yup.object().shape({
+        _id: yup.string().required("Required"),
+        first_name: yup.string().required("Required"),
+        last_name: yup.string().required("Required")
+    }),
+    role: yup.object().shape({
+        _id: yup.string().required("Required"),
+    }),
+    // startDate: yup.string().required("Required"),
+    // endDate: yup.string().required("Required")
+})
 
 function HorizontalStepper({ step, steps }: any) {
     return (
@@ -43,30 +59,33 @@ function HorizontalStepper({ step, steps }: any) {
     );
 }
 
-export default function BookingForm({
+export default function StaffForm({
     property,
     unitTypes: propertyUnitTypes,
     features: propertyFeatures,
 }: any) {
     // CONTEXT
     const {
-        openBookingForm: open,
-        setOpenBookingForm: setIsOpen,
-
-        bookingToEdit: toEdit,
-        setBookingToEdit: setToEdit,
-
         unitToBook: unit,
         setSnackbarMessage,
 
-        bookingsPage: page,
-        setBookingsPage: setPage,
+        openStaffForm: open,
+        setOpenStaffForm: setIsOpen,
+        staffToEdit: toEdit,
+        setStaffToEdit: setToEdit,
+        staffPage: page,
+        setStaffPage: setPage,
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
     const token = session.data?.accessToken
 
     const [isLoading, setIsLoading] = useState(false)
+
+    const { data: roles }: any = useQuery({
+        queryKey: ['roles', property, token],
+        queryFn: () => fetchRoles(token, null),
+    })
 
     const { data: features, isLoading: featuresLoading }: any = useQuery({
         queryKey: ['property-features', property, token],
@@ -88,24 +107,17 @@ export default function BookingForm({
                 first_name: "",
                 last_name: ""
             },
-            unitType: {
+            role: {
                 _id: "",
                 name: ""
             },
-            unit: {
-                _id: "",
-                name: ""
-            },
-            additionalFeatures: [
-                { _id: "", feature: { _id: "", name: "" } }
-            ],
-            startDate: "",
-            endDate: ""
+            // startDate: "",
+            // endDate: ""
 
         },
         mode: "onChange",
         reValidateMode: "onChange",
-        resolver: yupResolver(Object.keys(unit).length > 0 ? formSchema2 : formSchema),
+        resolver: yupResolver(formSchema),
     });
 
     useEffect(() => {
@@ -124,16 +136,15 @@ export default function BookingForm({
 
         const postData = {
             user: values.user._id,
-            unit: Object.keys(unit).length > 0 ? unit._id : values.unit._id,
-            additionalFeatures: [...values.additionalFeatures.map((item: any) => item._id)],
-            startDate: values.startDate,
-            endDate: values.endDate,
+            role: values.role._id,
+            // startDate: values.startDate,
+            // endDate: values.endDate,
             property
         }
 
         // POST A PROPERTY
         try {
-            const res = await fetch('/api/booking', {
+            const res = await fetch('/api/staff/property', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -152,7 +163,7 @@ export default function BookingForm({
                 open: true,
                 vertical: 'top',
                 horizontal: 'center',
-                message: "Booking created successfully",
+                message: "Staff created successfully",
                 icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -167,10 +178,10 @@ export default function BookingForm({
 
 
 
-        const data = {
-            name: values.name,
-            price: values.price
-        }
+        // const data = {
+        //     name: values.name,
+        //     price: values.price
+        // }
         // // EDIT A PROPERTY
         // if (toEdit?.name) {
         //     const edited = {
@@ -207,20 +218,10 @@ export default function BookingForm({
 
     // STEPPER
     const [steps, setSteps] = useState([
-        'Select a tenant',
-        'Select a unit',
-        'Tenancy details',
+        'Select a user',
+        'Select a role',
     ])
     const [step, setStep] = useState(0)
-
-    useEffect(() => {
-        if (unit?._id) {
-            setSteps([
-                'Select a tenant',
-                'Tenancy details',
-            ])
-        }
-    }, [unit])
 
 
     // SEARCH
@@ -236,7 +237,7 @@ export default function BookingForm({
         >
             <LinearProgress sx={{ display: isLoading ? "block" : "none" }} />
             <DialogTitle sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Typography fontWeight="600">Create a booking</Typography>
+                <Typography fontWeight="600">Add a staff member</Typography>
                 <IconButton onClick={() => {
                     setToEdit({})
                     setIsOpen(false)
@@ -339,33 +340,15 @@ export default function BookingForm({
 
                     <Box display={Object?.keys(unit)?.length > 0 && step === 1 ? "none" : step === 1 ? "flex" : "none"} flexDirection="column" gap="1rem">
                         <FormControl>
-                            <FormLabel>Select the unit type to book</FormLabel>
+                            <FormLabel>Select a role</FormLabel>
                             <Autocomplete
                                 // {...register("features")}
-                                options={unitTypes?.data || []}
+                                options={roles?.data || []}
                                 getOptionLabel={(option: any) => option.name}
                                 onChange={async (event, value) => {
                                     // setSelectedUnit(null)
-                                    setValue("unit", {})
-                                    setValue("unitType", value)
-                                    setLoadingUnits(true)
-
-                                    try {
-                                        const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/unit/unitType?id=${value._id}`, {
-                                            headers: {
-                                                Authorization: `Bearer ${session.data.accessToken}`,
-                                            },
-                                            method: "GET"
-                                        });
-
-                                        const res = await response.json();
-                                        console.log("UNITS", res.data)
-                                        setUnits(res.data)
-                                        setLoadingUnits(false)
-                                    } catch (error) {
-                                        setLoadingUnits(false)
-                                        alert("Fetch units error")
-                                    }
+                                    setValue("role", value)
+                                    // setLoadingUnits(true)
                                 }}
                                 renderInput={(params) =>
                                     <TextField
@@ -375,67 +358,9 @@ export default function BookingForm({
                                 }
                             />
                         </FormControl>
-
-                        <CircularProgress sx={{ display: loadingUnits ? "flex" : "none", mx: "auto" }} />
-
-
-                        <Box display={loadingUnits ? "none" : "flex"} flexDirection="column" gap="0.5rem">
-                            <Typography display={watch("unitType") ? "flex" : "none"}>Rooms Available</Typography>
-                            <Collapse in={units?.length > 0}>
-                                <Box display="flex" flexDirection="column" gap="0.5rem">
-                                    {
-                                        units?.map((item: any, i: any) => {
-                                            return (
-                                                <Box
-                                                    key={i}
-                                                    width="100%"
-                                                    display="flex"
-                                                    flexDirection="row"
-                                                    alignItems="center"
-                                                    gap="1rem"
-                                                    padding="0.75rem"
-                                                    border="1px solid"
-                                                    borderColor={watch("unit")?._id === item._id ? "primary.main" : "lightgrey"}
-                                                    bgcolor={watch("unit")?._id === item._id ? "primary.light" : "transparent"}
-                                                    borderRadius="0.5rem"
-                                                    sx={{ cursor: "pointer" }}
-                                                    onClick={async () => {
-                                                        await setError("unit", null)
-                                                        // setSelectedUnit(item)
-                                                        setValue("unit", item)
-                                                    }}
-                                                >
-                                                    <Avatar sx={{ width: "3.5rem", height: "3.5rem" }} />
-                                                    <Box display="flex" flexDirection="column" gap="0.25rem">
-                                                        <Typography fontWeight="600" color="grey">{item.name}</Typography>
-                                                        <Chip
-                                                            size="small"
-                                                            label={item?.status}
-                                                            color={item?.status === "AVAILABLE" ? "primary" : "error"}
-                                                            variant={"outlined"}
-                                                            sx={{
-                                                                fontWeight: "600",
-                                                                fontSize: "0.75rem",
-                                                            }}
-                                                        />
-                                                    </Box>
-
-                                                    <Box display={watch("unit")?._id === item._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6" style={{ color: "inherit" }}>
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                    </Box>
-
-                                                </Box>
-                                            )
-                                        })
-                                    }
-                                </Box>
-                            </Collapse>
-                        </Box>
                     </Box>
 
-                    <Box display={Object?.keys(unit)?.length > 0 && step === 1 ? "flex" : step === 2 ? "flex" : "none"} flexDirection="column" gap="1rem">
+                    {/* <Box display={Object?.keys(unit)?.length > 0 && step === 1 ? "flex" : step === 2 ? "flex" : "none"} flexDirection="column" gap="1rem">
                         <FormControl sx={{ width: "100%" }}>
                             <FormLabel>Select additional features for your booking</FormLabel>
                             <Autocomplete
@@ -480,7 +405,7 @@ export default function BookingForm({
                                 </LocalizationProvider>
                             </FormControl>
                         </Box>
-                    </Box>
+                    </Box> */}
                 </form>
             </DialogContent>
             <DialogActions sx={{ padding: "1.5rem", display: "flex" }}>
@@ -502,13 +427,6 @@ export default function BookingForm({
                         // await handleSubmit(onSubmit)(); // Run form validation and submission
                         if (step === 0) {
                             if (watch("user")?._id !== "") {
-                                setStep((prev) => prev + 1);
-                            }
-                        }
-                        if (step === 1) {
-                            if (unit?._id) return
-
-                            if (watch("unit")?._id !== "") {
                                 setStep((prev) => prev + 1);
                             }
                         }

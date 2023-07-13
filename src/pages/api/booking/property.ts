@@ -22,14 +22,46 @@ import {
     }: any = req;
   
     const decodedToken = authenticateUser(req, res);
+
+    // console.log(decodedToken)
+
+    if (!decodedToken?.user?._id) {
+      return res.status(401).json({
+        success: false,
+        msg: "Not Authorized",
+      });
+    }
+
     try {
       await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_SRV || "mongodb://localhost:27017/test_db").then(() => {
-        // USER
-        const { _id, role } = decodedToken.user;
   
+        //type of request
         const { method } = req;
+
+        // Property ID
+        const property = req.body.property || req.query.id
+
+        // Reject if no property provided
+        if (!property) {
+          return res.status(400).json({
+            success: false,
+            msg: "No property provided",
+          });
+        }
+
+        // Get permissions
+        const userRoles = decodedToken.userRoles
+        const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
+        const permissions = userPropertyRoles?.role?.permissions
         switch (method) {
           case "GET":
+            const getPermission = permissions?.find((permission: any) => permission.name === "View bookings")
+            if (!getPermission) {
+              return res.status(401).json({
+                success: false,
+                msg: "Not Authorized",
+              });
+            }
             //  if (id) {
             //   fetchSingleBooking(req, res);
             // } else if (searchQuery) {
@@ -39,12 +71,33 @@ import {
             // }
             break;
           case "POST":
+            const postPermission = permissions?.find((permission: any) => permission.name === "Post booking")
+            if (!postPermission) {
+              return res.status(401).json({
+                success: false,
+                msg: "Not Authorized",
+              });
+            }
             createBooking(req, res);
             break;
           case "PUT":
+            const putPermission = permissions?.find((permission: any) => permission.name === "Edit booking")
+            if (!putPermission) {
+              return res.status(401).json({
+                success: false,
+                msg: "Not Authorized",
+              });
+            }
             updateBooking(req, res);
             break;
           case "DELETE":
+            const deletePermission = permissions?.find((permission: any) => permission.name === "Delete booking")
+            if (!deletePermission) {
+              return res.status(401).json({
+                success: false,
+                msg: "Not Authorized",
+              });
+            }
             deleteBooking(req, res);
             break;
           default:
