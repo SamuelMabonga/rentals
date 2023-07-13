@@ -32,9 +32,9 @@ export default async function handler(
       switch (method) {
         case "GET":
     
-          if (query) {
-            return fetchSingleTenant(req, res);
-          }
+          // if (query) {
+          //   return fetchSingleTenant(req, res);
+          // }
           fetchAllTenants(req, res);
     
           break;
