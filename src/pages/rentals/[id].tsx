@@ -6,7 +6,7 @@ import { getSession, useSession } from "next-auth/react"
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
 import { useRouter } from "next/router"
 import fetchARental from "apis/tenant/fetchARental"
-import PaymentsForm from "Components/Properties/Forms/PaymentsForm"
+import PaymentsForm from "Components/Tenants/Forms/PaymentsForm"
 import { BillsTable } from "Components/Tenants/BillsTable"
 import RequestExtension from "Components/Tenants/Forms/RequestExtension"
 import { closePaymentModal, useFlutterwave } from "flutterwave-react-v3"

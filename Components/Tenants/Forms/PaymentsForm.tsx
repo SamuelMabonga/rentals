@@ -28,7 +28,7 @@ export default function PaymentsForm({ tenant }: any) {
     const { data: user }: any = useSession()
     const token = user?.accessToken
 
-    const { data, isLoading }: any = useQuery({ queryKey: ['tenant-bills', tenant, token], queryFn: () => fetchBills(token, tenant) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['tenant-bills', tenant, token], queryFn: () => fetchBills(token, tenant, null) })
 
     const [selectedBills, setSelectedBills] = useState<any>([])
     const [amount, setAmount] = useState<any>(0)
