@@ -67,8 +67,8 @@ export default function Property() {
     const router = useRouter()
     const { id }: any = router.query
     const { data }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(id) })
-    const { data: features }: any = useQuery({ queryKey: ['propertyFeatures', id], queryFn: () => fetchPropertyFeatures(id, null) })
-    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', id], queryFn: () => fetchPropertyUnitTypes(id, null) })
+    const { data: features }: any = useQuery({ queryKey: ['propertyFeatures', id], queryFn: () => fetchPropertyFeatures("token", id, null) })
+    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', id], queryFn: () => fetchPropertyUnitTypes("token", id, null) })
     console.log(data)
     console.log(features)
     console.log(unitTypes)
@@ -404,8 +404,8 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
 
     await Promise.all([
         await queryClient.prefetchQuery(['property', id], () => fetchAProperty(id)),
-        await queryClient.prefetchQuery(['propertyFeatures', id], () => fetchPropertyFeatures(id, null)),
-        await queryClient.prefetchQuery(['property-unitTypes', id], () => fetchPropertyUnitTypes(id, null)),
+        await queryClient.prefetchQuery(['propertyFeatures', id], () => fetchPropertyFeatures("token", id, null)),
+        await queryClient.prefetchQuery(['property-unitTypes', id], () => fetchPropertyUnitTypes("token", id, null)),
         // await queryClient.prefetchQuery(['tenant-bills', id], () => fetchBills(accessToken, id)),
     ])
 
