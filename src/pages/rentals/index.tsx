@@ -32,7 +32,7 @@ export default function Rentals({
     const session: any = useSession()
     const token = session?.data?.accessToken
 
-    const [openCreateForm, setOpenCreateForm] = useState(false)
+    // const [openCreateForm, setOpenCreateForm] = useState(false)
 
     const { data, isLoading }: any = useQuery({ queryKey: ['tenancies', token, page], queryFn: () => fetchUserTenancies(token, page) })
 

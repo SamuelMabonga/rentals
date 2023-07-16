@@ -101,6 +101,24 @@ const lightThemeOptions: ThemeOptions = {
         },
       ]
     },
+    MuiTabs: {
+      styleOverrides: {
+        root: {
+          "&.MuiTabs-root": {
+            fontFamily: jakarta.style.fontFamily,
+          }
+        }
+      }
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          "&.MuiTab-root": {
+            fontFamily: jakarta.style.fontFamily,
+          }
+        }
+      }
+    }
   }
 };
 

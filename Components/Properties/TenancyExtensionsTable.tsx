@@ -111,6 +111,7 @@ export const TenancyExtensionsTable = <T extends object>({ property }: ReactTabl
                                         },
                                         body: JSON.stringify({
                                             tenancyModificationId: row.row.original._id,
+                                            property: property,
                                         })
                                     })
 

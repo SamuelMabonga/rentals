@@ -104,6 +104,8 @@ export default function PaymentsForm({ tenant }: any) {
         });
      }, [tx_ref])
 
+     console.log("DATA ", data?.data)
+
     return (
         <Dialog
             open={open}

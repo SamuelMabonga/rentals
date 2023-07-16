@@ -42,12 +42,12 @@ export async function fetchPropertiesByRoles(req: any, res: any, user: string) {
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
     const [properties, propertiesCount] = await Promise.all([
-      UserRoles.find({ user: `${user}` })
+      UserRoles.find({ user: `${user}`, role: {$ne: "64aef65e5c197c23de2f429d"} })
         .populate("property")
         .populate("role")
         .skip((page - 1) * limit)
         .limit(limit),
-      UserRoles.countDocuments({ user: `${user}` }),
+      UserRoles.countDocuments({ user: `${user}`, role: {$ne: "64aef65e5c197c23de2f429d"} }),
     ]);
 
     res.status(200).json({
@@ -72,10 +72,10 @@ export async function fetchAllProperties(req: any, res: any) {
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
     const [properties, propertiesCount] = await Promise.all([
-      Property.find()
+      Property.find({status: "ACTIVE"})
         .skip((page - 1) * limit)
         .limit(limit),
-      Property.countDocuments(),
+      Property.countDocuments({status: "ACTIVE"}),
     ]);
 
     res.statusCode = 200
@@ -92,7 +92,7 @@ export async function fetchAllProperties(req: any, res: any) {
       msg: "failed to fetch  properties",
       data: error,
     });
-    console.log(error);
+    // console.log(error);
   }
 }
 
@@ -239,7 +239,7 @@ export async function searchProperty(req: any, res: any, searchQuery: string) {
         }
       : {};
 
-    const properties = await Property.find({ ...findParams });
+    const properties = await Property.find({ ...findParams, status: "ACTIVE" });
 
     res.status(200).json({
       success: true,

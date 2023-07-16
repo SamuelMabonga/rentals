@@ -64,7 +64,6 @@ const permissions = [
     { name: 'View tenants' },
     { name: 'Delete tenant' },
 
-
     // TENANTS
     { name: 'Create tenant' },
     { name: 'Edit tenant' },
@@ -82,4 +81,20 @@ const permissions = [
     { name: 'Edit staff' },
     { name: 'View staff' },
     { name: 'Delete staff' },
+
+    // BILL EXTENSION
+    { name: 'Create bill extension' },
+    { name: 'Edit bill extension' },
+    { name: 'View bill extensions' },
+    { name: 'Delete bill extension' },
+    { name: 'Accept bill extension' },
+    { name: 'Reject bill extension' },
+
+    // TENANCY MODIFICATION
+    { name: 'Create tenancy modification' },
+    { name: 'Edit tenancy modification' },
+    { name: 'View tenancy modification' },
+    { name: 'Delete tenancy modification' },
+    { name: 'Accept tenancy modification' },
+    { name: 'Reject tenancy modification' },
 ];

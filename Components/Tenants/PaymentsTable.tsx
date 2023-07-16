@@ -10,6 +10,7 @@ import moment from 'moment';
 import { useQuery } from '@tanstack/react-query';
 import fetchPayments from 'apis/tenant/fetchPayments';
 import { useSession } from 'next-auth/react';
+import currencyFormatter from 'Components/Common/currencyFormatter';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -44,7 +45,7 @@ export const PaymentsTable = <T extends object>({ tenant: id }: ReactTableProps<
         () => [
             {
                 header: 'Amount',
-                cell: (row) => row.renderValue(),
+                cell: (row) => currencyFormatter(row.renderValue(), 'UGX'),
                 accessorKey: 'amount',
             },
             {

@@ -131,7 +131,7 @@ export default function BookingForm({
             property
         }
 
-        // POST A PROPERTY
+        // POST A BOOKING
         try {
             const res = await fetch('/api/booking', {
                 method: 'POST',
@@ -463,7 +463,7 @@ export default function BookingForm({
                                 <FormLabel>When would you like to start</FormLabel>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
-                                        disablePast
+                                        // disablePast
                                         onChange={(event: any) => setValue("startDate", moment(event.$d).format("YYYY-MM-DD"))}
                                         // minDate={watch("unit")?.}
                                     />

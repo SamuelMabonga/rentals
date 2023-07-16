@@ -114,6 +114,7 @@ export const ExtensionsTable = <T extends object>({ property }: ReactTableProps<
                                         },
                                         body: JSON.stringify({
                                             extensionId: row.row.original._id,
+                                            property: property
                                         })
                                     })
 

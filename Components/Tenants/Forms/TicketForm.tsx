@@ -150,7 +150,7 @@ export default function TicketForm({ tenant }: any) {
                     style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}
                 >
                     <FormControl>
-                        <FormLabel>Rate</FormLabel>
+                        <FormLabel>Ticket type</FormLabel>
                         <Autocomplete
                             // {...register("features")}
                             options={[

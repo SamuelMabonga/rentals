@@ -48,6 +48,7 @@
     "react-filerobot-image-editor": "^4.4.0",
     "react-hook-form": "^7.43.9",
     "react-image-crop": "^8.6.12",
+    "recharts": "^2.7.2",
     "typescript": "5.0.4",
     "uuid": "^9.0.0",
     "yup": "^1.1.1"

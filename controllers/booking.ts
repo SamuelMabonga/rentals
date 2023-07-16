@@ -8,6 +8,7 @@ import moment from "moment";
 import { getPageInfo } from "helpers/page_info";
 import Roles from "models/roles";
 import UserRoles from "models/userRoles";
+import newTenantEmail from "helpers/newTenantEmail";
 
 // get all bookings
 export async function fetchAllBookings(req: any, res: any) {
@@ -283,7 +284,7 @@ export async function acceptBooking(req: any, res: any) {
     return additionalFeatures;
   }
 
-  console.log("BOOKING TO ACCEPT IS", id);
+  // console.log("BOOKING TO ACCEPT IS", id);
   try {
     //UPDATE booking status to accepted
     let booking = await Booking.findByIdAndUpdate(
@@ -398,7 +399,7 @@ export async function acceptBooking(req: any, res: any) {
             startDate: tenant.startDate,
             endDate: moment(tenant?.startDate).add(
               1,
-              tenant?.unit?.unitType?.billingPeriod?.period
+              feature?.billingPeriod?.period
             ),
             tenant: tenant._id,
             type: "FEATURE", // set bill type to 'Feature'
@@ -407,11 +408,11 @@ export async function acceptBooking(req: any, res: any) {
             pay_by: tenant?.customBillingPeriod?.period
               ? moment(tenant?.startDate).add(
                 1,
-                tenant?.customBillingPeriod?.period
+                feature?.billingPeriod?.period
               ).add(7, "days")
               : moment(tenant?.startDate).add(
                 1,
-                tenant?.unit?.unitType?.billingPeriod?.period
+                feature?.billingPeriod?.period
               ).add(7, "days"), // set dedault pay date to 7 days
           });
 
@@ -454,6 +455,15 @@ export async function acceptBooking(req: any, res: any) {
       } catch (error) {
         console.log("CREATE TENANT ROLE ERROR", error);
         return res.status(400).json({ error: "Failed to create tenant role" });
+      }
+
+
+      // Send email to tenant
+      try { 
+        await newTenantEmail(booking?.user?.email, res)
+      } catch (error) { 
+        console.log("SEND EMAIL ERROR", error);
+        return res.status(400).json({ error: "Failed to send email" });
       }
 
       // Return a success response

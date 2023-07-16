@@ -31,11 +31,8 @@ export const PropertiesTable = <T extends object>({ data, pageInfo }: ReactTable
         setPropertyToEdit
     }: any = useContext(CollectionsContext)
 
-    const session: any = useSession()
-
-    console.log(session)
+    // const session: any = useSession()
         
-
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -128,7 +125,12 @@ export const PropertiesTable = <T extends object>({ data, pageInfo }: ReactTable
         <TableRenderer
             data={data}
             columns={columns}
-            onRowClick={(row: any) => router.push(`/properties/${row._id}`)}
+            onRowClick={(row: any) => {
+                if (row.role.name === "Tenant") {
+                    return router.push(`/rentals/${row._id}`)
+                }
+                router.push(`/properties/${row._id}`)
+            }}
             pageInfo={pageInfo}
         />
     );
