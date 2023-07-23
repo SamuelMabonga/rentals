@@ -6,6 +6,7 @@ import Bills from "models/bills";
 import moment from "moment";
 import PropertyFeatures from "models/propertyFeatures";
 import { getPageInfo } from "helpers/page_info";
+import billsEmail from "helpers/billsEmail";
 
 // get all bills
 export async function fetchAllBills(req: any, res: any) {
@@ -223,6 +224,9 @@ export async function createCronBills(req: any, res: any) {
         startDate,
       } = tenant;
 
+      // Array to store created bills for the tenant
+      const createdBills = [];
+
       try {
         let latestRent: any[] = await Bills.find({ tenant: _id.toString(), type: "RENT" })
           .sort({ createdAt: -1 })
@@ -249,6 +253,8 @@ export async function createCronBills(req: any, res: any) {
 
           console.log("NEW RENT", newRent)
           await newRent.save();
+
+          createdBills.push(newRent);
         }
         // }
       } catch (error) {
@@ -278,12 +284,19 @@ export async function createCronBills(req: any, res: any) {
             });
 
             await newBill.save();
-            console.log("NEW BILL", newBill)
+            // console.log("NEW BILL", newBill)
+            createdBills.push(newBill);
           }
+
         } catch (error) {
           console.log("Failed to create bill for feature:", feature._id);
           console.log(error);
         }
+      }
+
+      // Send email to tenant
+      if (createdBills.length > 0) {
+        await billsEmail(tenant, createdBills, res);
       }
     }
 

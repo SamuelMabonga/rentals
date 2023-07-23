@@ -5,7 +5,19 @@ const nextConfig = {
     appDir: false,
   },
   images: {
-    domains: ["files.stripe.com", "source.unsplash.com", "images.unsplash.com", "d33wubrfki0l68.cloudfront.net", "v5.airtableusercontent.com", "asset.cloudinary.com", "res.cloudinary.com", "picsum.photos", "fastly.picsum.photos", "https://obs.line-scdn.net"],
+    domains: [
+      "files.stripe.com",
+      "source.unsplash.com",
+      "images.unsplash.com",
+      "d33wubrfki0l68.cloudfront.net",
+      "v5.airtableusercontent.com",
+      "asset.cloudinary.com",
+      "res.cloudinary.com",
+      "picsum.photos",
+      "fastly.picsum.photos",
+      "https://obs.line-scdn.net",
+      "api.cloudinary.com"
+    ],
   },
   env: {
     NEXT_PUBLIC_HOST: process.env.NEXT_PUBLIC_HOST,

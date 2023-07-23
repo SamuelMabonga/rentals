@@ -12,7 +12,7 @@ async function newTenantEmail(
     const mailOptions = {
         from: process.env.NEXT_PUBLIC_AUTH_EMAIL,
         to: email,
-        subject: `Verify your Email`,
+        subject: `Welcome to Our Property!`,
         html: `<!DOCTYPE html>
         <html>
         <head>

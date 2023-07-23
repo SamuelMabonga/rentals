@@ -1,19 +1,111 @@
 import { yupResolver } from "@hookform/resolvers/yup"
+import { CloudUpload, CloudUploadOutlined, Upload } from "@mui/icons-material"
 import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
+import ImageEditor from "Components/Common/ImageEditor"
 import FileInput from "Components/FileInput"
 import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
 import fetchProperties from "apis/user/fetchProperties"
 import { CollectionsContext } from "context/context"
+import { set } from "mongoose"
 import { useSession } from "next-auth/react"
-import React, { useContext, useEffect, useState } from "react"
+import Image from "next/image"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
 const formSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
     description: yup.string().required("Description is required"),
+    propertyProfileImage: yup.string().required("Image is required")
 })
+
+function ImageInput({ id, name, register, setImageToUpload, setOpenImageUploader, inputId, setInputId, imageUrl, setValue, error }: any) {
+    // IMAGE
+    const [selectedFile, setSelectedFile] = useState()
+    const [preview, setPreview] = useState()
+
+    // create a preview as a side effect, whenever selected file is changed
+    useEffect(() => {
+        if (!selectedFile) {
+            setPreview(undefined)
+            return
+        }
+
+        console.log("SELECTED FILE", selectedFile)
+        const objectUrl: any = URL.createObjectURL(selectedFile)
+        setPreview(objectUrl)
+
+        // SAVE IMAGE AND OPEN IMAGE EDITOR
+        setInputId(id)
+        setImageToUpload(objectUrl)
+        setOpenImageUploader(true)
+
+        // free memory when ever this component is unmounted
+        return () => URL.revokeObjectURL(objectUrl)
+    }, [selectedFile])
+
+
+    const onSelectFile = (e: any) => {
+        if (!e.target.files || e.target.files.length === 0) {
+            setSelectedFile(undefined)
+            return
+        }
+
+        // I've kept this example simple by using the first image instead of multiple
+        setSelectedFile(e.target.files[0])
+    }
+
+    const ref: any = useRef(null)
+
+    console.log("URL", imageUrl)
+
+    // SAVE IMAGE
+    useEffect(() => {
+        if (imageUrl === "") return
+
+        if (inputId === id) {
+            setValue(imageUrl)
+        }
+    }, [imageUrl])
+
+    return (
+        <FormControl
+            onClick={() => ref.current.click()}
+            sx={{
+                display: "flex",
+                width: "100%",
+            }}
+        >
+            <FormLabel>Profile Picture</FormLabel>
+            <Box display={imageUrl === "" ? "flex" : "none"} flexDirection="column" mx="auto" alignItems="center" border="1px solid #ccc" padding="1rem" width="100%" borderRadius="0.25rem">
+                <CloudUploadOutlined sx={{ width: "3rem", height: "3rem" }} />
+                <Typography color="gray" fontWeight="500" fontSize="0.875rem">Upload Image</Typography>
+            </Box>
+            <Box display={id === inputId ? "flex" : "none"} width={"100%"}>
+                <Image
+                    src={imageUrl}
+                    alt="profile image"
+                    width={0}
+                    height={0}
+                    layout="responsive"
+                />
+            </Box>
+            <TextField
+                inputRef={ref}
+                type="file"
+                id={id}
+                name={name}
+                onChange={onSelectFile}
+                sx={{
+                    display: "none"
+                }}
+            // {...register(name)}
+            />
+            <FormHelperText>{error?.message}</FormHelperText>
+        </FormControl>
+    )
+}
 
 export default function PropertyForm() {
     // CONTEXT
@@ -26,7 +118,16 @@ export default function PropertyForm() {
         propertiesPage: page,
         setPropertiesPage: setPage,
 
-        setSnackbarMessage
+        setSnackbarMessage,
+
+
+        setOpenImageUploader,
+        setImageToUpload,
+
+        inputId,
+        setInputId,
+        imageUrl,
+        setImageUrl,
     }: any = useContext(CollectionsContext)
 
     // fetch property features
@@ -43,6 +144,7 @@ export default function PropertyForm() {
         defaultValues: {
             name: "",
             description: "",
+            propertyProfileImage: ""
         },
         mode: "onChange",
         reValidateMode: "onChange",
@@ -107,7 +209,7 @@ export default function PropertyForm() {
                 body: JSON.stringify({ ...data })
             })
             const response = await res.json();
-            console.log(response)
+            // console.log(response)
             if (!response.success) {
                 setIsLoading(false)
                 return setSnackbarMessage({
@@ -142,6 +244,8 @@ export default function PropertyForm() {
             console.log(error)
         }
     }
+
+
 
     return (
         <Dialog
@@ -188,6 +292,29 @@ export default function PropertyForm() {
                         />
                         <FormHelperText>{errors?.description?.message}</FormHelperText>
                     </FormControl>
+
+                    {/* <FormLabel htmlFor="profile-image" > 
+                        Profile Image
+                        <TextField
+                            id="profie-image"
+                            type='file'
+                            onChange={onSelectFile}
+                            sx={{
+                                display: "none"
+                            }}
+                        />
+                    </FormLabel> */}
+
+                    <ImageInput
+                        setImageToUpload={setImageToUpload}
+                        setOpenImageUploader={setOpenImageUploader}
+                        id="propertyProfileImage"
+                        inputId={inputId}
+                        setInputId={setInputId}
+                        imageUrl={imageUrl}
+                        setValue={(value: string) => setValue("propertyProfileImage", value)}
+                        error={errors?.propertyProfileImage}
+                    />
                     {/* <FormControl>
                         <FormLabel>Features</FormLabel>
                         <Autocomplete
@@ -203,6 +330,7 @@ export default function PropertyForm() {
                     </FormControl> */}
                     {/* <FileInput />
                     <FileInput /> */}
+                    <ImageEditor />
                 </form>
             </DialogContent>
             <DialogActions sx={{ padding: "1.5rem" }}>

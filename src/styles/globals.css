@@ -1,3 +1,11 @@
+@import "node_modules/@syncfusion/ej2-base/styles/material.css";
+@import "node_modules/@syncfusion/ej2-buttons/styles/material.css";
+@import "node_modules/@syncfusion/ej2-popups/styles/material.css";
+@import "node_modules/@syncfusion/ej2-splitbuttons/styles/material.css";
+@import "node_modules/@syncfusion/ej2-inputs/styles/material.css";
+@import "node_modules/@syncfusion/ej2-navigations/styles/material.css";
+@import "node_modules/@syncfusion/ej2-image-editor/styles/material.css";
+
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
@@ -105,3 +113,26 @@ a {
     color-scheme: dark;
   }
 }
+
+
+
+.e-image-editor {
+	margin: 0 auto;
+}
+
+.e-img-editor-sample {
+	height: 80vh;
+	width: 100%;
+}
+
+@media only screen and (max-width: 700px) {
+	.e-img-editor-sample {
+		height: 70vh;
+		width: 100%;
+	}
+}
+
+.control-wrapper {
+	height: 100%;
+}
+

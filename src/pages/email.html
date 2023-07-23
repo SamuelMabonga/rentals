@@ -1,105 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Welcome to Our Property</title>
-  <link href="https://fonts.googleapis.com/css2?family=Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Bills Notification</title>
   <style>
+    /* CSS styles for the email template */
     body {
-      font-family: 'Jakarta Sans', Arial, sans-serif;
-      line-height: 1.5;
-      background-color: #f4f4f4;
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
     }
-
     .container {
       max-width: 600px;
       margin: 0 auto;
       padding: 20px;
-      background-color: #ffffff;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid #ccc;
     }
-
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-      text-align: center;
-      color: #333333;
+    h2 {
+      color: #333;
     }
-
-    p {
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
       margin-bottom: 10px;
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-
-    th, td {
-      padding: 8px;
-      text-align: left;
-      border-bottom: 1px solid #dddddd;
-    }
-
-    th {
-      font-weight: bold;
-    }
-
-    .cta-button {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 12px 24px;
-      background-color: #007bff;
-      color: #ffffff;
-      text-decoration: none;
-      border-radius: 4px;
-    }
-
-    .cta-button:hover {
-      background-color: #0056b3;
+    .bill-info {
+      display: flex;
+      justify-content: space-between;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Welcome to Our Property!</h1>
+    <h2>New Bills Notification</h2>
     <p>Dear [Tenant Name],</p>
-    <p>We are pleased to inform you that your booking has been accepted. We look forward to having you as our tenant. Please find below the details of your booking:</p>
-    <p>Booked Unit: [Unit Name]</p>
-    <p>Rent Frequency: [Rent Frequency]</p>
-    <p>Additional Features: [Additional Features]</p>
-    <table>
-      <thead>
-        <tr>
-          <th>Bill Name</th>
-          <th>Amount</th>
-          <th>Period</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Rent</td>
-          <td>$500</td>
-          <td>July 2023</td>
-        </tr>
-        <tr>
-          <td>Utilities</td>
-          <td>$100</td>
-          <td>July 2023</td>
-        </tr>
-        <tr>
-          <td>Service Fee</td>
-          <td>$50</td>
-          <td>July 2023</td>
-        </tr>
-      </tbody>
-    </table>
-    <p>Please log in to your account and proceed with the payment of the bills to confirm your booking.</p>
-    <p>If you have any questions or need further assistance, feel free to contact our support team at [Contact Email or Phone].</p>
-    <p>Thank you and we look forward to your stay with us!</p>
-    <a href="[Tenant Account URL]" class="cta-button">Log In and Pay Bills</a>
+    <p>We would like to inform you that new bills have been generated for your tenancy. Please find the details below:</p>
+
+    <h3>Rent Bill</h3>
+    <ul>
+      <li>Amount: [Rent Amount]</li>
+      <li>Period: [Rent Start Date] - [Rent End Date]</li>
+      <li>Payment Due By: [Rent Payment Due Date]</li>
+    </ul>
+
+    <h3>Additional Feature Bills</h3>
+    <ul>
+      <li>
+        <div class="bill-info">
+          <div>[Feature Name]</div>
+          <div>[Feature Amount]</div>
+        </div>
+        <div>Period: [Feature Start Date] - [Feature End Date]</div>
+        <div>Payment Due By: [Feature Payment Due Date]</div>
+      </li>
+      <!-- Repeat the above list item for each additional feature bill -->
+    </ul>
+
+    <p>Please log in to your account to view and pay the bills. If you have any questions or concerns, please contact our support team.</p>
+
+    <p>Thank you for being a valued tenant!</p>
+    <p>Sincerely,<br>Property Management Team</p>
   </div>
 </body>
 </html>

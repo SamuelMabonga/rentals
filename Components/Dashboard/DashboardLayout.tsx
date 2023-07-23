@@ -1,6 +1,7 @@
 import { Menu } from "@mui/icons-material"
 import { Avatar, Box, Button, CircularProgress, IconButton, Snackbar, Typography } from "@mui/material"
 import ConsecutiveSnackbars from "Components/Common/ConsecutiveSnackbars"
+import ImageEditor from "Components/Common/ImageEditor"
 import LoadingBackdrop from "Components/Common/LoadingBackdrop"
 import MobileDrawer from "Components/Common/MobileDrawer"
 import NavItem from "Components/Common/NavItem"
@@ -188,7 +189,7 @@ export default function DashboardLayout({ children }: any) {
                             </Box>
                         </Box>
 
-                        
+
                         <Box display={"flex"} flexDirection="column" gap="0.5rem">
                             <NavItem
                                 to="/dashboard"
@@ -355,8 +356,9 @@ export default function DashboardLayout({ children }: any) {
                 </Box>
                 {/* <ConsecutiveSnackbars /> */}
                 <RegularSnackbar />
-                <ImageUploader />
+                {/* <ImageUploader /> */}
                 <LoadingBackdrop />
+                {/* <ImageEditor /> */}
 
                 {/* PRELOADER */}
                 <MBox

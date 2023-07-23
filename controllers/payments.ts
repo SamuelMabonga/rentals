@@ -1,4 +1,5 @@
 import { getPageInfo } from "helpers/page_info";
+import successfulPaymentEmail from "helpers/successfulPaymentEmail";
 import Bills from "models/bills";
 import Payments from "models/payments";
 import Tenant from "models/tenant";
@@ -143,12 +144,10 @@ export async function flutterwaveWebhook(req: any, res: any) {
   const payload = req.body;
 
   try {
-    let payment = await Payments.findById(payload.data.tx_ref).populate("bills");
-
-    console.log("PAYMENT", payment);
+    let payment = await Payments.findById(payload.data.tx_ref).populate("bills").populate({ path: "tenant", populate: { path: "user" } });
 
     const {
-      tenant: tenantId
+      tenant: { _id: tenantId }
     } = payment._doc;
 
     // Check if the user has made any previous payments
@@ -241,6 +240,9 @@ export async function flutterwaveWebhook(req: any, res: any) {
           }
         }
       }
+
+      // Send email to tenant
+      await successfulPaymentEmail(payment.tenant, payment.bills, res);
 
       return res.json({
         success: true,

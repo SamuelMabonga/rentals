@@ -6,12 +6,16 @@ import { ThemeProvider, CssBaseline, createTheme, Box } from '@mui/material';
 
 import '../styles/globals.css';
 import "../styles/ReactCrop.css"
+
 import createEmotionCache from '@/utility/createEmotionCache';
 import lightThemeOptions from '@/theme/lightThemeOptions';
 import { SessionProvider, useSession } from 'next-auth/react';
 import { CollectionsContext, CollectionsProvider } from 'context/context';
 import DashboardLayout from 'Components/Dashboard/DashboardLayout';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { registerLicense } from '@syncfusion/ej2-base';
+
+registerLicense("Ngo9BigBOggjHTQxAR8/V1NGaF5cXmdCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdgWXhfd3RcRGZdUkd2WEU=")
 
 
 
