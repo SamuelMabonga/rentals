@@ -3,16 +3,19 @@ import { transporter } from "lib/nodemailer";
 import UserVerification from "models/user_verfication";
 import { NextApiResponse } from "next";
 
-
 export default async function successfulPaymentEmail(
-  tenant: any,
+  payment: any,
   createdBills: any,
   res: NextApiResponse
 ) {
+  const {
+    tenant: { user },
+  } = payment;
+  const paymentMethod = "Flutterwave";
   // email options
   const mailOptions = {
     from: process.env.NEXT_PUBLIC_AUTH_EMAIL,
-    to: tenant.user.email,
+    to: user?.email,
     subject: `Successful Payment Notification`,
     html: `<!DOCTYPE html>
         <html lang="en">
@@ -43,14 +46,14 @@ export default async function successfulPaymentEmail(
         <body>
           <div class="container">
             <h2>Payment Successful</h2>
-            <p>Dear [Tenant Name],</p>
+            <p>Dear ${user?.first_name}&nbsp;${user?.last_name}</p>
             <p>We are pleased to inform you that your payment has been successfully received and applied to your account.</p>
             <p>Payment Details:</p>
             <ul>
-              <li>Payment Amount: [Payment Amount]</li>
-              <li>Payment Date: [Payment Date]</li>
-              <li>Payment Method: [Payment Method]</li>
-              <li>Invoice Number: [Invoice Number]</li>
+              <li>Payment Amount: ${payment?.amountPaid}</li>
+              <li>Payment Date: ${payment?.createdAt}</li>
+              <li>Payment Method: ${paymentMethod}</li>
+              <li>Invoice Number: ${payment?._id}</li>
             </ul>
             <p>If you have any questions or concerns regarding your payment or your account, please don't hesitate to contact our support team.</p>
             <p>Thank you for your prompt payment and cooperation.</p>
@@ -62,13 +65,12 @@ export default async function successfulPaymentEmail(
   };
 
   try {
-    await transporter.sendMail(mailOptions)
+    await transporter.sendMail(mailOptions);
   } catch (error) {
     console.log("EMAIL ERROR", error);
     res.json({
       success: false,
       msg: "Failed to send email",
-    })
+    });
   }
-
 }
