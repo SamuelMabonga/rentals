@@ -242,7 +242,7 @@ export async function flutterwaveWebhook(req: any, res: any) {
       }
 
       // Send email to tenant
-      await successfulPaymentEmail(payment.tenant, payment.bills, res);
+      await successfulPaymentEmail(payment, payment.bills, res);
 
       return res.json({
         success: true,

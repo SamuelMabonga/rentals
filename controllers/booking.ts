@@ -460,7 +460,7 @@ export async function acceptBooking(req: any, res: any) {
 
       // Send email to tenant
       try { 
-        await newTenantEmail(booking?.user?.email, res)
+        await newTenantEmail(booking, res)
       } catch (error) { 
         console.log("SEND EMAIL ERROR", error);
         return res.status(400).json({ error: "Failed to send email" });

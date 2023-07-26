@@ -19,8 +19,21 @@ function sendEmailVerification(
   const mailOptions = {
     from: process.env.NEXT_PUBLIC_AUTH_EMAIL,
     to: email,
-    subject: `Verify your Email`,
-    html: `<p>Verfiy your email address to complete the sugnup and login to your email.</p><p>This link expires in <b>6 hours</b></p><p>Press <a href=${url}>here</a> to proceed</p>`,
+    subject: `Welcome to Rental It! Verify Your Email`,
+    html: `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
+        <h2 style="color: #0066cc;">Hello there,</h2>
+        <p>Welcome to <strong style="color: #0066cc;">Rental It</strong>! We're thrilled to have you on board.</p>
+        <p style="margin-bottom: 30px;">To get started, please verify your email address by clicking the link below:</p>
+        <a href=${url} style="display: inline-block; padding: 12px 24px; background-color: #0066cc; color: #ffffff; text-decoration: none; border-radius: 4px;">Verify My Email</a>
+        <p style="margin-top: 30px;">This link will expire in <strong>6 hours</strong>, so make sure to verify your email as soon as possible.</p>
+        <p style="margin-top: 20px;">If you didn't sign up for <strong style="color: #0066cc;">Rental It</strong>, you can safely ignore this email.</p>
+        <p style="margin-top: 40px;">Happy renting and exploring with <strong style="color: #0066cc;">Rental It</strong>!</p>
+        <p>Best regards,<br>The Rental It Team</p>
+      </div>
+    </div>
+  `,
   };
 
   // hash the unique string
