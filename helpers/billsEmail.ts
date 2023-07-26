@@ -47,7 +47,7 @@ export default async function billsEmail(
   const mailOptions = {
     from: process.env.NEXT_PUBLIC_AUTH_EMAIL,
     to: email,
-    subject: `Welcome to Rental It! Verify Your Email`,
+    subject: `Bills from RentIt`,
     html: `
         <!DOCTYPE html>
         <html lang="en">
