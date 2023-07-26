@@ -9,7 +9,7 @@ export default async function billsEmail(
   res: NextApiResponse
 ) {
   const {
-    user: { first_name, last_name },
+    user: { first_name, last_name, email },
   } = tenant;
   // Loop through the array of createdBills and generate HTML content for each bill
   const additionalFeatureBills = createdBills.filter(
@@ -44,9 +44,10 @@ export default async function billsEmail(
 
   const allBillsHTML = rentBillHTML + additionalFeatureBillsHTML;
 
-  // Modify the HTML content of the email to include all the bills
   const mailOptions = {
-    // ... (previous code remains unchanged)
+    from: process.env.NEXT_PUBLIC_AUTH_EMAIL,
+    to: email,
+    subject: `Welcome to Rental It! Verify Your Email`,
     html: `
         <!DOCTYPE html>
         <html lang="en">
