@@ -53,7 +53,7 @@ export async function fetchPropertiesByRoles(req: any, res: any, user: string) {
     res.status(200).json({
       success: true,
       msg: "Properties fetched successfully",
-      data: properties.map((property) => ({...property.property._doc, role: property.role})),
+      data: properties.map((property) => ({...property?.property?._doc, role: property.role})),
       pageInfo: getPageInfo(limit, propertiesCount, page),
     });
   } catch (error) {

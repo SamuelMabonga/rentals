@@ -12,7 +12,6 @@ const lightThemeOptions: ThemeOptions = {
       dark: "#360666",
       light: "#F2EEF6",
       // contrastText: ""
-
     },
     secondary: {
       main: "#100323",

@@ -67,6 +67,7 @@ const CollectionsProvider = ({children}: any) => {
     const [imageToUpload, setImageToUpload] = useState("https://scaleflex.airstore.io/demo/stephen-walker-unsplash.jpg")
     const [inputId, setInputId] = useState("")
     const [imageUrl, setImageUrl] = useState("")
+    const [imageType, setImageType] = useState("")
 
 
     // RENTAL
@@ -211,9 +212,10 @@ const CollectionsProvider = ({children}: any) => {
             setInputId,
             imageUrl,
             setImageUrl,
+            imageType,
+            setImageType,
 
-
-
+            
             // RENTALS
             activeRentalTab,
             setActiveRentalTab,

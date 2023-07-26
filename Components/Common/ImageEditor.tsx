@@ -17,6 +17,29 @@ function uint8ArrayToBase64(uint8Array: any) {
     return base64String;
 }
 
+const sizes: any = {
+    cover: {
+        width: 1200,
+        height: 675,
+        aspectRatio: "16:9"
+    },
+    profile: {
+        width: 400,
+        height: 400,
+        aspectRatio: "square"
+    },
+    avatar: {
+        width: 200,
+        height: 200,
+        aspectRatio: "square"
+    },
+    post: {
+        width: 600,
+        height: 600,
+        aspectRatio: "square"
+    }
+}
+
 
 export default function ImageEditor(this: any) {
     // CONTEXT
@@ -28,13 +51,11 @@ export default function ImageEditor(this: any) {
 
         setImageUrl,
 
-        setSnackbarMessage
+        setSnackbarMessage,
+        imageType,
+        setImageType
     }: any = React.useContext(CollectionsContext)
 
-    console.log("IMAGE TO UPLOAD", imageToUpload)
-
-
-    const canvasRef: any = React.useRef(null)
     let imgObj: any;
     function imageEditorCreated(): void {
         imgObj.select("Square");
@@ -63,16 +84,11 @@ export default function ImageEditor(this: any) {
 
     // FUNCTIONS
     function fileOpened() {
-        imgObj.select('16:9');
+        console.log("FILE OPENED", imageType)
+        imgObj.select(sizes[imageType].aspectRatio);
     }
 
-    const [cf, setcf] = React.useState<any>()
-
-    console.log("CFFFF", cf)
-
-    const [loading, setLoading] = useState(false)
-
-    async function dlgDoneButtonClick() {
+    async function save() {
         setSnackbarMessage({
             open: true,
             vertical: 'top',
@@ -83,7 +99,10 @@ export default function ImageEditor(this: any) {
 
         imgObj.crop();
         let croppedData = imgObj.getImageData();
+        console.log("CROPPED DATA", croppedData)
         let canvas: any = document.querySelector('#img-canvas');
+        canvas.width = sizes[imageType].width;
+        canvas.height = sizes[imageType].height;
         let ctx = canvas.getContext('2d');
         let parentDiv: any = document.querySelector('.e-profile');
         let tempCanvas = parentDiv.appendChild(createElement('canvas'));
@@ -98,13 +117,12 @@ export default function ImageEditor(this: any) {
         canvas.style.backgroundColor = '#fff';
 
         // console.log("CTX", ctx)
-        const base64 = ctx.canvas.toDataURL("image/jpeg")
+        const base64 = ctx.canvas.toDataURL("image/png")
         console.log("BASE64", base64)
 
         const formData = new FormData()
         formData.append("file", base64)
         formData.append("upload_preset", "social_pledge")
-
 
 
         try {
@@ -145,68 +163,6 @@ export default function ImageEditor(this: any) {
 
     }
 
-    async function save() {
-        // imgObj.crop();
-        // let croppedData = imgObj.getImageData()
-
-        // // Obtain a blob: URL for the image data.
-        // console.log("DATA", croppedData.data)
-        // const arrayBufferView = new Uint8Array(croppedData);
-
-        // const blob = new Blob([arrayBufferView], { type: "image/jpeg" });
-        // // const urlCreator = window.URL || window.webkitURL;
-        // const imageUrl = URL.createObjectURL(blob);
-        // console.log("URL", imageUrl)
-        // setcf(imageUrl)
-
-        await dlgDoneButtonClick()
-        // const img: any = document.querySelector("#photo");
-        // img.src = imageUrl;
-
-        // const croppedFile = new File([croppedData], "cropped.png", { type: "image/png" })
-
-        // console.log(croppedFile)
-
-        // setcf(URL.createObjectURL(croppedFile))
-
-        // const base64 = uint8ArrayToBase64(croppedData)
-
-        // console.log(base64)
-
-
-        // const formData = new FormData()
-        // formData.append("file", croppedFile)
-        // formData.append("upload_preset", "social_pledge")
-
-        // await fetch(
-        //     "https://api.cloudinary.com/v1_1/dfmoqlbyl/image/upload",
-        //     {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             // Authorization: `Bearer ${token}`,
-        //         },
-        //         body: formData,
-        //     }
-        // ).then((response) => {
-        //     console.log(response)
-        // })
-
-    }
-
-    // function handleImageLoaded() {
-    //     if (imgSrc === '') {
-    //       let canvas = document.querySelector('#img-canvas');
-    //       let image = document.querySelector('#custom-img');
-    //       let ctx = canvas.getContext('2d');
-    //       canvas.width = image.width < image.height ? image.width : image.height;
-    //       canvas.height = canvas.width;
-    //       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    //       document.querySelector('.e-profile').classList.remove('e-hide');
-    //     }
-    //   }
-
-
 
     return (
         <Dialog open={open} fullScreen>
@@ -233,35 +189,12 @@ export default function ImageEditor(this: any) {
                                     ref={(img) => { imgObj = img }}
                                     created={imageEditorCreated}
                                     fileOpened={fileOpened}
-
                                     saved={(event, data) => console.log("SAVE EVENT", data)}
                                 >
                                 </ImageEditorComponent>
-                                {/* <canvas ref={canvasRef} style={{ display: 'none' }}></canvas> */}
-                                {/* <img src={cf} style={{ width: "10rem" }} /> */}
                                 <Box className="e-profile e-hide" display="none">
                                     <div className="e-custom-wrapper">
                                         <canvas id="img-canvas"></canvas>
-                                        {/* <img
-                                            alt="img"
-                                            className="e-custom-img"
-                                            id="custom-img"
-                                            // onLoad={handleImageLoaded}
-                                            src="https://ej2.syncfusion.com/react/demos/src/image-editor/images/profile.png"
-                                        /> */}
-                                        {/* <input
-                                            type="file"
-                                            id="img-upload"
-                                            className="e-custom-file"
-                                            onChange={fileChanged}
-                                        />
-                                        <span
-                                            id="custom-edit"
-                                            className="e-custom-edit"
-                                            onClick={editClicked}
-                                        >
-                                            <span className="e-custom-icon sb-icons"></span>
-                                        </span> */}
                                     </div>
                                 </Box>
                             </div>
