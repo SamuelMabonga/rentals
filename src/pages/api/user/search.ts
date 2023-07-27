@@ -1,16 +1,9 @@
-import {
-    createProperty,
-    deleteProperty,
-    fetchAllProperties,
-    fetchSingleProperty,
-    updateProperty,
-  } from "controllers/property";
-  import { connectToMongoDB } from "lib/mongodb";
-  import { NextApiRequest, NextApiResponse } from "next";
-  import { getToken } from "next-auth/jwt";
-  import { getSession } from "next-auth/react";
-  import jwt from "jsonwebtoken";
-  import authenticateUser from "helpers/authenticate_user";
+import { connectToMongoDB } from "lib/mongodb";
+import { NextApiRequest, NextApiResponse } from "next";
+import { getToken } from "next-auth/jwt";
+import { getSession } from "next-auth/react";
+import jwt from "jsonwebtoken";
+import authenticateUser from "helpers/authenticate_user";
 import { searchUsers } from "controllers/searchUsers";
   
   export default async function handler(
