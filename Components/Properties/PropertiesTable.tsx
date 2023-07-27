@@ -38,10 +38,10 @@ export const PropertiesTable = <T extends object>({ data, pageInfo }: ReactTable
         () => [
             {
                 header: 'Image',
-                cell: (row) => {
+                cell: (row: any) => {
                     return (
                         <Avatar
-                            src={row.row.original.image}
+                            src={row.row.original.propertyProfileImage}
                             alt="Avatar"
                             sx={{
                                 width: "3rem",

@@ -28,7 +28,7 @@ export async function fetchPropertiesByRoles(req: any, res: any, user: string) {
       success: true,
       msg: "Properties fetched successfully",
       data: properties.map((property) => ({
-        ...property.property._doc,
+        ...property?.property?._doc,
         role: property.role,
       })),
       pageInfo: getPageInfo(limit, propertiesCount, page),

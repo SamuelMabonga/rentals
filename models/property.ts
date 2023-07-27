@@ -24,7 +24,7 @@ const propertySchema: any = new Schema(
       enum: ["ACTIVE", "INACTIVE"],
       default: "INACTIVE"
     },
-    cover_photo: {
+    propertyCoverImage: {
       type: String,
       validate: {
         validator: function (value: any) {
@@ -34,7 +34,7 @@ const propertySchema: any = new Schema(
         message: "Invalid cover photo URL",
       },
     },
-    profile_photo: {
+    propertyProfileImage: {
       type: String,
       validate: {
         validator: function (value: any) {

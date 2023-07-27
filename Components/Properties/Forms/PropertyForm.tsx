@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup"
 import { CloudUpload, CloudUploadOutlined, Upload } from "@mui/icons-material"
-import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
+import { Autocomplete, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
 import ImageEditor from "Components/Common/ImageEditor"
 import FileInput from "Components/FileInput"
@@ -17,16 +17,35 @@ import * as yup from "yup"
 const formSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
     description: yup.string().required("Description is required"),
-    propertyProfileImage: yup.string().required("Image is required")
+    propertyProfileImage: yup.string().required("Image is required"),
+    propertyCoverImage: yup.string().required("Image is required"),
 })
 
-function ImageInput({ id, name, register, setImageToUpload, setOpenImageUploader, inputId, setInputId, imageUrl, setValue, error }: any) {
+function ImageInput({
+    id,
+    name,
+    label,
+    value,
+    register,
+    setImageToUpload,
+    setOpenImageUploader,
+    inputId,
+    setInputId,
+    imageUrl,
+    setValue,
+    error,
+    imageType,
+    setImageType
+}: any) {
     // IMAGE
     const [selectedFile, setSelectedFile] = useState()
     const [preview, setPreview] = useState()
 
     // create a preview as a side effect, whenever selected file is changed
     useEffect(() => {
+        // Stop if ids do not match
+        if (!inputId === id) return
+
         if (!selectedFile) {
             setPreview(undefined)
             return
@@ -40,13 +59,14 @@ function ImageInput({ id, name, register, setImageToUpload, setOpenImageUploader
         setInputId(id)
         setImageToUpload(objectUrl)
         setOpenImageUploader(true)
+        setImageType(imageType)
 
         // free memory when ever this component is unmounted
         return () => URL.revokeObjectURL(objectUrl)
     }, [selectedFile])
 
 
-    const onSelectFile = (e: any) => {
+    const onSelectFile: any = (e: any) => {
         if (!e.target.files || e.target.files.length === 0) {
             setSelectedFile(undefined)
             return
@@ -57,8 +77,6 @@ function ImageInput({ id, name, register, setImageToUpload, setOpenImageUploader
     }
 
     const ref: any = useRef(null)
-
-    console.log("URL", imageUrl)
 
     // SAVE IMAGE
     useEffect(() => {
@@ -77,18 +95,29 @@ function ImageInput({ id, name, register, setImageToUpload, setOpenImageUploader
                 width: "100%",
             }}
         >
-            <FormLabel>Profile Picture</FormLabel>
-            <Box display={imageUrl === "" ? "flex" : "none"} flexDirection="column" mx="auto" alignItems="center" border="1px solid #ccc" padding="1rem" width="100%" borderRadius="0.25rem">
+            <FormLabel>{label}</FormLabel>
+            <Box display={value === "" ? "flex" : "none"} flexDirection="column" mx="auto" alignItems="center" border="1px solid #ccc" padding="1rem" width="100%" borderRadius="0.25rem">
                 <CloudUploadOutlined sx={{ width: "3rem", height: "3rem" }} />
                 <Typography color="gray" fontWeight="500" fontSize="0.875rem">Upload Image</Typography>
             </Box>
-            <Box display={id === inputId ? "flex" : "none"} width={"100%"}>
+            <Box display={imageType === "cover" && value !== "" ? "flex" : "none"} width={"100%"}>
                 <Image
-                    src={imageUrl}
-                    alt="profile image"
+                    src={value}
+                    alt="cover image"
                     width={0}
                     height={0}
                     layout="responsive"
+                />
+            </Box>
+            <Box display={imageType === "avatar" && value !== "" ? "flex" : "none"} width={"100%"}>
+                <Avatar
+                    src={value}
+                    alt="avatar image"
+                    sx={{
+                        width: "10rem",
+                        height: "10rem",
+                        border: "1px solid #ccc",
+                    }}
                 />
             </Box>
             <TextField
@@ -128,6 +157,8 @@ export default function PropertyForm() {
         setInputId,
         imageUrl,
         setImageUrl,
+        imageType,
+        setImageType,
     }: any = useContext(CollectionsContext)
 
     // fetch property features
@@ -144,7 +175,8 @@ export default function PropertyForm() {
         defaultValues: {
             name: "",
             description: "",
-            propertyProfileImage: ""
+            propertyProfileImage: "",
+            propertyCoverImage: ""
         },
         mode: "onChange",
         reValidateMode: "onChange",
@@ -168,7 +200,9 @@ export default function PropertyForm() {
         const data = {
             name: values.name,
             description: values.description,
-            owner: session?.data?.user?._id
+            owner: session?.data?.user?._id,
+            propertyProfileImage: values.propertyProfileImage,
+            propertyCoverImage: values.propertyCoverImage
         }
 
         // EDIT A PROPERTY
@@ -306,6 +340,9 @@ export default function PropertyForm() {
                     </FormLabel> */}
 
                     <ImageInput
+                        name="propertyProfileImage"
+                        label={"Property profile image"}
+                        value={watch("propertyProfileImage")}
                         setImageToUpload={setImageToUpload}
                         setOpenImageUploader={setOpenImageUploader}
                         id="propertyProfileImage"
@@ -314,6 +351,24 @@ export default function PropertyForm() {
                         imageUrl={imageUrl}
                         setValue={(value: string) => setValue("propertyProfileImage", value)}
                         error={errors?.propertyProfileImage}
+                        imageType={"avatar"}
+                        setImageType={setImageType}
+                    />
+
+                    <ImageInput
+                        name="propertyCoverImage"
+                        label={"Property cover image"}
+                        value={watch("propertyCoverImage")}
+                        setImageToUpload={setImageToUpload}
+                        setOpenImageUploader={setOpenImageUploader}
+                        id="propertyCoverImage"
+                        inputId={inputId}
+                        setInputId={setInputId}
+                        imageUrl={imageUrl}
+                        setValue={(value: string) => setValue("propertyCoverImage", value)}
+                        error={errors?.propertyCoverImage}
+                        imageType={"cover"}
+                        setImageType={setImageType}
                     />
                     {/* <FormControl>
                         <FormLabel>Features</FormLabel>
