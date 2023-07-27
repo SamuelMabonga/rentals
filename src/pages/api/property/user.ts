@@ -1,19 +1,16 @@
 import mongoose from "mongoose";
+import { NextApiRequest, NextApiResponse } from "next";
+import authenticateUser from "helpers/authenticate_user";
+import {
+  fetchSingleProperty,
+  searchProperty,
+} from "controllers/property/public";
+import { fetchPropertiesByRoles } from "controllers/property/admin";
 import {
   createProperty,
   deleteProperty,
-  fetchOwnerProperties,
-  fetchPropertiesByRoles,
-  fetchSingleProperty,
-  searchProperty,
   updateProperty,
-} from "controllers/property";
-import { connectToMongoDB } from "lib/mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { getToken } from "next-auth/jwt";
-import { getSession } from "next-auth/react";
-import jwt from "jsonwebtoken";
-import authenticateUser from "helpers/authenticate_user";
+} from "controllers/property/owner";
 
 export default async function handler(
   req: NextApiRequest,
@@ -34,7 +31,7 @@ export default async function handler(
         // USER
         const { _id: user, role } = decodedToken.user;
 
-        console.log("DECODED TOKEN", decodedToken.userRoles)
+        console.log("DECODED TOKEN", decodedToken.userRoles);
 
         const { method } = req;
         switch (method) {
