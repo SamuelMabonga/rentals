@@ -18,8 +18,8 @@ import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
 const formSchema = yup.object().shape({
-    // name: yup.string().required("Name is required"),
-    // description: yup.string().required("Description is required"),
+    name: yup.string().required("Name is required"),
+    unitType: yup.object().required("Unit type is required")
 })
 
 export default function UnitForm({property}: any) {
@@ -48,10 +48,10 @@ export default function UnitForm({property}: any) {
 
     const [isLoading, setIsLoading] = useState(false)
 
-    const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
+    const { handleSubmit, register, watch, setValue, reset, formState: { errors }, setError }: any = useForm({
         defaultValues: {
             name: "",
-            unitType: {name: ""}
+            unitType: null
         },
         mode: "onChange",
         reValidateMode: "onChange",
@@ -66,7 +66,7 @@ export default function UnitForm({property}: any) {
         }
 
         reset()
-        setValue("unitType", {name: ""})
+        // setValue()
 
     }, [toEdit])
 
@@ -183,7 +183,9 @@ export default function UnitForm({property}: any) {
                     onSubmit={handleSubmit(onSubmit)}
                     style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}
                 >
-                    <FormControl>
+                    <FormControl
+                        error={errors?.name?.message}
+                    >
                         <FormLabel>Name</FormLabel>
                         <TextField
                             placeholder=""
@@ -192,14 +194,19 @@ export default function UnitForm({property}: any) {
                         />
                         <FormHelperText>{errors?.name?.message}</FormHelperText>
                     </FormControl>
-                    <FormControl>
+                    <FormControl
+                        error={errors?.unitType?.message}
+                    >   
                         <FormLabel>Unit Type</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
                             value={watch("unitType")}
                             options={unitTypes?.data || []}
                             getOptionLabel={(option: any) => option.name}
-                            onChange={(event, value) => setValue("unitType", value)}
+                            onChange={(event, value) => {
+                                setValue("bunitType", value)
+                                setError("unitType", null)
+                            }}
                             renderInput={(params) =>
                                 <TextField
                                     {...params}
@@ -207,6 +214,7 @@ export default function UnitForm({property}: any) {
                                 />
                             }
                         />
+                        <FormHelperText>{errors?.unitType?.message}</FormHelperText>
                     </FormControl>
                 </form>
             </DialogContent>

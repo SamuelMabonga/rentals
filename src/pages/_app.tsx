@@ -55,15 +55,22 @@ const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
           <CssBaseline />
           <QueryClientProvider client={queryClient}>
             <Hydrate state={pageProps.dehydratedState}>
-              <SessionProvider session={session}>
+              <SessionProvider
+                session={session}
+                // Re-fetch session every 5 minutes
+                refetchInterval={5 * 60}
+                // Re-fetches session when window is focused
+                refetchOnWindowFocus={true}
+                refetchWhenOffline={false}
+              >
                 {Component.auth ? (
                   <Auth>
                     {/* <QueryClientProvider client={queryClient}>
                       <Hydrate state={pageProps.dehydratedState}> */}
-                        <DashboardLayout>
-                          <Component {...pageProps} />
-                        </DashboardLayout>
-                      {/* </Hydrate>
+                    <DashboardLayout>
+                      <Component {...pageProps} />
+                    </DashboardLayout>
+                    {/* </Hydrate>
                       <ReactQueryDevtools initialIsOpen={false} />
                     </QueryClientProvider> */}
                   </Auth>

@@ -42,7 +42,7 @@ export default function Login() {
         console.log(result)
 
         if (result?.ok) {
-            router.push("/dashboard")
+            router.push("/select-role")
         }
 
     }
@@ -148,6 +148,9 @@ export default function Login() {
                                 }}
                             >
                                 <Typography color="primary.dark" mx="auto">Rentals</Typography>
+                                <Box>
+                                    <Button onClick={() => signIn("google")}>Sign in with Google</Button>
+                                </Box>
                                 <Box display="flex" flexDirection="column">
                                     <Typography color="primary.dark" mx="auto" fontSize="1.5rem" fontWeight="600">Login</Typography>
                                     <Typography color="primary.dark" mx="auto" textAlign="center">Enter your credentials to continue</Typography>

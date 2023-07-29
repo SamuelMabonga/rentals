@@ -17,7 +17,7 @@ const formSchema = yup.object().shape({
     billingPeriod: yup.object().required("Billing period is required"),
 })
 
-export default function PropertyFeatureForm({property}: any) {
+export default function PropertyFeatureForm({ property }: any) {
     // CONTEXT
     const {
         openPropertyFeaturesForm: open,
@@ -37,7 +37,7 @@ export default function PropertyFeatureForm({property}: any) {
 
     const [isLoading, setIsLoading] = useState(false)
 
-    const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
+    const { handleSubmit, register, watch, setValue, reset, formState: { errors }, setError }: any = useForm({
         defaultValues: {
             feature: "",
             price: "",
@@ -105,7 +105,7 @@ export default function PropertyFeatureForm({property}: any) {
                     horizontal: 'center',
                     message: "Property feature edited successfully",
                     icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </Box>
@@ -140,7 +140,7 @@ export default function PropertyFeatureForm({property}: any) {
                 horizontal: 'center',
                 message: "Property feature created successfully",
                 icon: <Box width="1.5rem" height="1.5rem" color="lightgreen">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{color: "inherit"}} className="w-6 h-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: "inherit" }} className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </Box>
@@ -178,7 +178,7 @@ export default function PropertyFeatureForm({property}: any) {
                     onSubmit={handleSubmit(onSubmit)}
                     style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}
                 >
-                    <FormControl>
+                    <FormControl error={errors?.feature?.message}>
                         <FormLabel>Feature</FormLabel>
                         <Autocomplete
                             // {...register("feature")}
@@ -191,19 +191,23 @@ export default function PropertyFeatureForm({property}: any) {
                                     placeholder=""
                                 />
                             }
-                            onChange={(event, value) => setValue("feature", value)}
+                            onChange={(event, value) => {
+                                setValue("feature", value)
+                                setError("feature", null)
+                            }}
                         />
+                        <FormHelperText>{errors?.feature?.message}</FormHelperText>
                     </FormControl>
-                    <FormControl>
+                    <FormControl error={errors?.price?.message}>
                         <FormLabel>Price</FormLabel>
                         <TextField
                             placeholder=""
                             {...register("price")}
                         // value={}
                         />
-                        <FormHelperText>{errors?.name?.message}</FormHelperText>
+                        <FormHelperText>{errors?.price?.message}</FormHelperText>
                     </FormControl>
-                    <FormControl>
+                    <FormControl error={errors?.billingPeriod?.message}>
                         <FormLabel>Billing Period</FormLabel>
                         <Autocomplete
                             // {...register("features")}
@@ -216,8 +220,12 @@ export default function PropertyFeatureForm({property}: any) {
                                     placeholder=""
                                 />
                             }
-                            onChange={(event, value) => setValue("billingPeriod", value)}
+                            onChange={(event, value) => {
+                                setValue("billingPeriod", value)
+                                setError("billingPeriod", null)
+                            }}
                         />
+                        <FormHelperText>{errors?.billingPeriod?.message}</FormHelperText>
                     </FormControl>
                 </form>
             </DialogContent>

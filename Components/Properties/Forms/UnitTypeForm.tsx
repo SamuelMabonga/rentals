@@ -17,8 +17,11 @@ import { useForm } from "react-hook-form"
 import * as yup from "yup"
 
 const formSchema = yup.object().shape({
-    // name: yup.string().required("Name is required"),
-    // description: yup.string().required("Description is required"),
+    name: yup.string().required("Name is required"),
+    description: yup.string().required("Name is required"),
+    // features: yup.array().required("Billing period is required"),
+    price: yup.string().required("Name is required"),
+    billingPeriod: yup.object().required("Billing period is required")
 })
 
 export default function UnitTypeForm({
@@ -49,13 +52,13 @@ export default function UnitTypeForm({
 
     const [isLoading, setIsLoading] = useState(false)
 
-    const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
+    const { handleSubmit, register, watch, setValue, reset, formState: { errors }, setError }: any = useForm({
         defaultValues: {
             name: "",
             description: "",
             features: [],
-            price: null,
-            billingPeriod: {}
+            price: "",
+            billingPeriod: null
         },
         mode: "onChange",
         reValidateMode: "onChange",
@@ -98,13 +101,13 @@ export default function UnitTypeForm({
                 price: values.price,
             }
             try {
-                const res = await fetch(`/api/unitTypes?id=${toEdit._id}`,{
+                const res = await fetch(`/api/unitTypes?id=${toEdit._id}`, {
                     method: 'PUT',
-                    headers:{
-                        'Content-Type':'application/json',
+                    headers: {
+                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({...edited})
+                    body: JSON.stringify({ ...edited })
                 })
                 const response = await res.json();
                 console.log(response)
@@ -124,7 +127,7 @@ export default function UnitTypeForm({
                     </Box>
                 })
                 return
-            } catch(error) {
+            } catch (error) {
                 setIsLoading(false)
                 console.log(error)
                 return
@@ -190,8 +193,10 @@ export default function UnitTypeForm({
                     onSubmit={handleSubmit(onSubmit)}
                     style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}
                 >
-                    <FormControl>
-                        <FormLabel>Name</FormLabel>
+                    <FormControl
+                        error={errors?.name?.message}
+                    >
+                        <FormLabel required >Name</FormLabel>
                         <TextField
                             placeholder=""
                             {...register("name")}
@@ -199,8 +204,10 @@ export default function UnitTypeForm({
                         />
                         <FormHelperText>{errors?.name?.message}</FormHelperText>
                     </FormControl>
-                    <FormControl>
-                        <FormLabel>Description</FormLabel>
+                    <FormControl
+                        error={errors?.description?.message}
+                    >
+                        <FormLabel required>Description</FormLabel>
                         <TextField
                             {...register("description")}
                             multiline
@@ -209,7 +216,9 @@ export default function UnitTypeForm({
                         />
                         <FormHelperText>{errors?.description?.message}</FormHelperText>
                     </FormControl>
-                    <FormControl>
+                    <FormControl
+                        error={errors?.features?.message}
+                    >
                         <FormLabel>Features</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
@@ -225,24 +234,32 @@ export default function UnitTypeForm({
                                 />
                             }
                         />
+                        <FormHelperText>{errors?.features?.message}</FormHelperText>
                     </FormControl>
-                    <FormControl>
-                        <FormLabel>Price</FormLabel>
+                    <FormControl
+                        error={errors?.price?.message}
+                    >
+                        <FormLabel required>Price</FormLabel>
                         <TextField
                             placeholder=""
                             {...register("price")}
                         // value={}
                         />
-                        <FormHelperText>{errors?.name?.message}</FormHelperText>
+                        <FormHelperText>{errors?.price?.message}</FormHelperText>
                     </FormControl>
-                    <FormControl>
-                        <FormLabel>Billing Period</FormLabel>
+                    <FormControl
+                        error={errors?.billingPeriod?.message}
+                    >
+                        <FormLabel required>Billing Period</FormLabel>
                         <Autocomplete
                             // {...register("features")}/
                             value={watch("billingPeriod")}
                             options={billingPeriods?.data || []}
                             getOptionLabel={(option: any) => option.name}
-                            onChange={(event, value) => setValue("billingPeriod", value)}
+                            onChange={(event, value) => {
+                                setValue("billingPeriod", value)
+                                setError("billingPeriod", null)
+                            }}
                             renderInput={(params) =>
                                 <TextField
                                     {...params}
@@ -250,6 +267,7 @@ export default function UnitTypeForm({
                                 />
                             }
                         />
+                        <FormHelperText>{errors?.billingPeriod?.message}</FormHelperText>
                     </FormControl>
                     {/* <FileInput />
                     <FileInput /> */}
