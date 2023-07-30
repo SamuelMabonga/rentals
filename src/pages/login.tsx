@@ -149,7 +149,7 @@ export default function Login() {
                             >
                                 <Typography color="primary.dark" mx="auto">Rentals</Typography>
                                 <Box>
-                                    <Button onClick={() => signIn("google")}>Sign in with Google</Button>
+                                    <Button onClick={() => signIn("google", { callbackUrl: '/dashboard' })}>Sign in with Google</Button>
                                 </Box>
                                 <Box display="flex" flexDirection="column">
                                     <Typography color="primary.dark" mx="auto" fontSize="1.5rem" fontWeight="600">Login</Typography>
