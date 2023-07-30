@@ -85,31 +85,31 @@ const options: AuthOptions = {
     maxAge: 24 * 60 * 60,
   },
   callbacks: {
-    jwt: async ({ token, user }: any) => {
-      // console.log("USER", user)
-      // console.log("TOKEN", token)
-      // await connectToMongoDB().catch((err) => {
-      //   throw new Error(err);
-      // });
+    // jwt: async ({ token, user }: any) => {
+    //   // console.log("USER", user)
+    //   // console.log("TOKEN", token)
+    //   // await connectToMongoDB().catch((err) => {
+    //   //   throw new Error(err);
+    //   // });
 
-      if (user) {
-        token.user = user;
+    //   if (user) {
+    //     token.user = user;
 
-        try {
-          const userRoles = await UserRoles.find({ user: user._id }).populate({
-            path: "role",
-            populate: { path: "permissions" },
-          });
-          token.userRoles = userRoles;
+    //     try {
+    //       const userRoles = await UserRoles.find({ user: user._id }).populate({
+    //         path: "role",
+    //         populate: { path: "permissions" },
+    //       });
+    //       token.userRoles = userRoles;
 
-          return token;
-        } catch (error) {
-          console.log(error);
-        }
-      }
+    //       return token;
+    //     } catch (error) {
+    //       console.log(error);
+    //     }
+    //   }
 
-      return token;
-    },
+    //   return token;
+    // },
     session: async ({ session, token }: any) => {
       // console.log("SESSION", session)
       // console.log("TOKEN", token)
