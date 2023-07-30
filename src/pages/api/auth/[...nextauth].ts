@@ -42,7 +42,7 @@ const options: AuthOptions = {
           prompt: "consent",
           access_type: "offline",
           response_type: "code"
-        }
+        },
       }
     }),
     CredentialsProvider({
@@ -150,40 +150,46 @@ const options: AuthOptions = {
       // }
       return session;
     },
-    // signIn: async (params: any) => {
-    //   const { user, account, profile } = params;
-    //   // // If the user hasn't selected an entity, redirect them to the entity selection page
-    //   // if (!user.entity) {
-    //   //   return Promise.resolve("/entity-selection");
-    //   // }
+    signIn: async (params: any) => {
+      const { user, account, profile } = params;
 
-    //   // // If the user has an entity selected, proceed with regular authentication
-    //   // return Promise.resolve(true);
+      if (account.provider === "google") {
+        // return profile.email_verified && profile.email.endsWith("@example.com")
+        return true;
+      }
+
+      // // If the user hasn't selected an entity, redirect them to the entity selection page
+      // if (!user.entity) {
+      //   return Promise.resolve("/entity-selection");
+      // }
+
+      // // If the user has an entity selected, proceed with regular authentication
+      // return Promise.resolve(true);
 
 
-    //   // console.log("ACCOUNT", profile)
+      // console.log("ACCOUNT", profile)
 
-    //   try {
-    //     const userRoles = await UserRoles.find({ user: user._id }).populate({
-    //       path: "role",
-    //       populate: { path: "permissions" },
-    //     });
+      // try {
+      //   const userRoles = await UserRoles.find({ user: user._id }).populate({
+      //     path: "role",
+      //     populate: { path: "permissions" },
+      //   });
 
-    //     // console.log("USER ROLES", userRoles);
+      //   // console.log("USER ROLES", userRoles);
 
-    //     // Include the roles in the JWT token's payload
-    //     // user.token = jwt.sign({ ...user, roles: userRoles }, process.env.NEXT_PUBLIC_AUTH_SECRET as string, {
-    //     //   expiresIn: '5m',
-    //     // });
+      //   // Include the roles in the JWT token's payload
+      //   // user.token = jwt.sign({ ...user, roles: userRoles }, process.env.NEXT_PUBLIC_AUTH_SECRET as string, {
+      //   //   expiresIn: '5m',
+      //   // });
 
-    //     // session.userRoles = userRoles;
-    //     return "http://localhost:3000/select-role"
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
+      //   // session.userRoles = userRoles;
+      //   return "http://localhost:3000/select-role"
+      // } catch (error) {
+      //   console.log(error);
+      // }
 
-    //   return true;
-    // },
+      return true;
+    },
   },
 };
 
