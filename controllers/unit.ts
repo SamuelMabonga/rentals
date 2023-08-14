@@ -1,3 +1,4 @@
+import Fuse from "fuse.js";
 import Unit from "models/unit";
 import Tenant from "models/tenant";
 import UnitType from "models/unitType";
@@ -50,20 +51,26 @@ export async function fetchAllUnits(req: any, res: any) {
 // get all units
 export async function fetchAllPropertyUnits(req: any, res: any) {
   const {
-    query: { id, searchQuery },
-  }: any = req;
+    id, status
+  } = req.query
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
 
   try {
     const [units, unitsCount] = await Promise.all([
-      Unit.find({ "property": id })
+      Unit.find(queryCondition)
         .populate({
           path: "unitType",
        })
         .skip((page - 1) * limit)
         .limit(limit),
-      Unit.countDocuments({ "property": id }),
+      Unit.countDocuments(queryCondition),
     ]);
 
     res.status(200).json({
@@ -188,7 +195,6 @@ export async function fetchSingleUnit(req: any, res: any) {
 export async function updateUnit(req: any, res: any) {
   try {
     let unit = await Unit.findById(req.query.id);
-
     const data = {
       name: req.body.name || unit.name,
       unitType: req.body.unitType || unit.unitType,
@@ -233,5 +239,53 @@ export async function deleteUnit(req: any, res: any) {
       data: error,
     });
     console.log(error);
+  }
+}
+
+
+// @desc    search
+// @route   GET /api/booking?searchQuery=searchQuery
+export async function searchPropertyUnits(req: any, res: any, searchQuery: any) {
+
+  const {
+    id, status
+  } = req.query
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
+  try {
+    let units = await Unit.find(queryCondition)
+      .populate({
+        path: "property",
+      })
+      .populate({
+        path: "unitType",
+      })
+
+    const options = {
+      keys: ["name", "unitType.name"],
+      threshold: 0.3,
+    };
+
+    if (searchQuery?.replace(/%/g, "")) {
+      const formatText = searchQuery?.replace(/%/g, "");
+      const fuse = new Fuse(units, options);
+      units = fuse.search(formatText)?.map(({ item }) => item);
+    }
+
+    res.status(200).json({
+      success: true,
+      msg: `${searchQuery} searched successfully`,
+      data: units,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: `Failed to search ${searchQuery}`,
+      data: error,
+    });
   }
 }

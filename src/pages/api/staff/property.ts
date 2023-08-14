@@ -16,25 +16,26 @@ export default async function handler(
     res: NextApiResponse
 ) {
 
-    const decodedToken = authenticateUser(req, res);
+    // const decodedToken = authenticateUser(req, res);
 
-    if (!decodedToken?.user?._id) {
-        return res.status(401).json({
-            success: false,
-            msg: "Not Authorized",
-        });
-    }
+    // if (!decodedToken?.user?._id) {
+    //     return res.status(401).json({
+    //         success: false,
+    //         msg: "Not Authorized",
+    //     });
+    // }
 
     connectToMongoDB().catch((err) => res.json(err));
 
     // USER
-    const { _id, role } = decodedToken.user;
+    // const { _id, role } = decodedToken.user;
 
     //type of request
     const { method } = req;
 
     // Property ID
     const property = req.body.property || req.query.id
+    const searchQuery: any = req.query.searchQuery
 
     // Reject if no property provided
     if (!property) {
@@ -45,57 +46,58 @@ export default async function handler(
     }
 
     // Get permissions
-    const userRoles = decodedToken.userRoles
-    const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
-    const permissions = userPropertyRoles?.role?.permissions
+    // const userRoles = decodedToken.userRoles
+    // const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
+    // const permissions = userPropertyRoles?.role?.permissions
 
     switch (method) {
         case "GET":
-            const getPermission = permissions?.find((permission: any) => permission.name === "View staff")
-            if (!getPermission) {
-                return res.status(401).json({
-                    success: false,
-                    msg: "Not Authorized",
-                });
-            }
+            // const getPermission = permissions?.find((permission: any) => permission.name === "View staff")
+            // if (!getPermission) {
+            //     return res.status(401).json({
+            //         success: false,
+            //         msg: "Not Authorized",
+            //     });
+            // }
             // if (id) {
             //   fetchSingleStaff(req, res);
-            // } else if (searchQuery) {
-            //   searchStaff(req, res, searchQuery);
-            // } else {
+            // } else 
+            if (searchQuery) {
+              searchStaff(req, res);
+            } else {
             fetchAllStaffByProperty(req, res);
-            // }
+            }
             break;
         case "POST":
-            const postPermission = permissions?.find((permission: any) => permission.name === "Create staff")
-            if (!postPermission) {
-                return res.status(401).json({
-                    success: false,
-                    msg: "Not Authorized",
-                });
-            }
+            // const postPermission = permissions?.find((permission: any) => permission.name === "Create staff")
+            // if (!postPermission) {
+            //     return res.status(401).json({
+            //         success: false,
+            //         msg: "Not Authorized",
+            //     });
+            // }
 
             createStaff(req, res);
             break;
         case "PUT":
-            const putPermission = permissions?.find((permission: any) => permission.name === "Edit staff")
-            if (!putPermission) {
-                return res.status(401).json({
-                    success: false,
-                    msg: "Not Authorized",
-                });
-            }
+            // const putPermission = permissions?.find((permission: any) => permission.name === "Edit staff")
+            // if (!putPermission) {
+            //     return res.status(401).json({
+            //         success: false,
+            //         msg: "Not Authorized",
+            //     });
+            // }
 
             updateStaff(req, res);
             break;
         case "DELETE":
-            const deletePermission = permissions?.find((permission: any) => permission.name === "Delete staff")
-            if (!deletePermission) {
-                return res.status(401).json({
-                    success: false,
-                    msg: "Not Authorized",
-                });
-            }
+            // const deletePermission = permissions?.find((permission: any) => permission.name === "Delete staff")
+            // if (!deletePermission) {
+            //     return res.status(401).json({
+            //         success: false,
+            //         msg: "Not Authorized",
+            //     });
+            // }
 
             deleteStaff(req, res);
             break;

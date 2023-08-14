@@ -1,6 +1,7 @@
 import { getPageInfo } from "helpers/page_info";
 import Staff from "models/staff";
 import UserRoles from "models/userRoles";
+import Fuse from "fuse.js";
 
 // get all staffs
 export async function fetchAllStaffs(req: any, res: any) {
@@ -32,17 +33,27 @@ export async function fetchAllStaffs(req: any, res: any) {
 
 // get all staffs
 export async function fetchAllStaffByProperty(req: any, res: any) {
-  const { id } = req.query;
+  const {
+    query: { id, searchQuery, status },
+  }: any = req;
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    console.log("status is", status);
+    queryCondition.status = status;
+  }
+
+
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
     const [staffs, staffsCount] = await Promise.all([
-      UserRoles.find({ property: id })
+      UserRoles.find(queryCondition)
         .populate("role")
         .populate("user")
         .skip((page - 1) * limit)
         .limit(limit),
-      UserRoles.countDocuments({ property: id }),
+      UserRoles.countDocuments(queryCondition),
     ]);
 
     res.status(200).json({
@@ -209,19 +220,34 @@ export async function deleteStaff(req: any, res: any) {
 
 // @desc    search
 // @route   GET /api/staff?searchQuery=searchQuery
-export async function searchStaff(req: any, res: any, searchQuery: string) {
-  try {
-    let findParams = searchQuery
-      ? {
-        $text: {
-          $search: searchQuery,
-          $caseSensitive: false,
-          $diacriticSensitive: false,
-        },
-      }
-      : {};
+export async function searchStaff(req: any, res: any) {
+  const {
+    query: { id, searchQuery, status },
+  }: any = req;
 
-    const staff = await Staff.find({ ...findParams });
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    console.log("status is", status);
+    queryCondition.status = status;
+  }
+
+  try {
+    let staff = await UserRoles.find(queryCondition)
+      .populate('user')
+      .populate('role')
+      .populate({path: "tenant", populate: {path: "unit"}})
+
+
+    const options = {
+      keys: ["user.name", "user.email"],
+      threshold: 0.3,
+    };
+
+    if (searchQuery?.replace(/%/g, "")) {
+      const formatText = searchQuery?.replace(/%/g, "");
+      const fuse = new Fuse(staff, options);
+      staff = fuse.search(formatText)?.map(({ item }) => item);
+    }
 
     res.status(200).json({
       success: true,

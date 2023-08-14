@@ -13,7 +13,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  authenticateUser(req, res);
+  // authenticateUser(req, res);
   
   connectToMongoDB().catch((err) => res.json(err));
 

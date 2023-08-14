@@ -5,6 +5,7 @@ import {
   fetchAllPropertyUnits,
   fetchAllUnits,
   fetchSingleUnit,
+  searchPropertyUnits,
   updateUnit,
 } from "controllers/unit";
 import authenticateUser from "helpers/authenticate_user";
@@ -20,14 +21,14 @@ export default async function handler(
   //   query: { id, searchQuery },
   // }: any = req;
 
-  const decodedToken = authenticateUser(req, res);
+  // const decodedToken = authenticateUser(req, res);
 
-  if (!decodedToken?.user?._id) {
-    return res.status(401).json({
-      success: false,
-      msg: "Not Authorized",
-    });
-  }
+  // if (!decodedToken?.user?._id) {
+  //   return res.status(401).json({
+  //     success: false,
+  //     msg: "Not Authorized",
+  //   });
+  // }
 
   try {
     await mongoose
@@ -52,18 +53,21 @@ export default async function handler(
         }
 
         // Get permissions
-        const userRoles = decodedToken.userRoles
-        const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
-        const permissions = userPropertyRoles?.role?.permissions
+        // const userRoles = decodedToken.userRoles
+        // const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
+        // const permissions = userPropertyRoles?.role?.permissions
 
         switch (method) {
           case "GET":
-            const getPermission = permissions?.find((permission: any) => permission.name === "View unit")
-            if (!getPermission) {
-              return res.status(401).json({
-                success: false,
-                msg: "Not Authorized",
-              });
+            // const getPermission = permissions?.find((permission: any) => permission.name === "View unit")
+            // if (!getPermission) {
+            //   return res.status(401).json({
+            //     success: false,
+            //     msg: "Not Authorized",
+            //   });
+            // }
+            if (req.query.searchQuery) {
+              return searchPropertyUnits(req, res, req.query.searchQuery);
             }
             fetchAllPropertyUnits(req, res);
             // fetchAllUnits(req, res)
@@ -72,33 +76,33 @@ export default async function handler(
             //   fetchSingleUnit(req, res);
             break;
           case "POST":
-            const postPermission = permissions?.find((permission: any) => permission.name === "Create unit")
-            if (!postPermission) {
-              return res.status(401).json({
-                success: false,
-                msg: "Not Authorized",
-              });
-            }
+            // const postPermission = permissions?.find((permission: any) => permission.name === "Create unit")
+            // if (!postPermission) {
+            //   return res.status(401).json({
+            //     success: false,
+            //     msg: "Not Authorized",
+            //   });
+            // }
             createUnit(req, res);
             break;
           case "PUT":
-            const putPermission = permissions?.find((permission: any) => permission.name === "Edit unit")
-            if (!putPermission) {
-              return res.status(401).json({
-                success: false,
-                msg: "Not Authorized",
-              });
-            }
+            // const putPermission = permissions?.find((permission: any) => permission.name === "Edit unit")
+            // if (!putPermission) {
+            //   return res.status(401).json({
+            //     success: false,
+            //     msg: "Not Authorized",
+            //   });
+            // }
             updateUnit(req, res);
             break;
           case "DELETE":
-            const deletePermission = permissions?.find((permission: any) => permission.name === "Delete unit")
-            if (!deletePermission) {
-              return res.status(401).json({
-                success: false,
-                msg: "Not Authorized",
-              });
-            }
+            // const deletePermission = permissions?.find((permission: any) => permission.name === "Delete unit")
+            // if (!deletePermission) {
+            //   return res.status(401).json({
+            //     success: false,
+            //     msg: "Not Authorized",
+            //   });
+            // }
             deleteUnit(req, res);
             break;
           default:

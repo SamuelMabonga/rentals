@@ -31,9 +31,9 @@ export default function PropertyFeatureForm({ property }: any) {
     const session: any = useSession()
     const token = session?.data?.accessToken
 
-    const { refetch }: any = useQuery({ queryKey: ['property-features', token, property], queryFn: () => fetchPropertyFeatures(token, property, null) })
-    const { data: features }: any = useQuery({ queryKey: ['features', token], queryFn: () => fetchFeatures(token, null) })
-    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
+    const { refetch }: any = useQuery({ queryKey: ['property-features', property], queryFn: () => fetchPropertyFeatures(property, null) })
+    const { data: features }: any = useQuery({ queryKey: ['features'], queryFn: () => fetchFeatures(null) })
+    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods() })
 
     const [isLoading, setIsLoading] = useState(false)
 

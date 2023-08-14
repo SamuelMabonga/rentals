@@ -32,7 +32,7 @@ export const BillingPeriodsTable = <T extends object>({ }: ReactTableProps<T>) =
     // SESSION
     const session: any = useSession()
     const token = session?.data?.accessToken
-    const { data }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
+    const { data }: any = useQuery({ queryKey: ['billingPeriods'], queryFn: () => fetchBillingPeriods() })
 
     console.log(data)
     const router = useRouter()

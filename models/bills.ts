@@ -2,6 +2,7 @@ import { Schema, model, models } from "mongoose";
 import Tenant from "./tenant";
 import PropertyFeatures from "./propertyFeatures";
 import Extensions from "./extensions";
+import Property from "./property";
 
 const BillsShema: any = new Schema(
   {
@@ -14,6 +15,10 @@ const BillsShema: any = new Schema(
     tenant: {
       type: Schema.Types.ObjectId,
       ref: Tenant,
+    },
+    property: {
+      type: Schema.Types.ObjectId,
+      ref: Property,
     },
     type: {
       type: String, // Rent / Feature

@@ -32,7 +32,7 @@ export const ExtensionsTable = <T extends object>({ property }: ReactTableProps<
     // SESSION
     const session: any = useSession()
     const token = session?.data?.accessToken
-    const { data }: any = useQuery({ queryKey: ['extensions', token, property], queryFn: () => fetchExtensions(token, property) })
+    const { data }: any = useQuery({ queryKey: ['extensions', property], queryFn: () => fetchExtensions(property) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
@@ -54,8 +54,8 @@ export const ExtensionsTable = <T extends object>({ property }: ReactTableProps<
             },
             {
                 header: 'Tenant',
-                cell: (row: any) => `${row?.row?.original?.tenant?.user?.first_name} ${row?.row?.original?.tenant?.user?.last_name}`,
-                // accessorKey: 'name',
+                cell: (row: any) => row.renderValue(),
+                accessorKey: 'tenant.user.name',
             },
             {
                 header: 'Amount',

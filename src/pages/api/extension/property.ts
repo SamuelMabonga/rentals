@@ -20,19 +20,19 @@ export default async function handler(
     query: { id, searchQuery },
   }: any = req;
 
-  const decodedToken = authenticateUser(req, res);
+  // const decodedToken = authenticateUser(req, res);
 
-  if (!decodedToken?.user?._id) {
-    return res.status(401).json({
-      success: false,
-      msg: "Not Authorized",
-    });
-  }
+  // if (!decodedToken?.user?._id) {
+  //   return res.status(401).json({
+  //     success: false,
+  //     msg: "Not Authorized",
+  //   });
+  // }
 
   try {
     await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_SRV || "mongodb://localhost:27017/test_db").then(() => {
       // USER
-      const { _id, role } = decodedToken.user;
+      // const { _id, role } = decodedToken.user;
 
       //type of request
       const { method } = req;
@@ -49,20 +49,20 @@ export default async function handler(
       }
 
       // Get permissions
-      const userRoles = decodedToken.userRoles
-      const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
-      const permissions = userPropertyRoles?.role?.permissions
+      // const userRoles = decodedToken.userRoles
+      // const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
+      // const permissions = userPropertyRoles?.role?.permissions
 
       switch (method) {
         case "GET":
 
-          const getPermission = permissions?.find((permission: any) => permission.name === "View bill extensions")
-          if (!getPermission) {
-            return res.status(401).json({
-              success: false,
-              msg: "Not Authorized",
-            });
-          }
+          // const getPermission = permissions?.find((permission: any) => permission.name === "View bill extensions")
+          // if (!getPermission) {
+          //   return res.status(401).json({
+          //     success: false,
+          //     msg: "Not Authorized",
+          //   });
+          // }
 
           //   if (id) {
           //     return fetchSingleUnit(req, res)

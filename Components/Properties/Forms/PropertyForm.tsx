@@ -200,7 +200,7 @@ export default function PropertyForm() {
         const data = {
             name: values.name,
             description: values.description,
-            owner: session?.data?.user?._id,
+            owner: session?.data?.user?.id,
             propertyProfileImage: values.propertyProfileImage,
             propertyCoverImage: values.propertyCoverImage
         }

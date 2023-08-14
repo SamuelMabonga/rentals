@@ -1,6 +1,7 @@
 import { getPageInfo } from "helpers/page_info";
 import Tenant from "models/tenant";
 import UserRoles from "models/userRoles";
+import Fuse from "fuse.js";
 
 // get all tenants
 export async function fetchAllTenants(req: any, res: any) {
@@ -63,22 +64,29 @@ export async function fetchAllUserTenancies(req: any, res: any, id: string) {
 
 // get property's tenants
 export async function fetchAllPropertyTenants(req: any, res: any) {
+
   const {
-    query: { id, searchQuery },
-  }: any = req;
+    id, status
+  } = req.query
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
 
   try {
     const [tenants, tenantsCount] = await Promise.all([
-      Tenant.find({ "property": id })
+      Tenant.find(queryCondition)
         .populate("user")
         .populate({
           path: "unit",
           })
         .skip((page - 1) * limit)
         .limit(limit),
-      Tenant.countDocuments({ "property": id }),
+      Tenant.countDocuments(queryCondition),
     ]);
     res.status(200).json({
       success: true,
@@ -205,6 +213,50 @@ export async function deleteTenant(req: any, res: any) {
     res.status(400).json({
       success: false,
       msg: "failed to delete tenant",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// @desc    search
+// @route   GET /api/tenant/property?id=property&searchQuery=searchQuery
+export async function searchTenant(req: any, res: any, searchQuery: string) {
+  const {
+    id, status
+  } = req.query
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
+  const property = req.query.id;
+  try {
+    let tenants = await Tenant.find(queryCondition)
+      .populate("user")
+      .populate("unit")
+
+    const options = {
+      keys: ["user.name", "user.email", "unit.name"],
+      threshold: 0.3,
+    };
+
+    if (searchQuery?.replace(/%/g, "")) {
+      const formatText = searchQuery?.replace(/%/g, "");
+      const fuse = new Fuse(tenants, options);
+      tenants = fuse.search(formatText)?.map(({ item }: any) => item);
+    }
+
+    res.status(200).json({
+      success: true,
+      msg: `${searchQuery} searched successfully`,
+      data: tenants,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: `Failed to search ${searchQuery}`,
       data: error,
     });
     console.log(error);

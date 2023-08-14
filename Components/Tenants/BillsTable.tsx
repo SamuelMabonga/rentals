@@ -92,7 +92,7 @@ interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
     tenant: any
-    openFlutterwave: any
+    // openFlutterwave: any
 }
 
 type Item = {
@@ -104,7 +104,7 @@ type Item = {
     actions: any;
 }
 
-export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactTableProps<T>) => {
+export const BillsTable = <T extends object>({ tenant }: ReactTableProps<T>) => {
 
     const [billToExtend, setBillToExtend] = React.useState<any>(null)
 
@@ -123,33 +123,21 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
         setTenantBillsPage: setPage,
     }: any = useContext(CollectionsContext)
 
-    const session: any = useSession()
-    const token = session?.data?.accessToken
-    const tenantId = tenant?._id
-    const { data, isLoading, refetch }: any = useQuery({ queryKey: ['tenant-bills', tenantId, token, page], queryFn: () => fetchBills(token, tenantId, page) })
+    // const session: any = useSession()
+    // const token = session?.data?.accessToken
+    // const tenantId = tenant?._id
+    const { data, isLoading, refetch }: any = useQuery({ queryKey: ['tenant-bills', tenant, page], queryFn: () => fetchBills(tenant, page) })
 
     const { data: user }: any = useSession()
 
-    const router = useRouter()
+    
 
     const handleFlutterPayment = useFlutterwave(paymentConfig);
-
-    function handleOpenFlutterwave() {
-        handleFlutterPayment({
-            callback: (response: any) => {
-                console.log(response);
-                closePaymentModal() // this will close the modal programmatically
-            },
-            onClose: () => { },
-        });
-    }
 
     useEffect(() => {
         if (!paymentConfig?.tx_ref) {
             return
         }
-
-        console.log("paymentConfig", paymentConfig)
 
         handleFlutterPayment({
             callback: (response: any) => {
@@ -228,13 +216,11 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                                     tenant: tenant,
                                 }
 
-                                // setAccepting(true)
-
                                 try {
                                     const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/payments`, {
                                         method: "POST",
                                         headers: {
-                                            Authorization: `Bearer ${token}`,
+                                            // Authorization: `Bearer ${token}`,
                                             'Content-Type': 'application/json',
                                         },
                                         body: JSON.stringify({
@@ -253,7 +239,7 @@ export const BillsTable = <T extends object>({ tenant, openFlutterwave }: ReactT
                                         customer: {
                                             email: user?.user?.email,
                                             phonenumber: "0784******",
-                                            name: `${user?.user?.first_name} ${user?.user?.last_name}`
+                                            name: `${user?.user?.name}`
                                         },
                                         customizations: {
                                             title: "Rent Payment",

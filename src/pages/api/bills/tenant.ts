@@ -20,7 +20,7 @@ import {
       query: { id, searchQuery },
     }: any = req;
   
-    const decodedToken = authenticateUser(req, res);
+    // const decodedToken = authenticateUser(req, res);
   
     try {
       await mongoose
@@ -30,7 +30,7 @@ import {
         )
         .then(() => {
           // USER
-          const { _id: userId, role } = decodedToken.user;
+          // const { _id: userId, role } = decodedToken.user;
   
           const { method } = req;
           switch (method) {
@@ -40,7 +40,7 @@ import {
             //   } else if (searchQuery) {
             //     searchBill(req, res, searchQuery);
             //   } else {
-                fetchAllTenantBills(req, res, userId);
+                fetchAllTenantBills(req, res, "");
             //   }
               break;
             // case "POST":

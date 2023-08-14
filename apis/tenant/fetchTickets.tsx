@@ -1,9 +1,9 @@
-export default async function fetchTickets(token: string, id: string) {
+export default async function fetchTickets(id: string) {
     
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/ticket/tenant?id=${id}`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        // headers: {
+        //     Authorization: `Bearer ${token}`,
+        // },
         method: "GET"
     });
 

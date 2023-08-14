@@ -1,8 +1,8 @@
-export default async function fetchStaff(token: string, property: string, page: any) {
+export default async function fetchStaff(property: string, page: any, searchQuery: string, status: string) {
     // if (!property) return new Error("No property Id")
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/staff/property?id=${property}&page=${page}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/staff/property?id=${property}&page=${page}&searchQuery=${searchQuery}&status=${status}`, {
         headers: {
-            Authorization: `Bearer ${token}`,
+            // Authorization: `Bearer ${token}`,
             Accept: 'application/json',
         },
         method: "GET"

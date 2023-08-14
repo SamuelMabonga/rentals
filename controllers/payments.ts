@@ -88,12 +88,12 @@ export async function fetchPaymentsByTenant(req: any, res: any, userId: string) 
       data: payments,
     });
 
-    if (payments[0].tenant.user != userId) {
-      return res.status(403).json({
-        success: false,
-        msg: "You are not authorized to view this tenant's payments",
-      });
-    }
+    // if (payments[0].tenant.user != userId) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     msg: "You are not authorized to view this tenant's payments",
+    //   });
+    // }
 
   } catch (error) {
     res.status(400).json({

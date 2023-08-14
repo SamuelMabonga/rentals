@@ -11,6 +11,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import moment from "moment"
+import fetchARental from "apis/tenant/fetchARental"
+import { useQuery } from "@tanstack/react-query"
+import { useRouter } from "next/router"
 
 
 const formSchema = yup.object().shape({
@@ -49,6 +52,14 @@ export default function RequestExtension({
         resolver: yupResolver(formSchema),
     });
 
+    // const {
+    //     property: {
+    //         _id: propertyId
+    //     }
+    // } = JSON.parse(localStorage.getItem("role") || "{}")
+
+    // const {data} = useQuery(["property", propertyId], fetchARental()) 
+
     // useEffect(() => {
     //     if (toEdit?.name) {
     //         setValue("newDate", toEdit.name)
@@ -60,6 +71,16 @@ export default function RequestExtension({
 
     // }, [toEdit])
 
+
+    // const router = useRouter()
+
+    const { data }: any = useQuery({ queryKey: ['tenancy', tenant], queryFn: () => fetchARental(tenant) })
+
+    const {
+        property
+    } = data?.data || {}
+
+
     async function onSubmit(values: any) {
         setIsLoading(true)
 
@@ -67,10 +88,10 @@ export default function RequestExtension({
         const postData = {
             newDate: values.newDate,
             notes: values.notes,
-            tenant: tenant._id,
+            tenant: tenant,
             type: "RENT",
             bill: billToExtend,
-            property: tenant.property,
+            property: property,
         }
 
         try {

@@ -14,7 +14,7 @@ import { createRole, fetchAllRoles, updateRole } from "controllers/roles";
     req: NextApiRequest,
     res: NextApiResponse
   ) {
-    authenticateUser(req, res);
+    // authenticateUser(req, res);
     
     connectToMongoDB().catch((err) => res.json(err));
   

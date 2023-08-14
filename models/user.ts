@@ -1,4 +1,5 @@
 import { Schema, model, models } from "mongoose";
+import UserRoles from "./userRoles";
 
 
 const UserShema = new Schema({
@@ -11,36 +12,48 @@ const UserShema = new Schema({
       "Invalid email address",
     ],
   },
+  id: {
+    type: String,
+  },
+  name: {
+    type: String,
+  },
+  image: {
+    type: String,
+  },
+  emailVerified: {
+    type: String,
+  },
   first_name: {
     type: String,
-    required: [true, "first name is required"],
+    // required: [true, "first name is required"],
     minLength: [4, "first name should be atleast 4 characters long"],
     maxLength: [30, "first name should be atleast 30 characters long"],
   },
   last_name: {
     type: String,
-    required: [true, "first name is required"],
+    // required: [true, "first name is required"],
     minLength: [4, "first name should be atleast 4 characters long"],
     maxLength: [30, "first name should be atleast 30 characters long"],
   },
   password: {
     type: String,
-    required: [true, "password is required"],
+    // required: [true, "password is required"],
     select: false,
   },
   national_id: {
     type: String,
-    required: [true, "national id is required"],
+    // required: [true, "national id is required"],
   },
   phone_number: {
     type: String,
-    required: [true, "phone number is required"],
+    // required: [true, "phone number is required"],
   },
   verified: {
     type: String,
   },
   role: {
-    type: String,
+    type: String
   },
   isEmail_verified: { type: Boolean, default: false },
 }, {
@@ -50,8 +63,7 @@ const UserShema = new Schema({
 //indexed fields for searching
 UserShema.index({
   email: "text",
-  first_name: 'text',
-  last_name: 'text'
+  name: 'text',
 });
 
 const User = models.User || model("User", UserShema);

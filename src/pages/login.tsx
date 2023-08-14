@@ -8,6 +8,7 @@ import * as yup from "yup"
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import Image from 'next/image';
+import { Google } from '@mui/icons-material';
 
 const formSchema = yup.object().shape({
     email: yup.string().required(),
@@ -58,23 +59,24 @@ export default function Login() {
             <main style={{ width: "100vw", minHeight: "100vh" }}>
                 <Box
                     width="100vw"
-                    height={"100vh"}
+                    height={["fit-content", "100vh"]}
                     sx={{
                         bgcolor: "primary.light",
                     }}
                     display="grid"
-                    gridTemplateColumns="1fr 1fr"
-                // overflow="scroll"
+                    gridTemplateColumns={["1fr", "1fr 1fr"]}
+                    overflow="scroll"
                 >
-                    <Box overflow={"hidden"} position="relative">
-                        <Image
-                            src="https://res.cloudinary.com/dfmoqlbyl/image/upload/c_crop,h_1600,w_900/v1688576609/RentIt/houses_tkovar.png"
-                            alt="houses"
-                            width={0}
-                            height={0}
-                            layout="responsive"
-                        />
-
+                    <Box
+                        height="100%"
+                        overflow={"hidden"}
+                        position="relative"
+                        sx={{
+                            backgroundImage: 'url(https://res.cloudinary.com/dfmoqlbyl/image/upload/c_crop,h_1600,w_900/v1688576609/RentIt/houses_tkovar.png)',
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                        }}
+                    >
                         <Box
                             overflow={"hidden"}
                             sx={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, #1E1E1E 99.47%)" }}
@@ -82,13 +84,12 @@ export default function Login() {
                             top={0}
                             left={0}
                             width="100%"
-                            height="100%"
+                            height="fit-content"
+                            minHeight={"100vh"}
                             padding="1.5rem"
                             display="flex"
                             flexDirection="column"
                         >
-
-
                             <Typography variant="h3" fontWeight="600" letterSpacing={-1} lineHeight="110%" mt="auto">
                                 Effortlessly manage your rental properties and tenants with Rentals.
                             </Typography>
@@ -147,9 +148,22 @@ export default function Login() {
                                     padding: "1.5rem"
                                 }}
                             >
-                                <Typography color="primary.dark" mx="auto">Rentals</Typography>
+                                <Typography color="primary.dark" mx="auto" fontWeight="600">Rent It</Typography>
                                 <Box>
-                                    <Button onClick={() => signIn("google", { callbackUrl: 'https://rentals-alpha.vercel.app/dashboard' })}>Sign in with Google</Button>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => signIn("google", { callbackUrl: "/select-role" })}
+                                        sx={{
+                                            width: "100%",
+                                            display: "flex",
+                                            gap: "0.5rem",
+                                            padding: "1rem",
+                                            borderRadius: "0.5rem"
+                                        }}
+                                    >
+                                        <Google />
+                                        <span>Sign in with Google</span>
+                                    </Button>
                                 </Box>
                                 <Box display="flex" flexDirection="column">
                                     <Typography color="primary.dark" mx="auto" fontSize="1.5rem" fontWeight="600">Login</Typography>

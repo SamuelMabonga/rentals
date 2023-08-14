@@ -1,6 +1,9 @@
 import { yupResolver } from "@hookform/resolvers/yup"
 import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
+import { useQuery } from "@tanstack/react-query"
 import FileInput from "Components/FileInput"
+import fetchARental from "apis/tenant/fetchARental"
+import fetchTickets from "apis/tenant/fetchTickets"
 import { CollectionsContext } from "context/context"
 import { useSession } from "next-auth/react"
 import React, { useContext, useEffect, useState } from "react"
@@ -24,10 +27,26 @@ export default function TicketForm({ tenant }: any) {
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
 
-    const session: any = useSession()
-    const token = session.data?.accessToken
+    // const session: any = useSession()
+    // const token = session.data?.accessToken
 
     const [isLoading, setIsLoading] = useState(false)
+
+    // const {tenant: {
+    //     unit,
+    //     property,
+    // }} = JSON.parse(localStorage.getItem("role") || "")
+
+    const { data }: any = useQuery({ queryKey: ['tenancy', tenant], queryFn: () => fetchARental(tenant) })
+
+    console.log("DATAA" , data)
+
+    const {
+        property,
+        unit
+    } = data?.data || {}
+
+    const {refetch} = useQuery(["tenant-tickets", tenant], () => fetchTickets(tenant))
 
     const { handleSubmit, register, watch, setValue, reset, formState: { errors } }: any = useForm({
         defaultValues: {
@@ -57,9 +76,9 @@ export default function TicketForm({ tenant }: any) {
         const data = {
             type: values.type.value,
             message: values.message,
-            tenant: tenant._id,
-            unit: tenant.unit._id,
-            property: tenant.unit.property._id,
+            tenant,
+            unit,
+            property,
         }
 
         // POST A PROPERTY
@@ -69,12 +88,13 @@ export default function TicketForm({ tenant }: any) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
+                    // Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({ ...data })
             })
             await res.json();
             // console.log(response)
+            refetch()
             setIsLoading(false)
             setIsOpen(false)
             setSnackbarMessage({

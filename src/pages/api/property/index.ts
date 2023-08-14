@@ -1,3 +1,4 @@
+import { createProperty } from "controllers/property/owner";
 import {
   fetchAllProperties,
   fetchSingleProperty,
@@ -19,7 +20,7 @@ export default async function handler(
     await mongoose
       .connect(
         process.env.NEXT_PUBLIC_MONGODB_SRV ||
-          "mongodb://localhost:27017/test_db"
+        "mongodb://localhost:27017/test_db"
       )
       .then(() => {
         const { method } = req;
@@ -30,6 +31,10 @@ export default async function handler(
             } else if (searchQuery) {
               return searchProperty(req, res, searchQuery);
             } else fetchAllProperties(req, res);
+            break;
+
+          case "POST":
+            createProperty(req, res);
             break;
           default:
             //   res.setHeaders("Allow", ["GET", "PUT", "DELETE", "POST", "PATCH"]);

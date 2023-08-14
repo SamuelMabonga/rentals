@@ -1,8 +1,8 @@
-export default async function fetchARental(token: string, id: string) {
+export default async function fetchARental(id: string) {
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/tenant/user?id=${id}`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        // headers: {
+        //     Authorization: `Bearer ${token}`,
+        // },
         method: "GET"
     });
 

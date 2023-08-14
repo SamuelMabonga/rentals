@@ -16,6 +16,10 @@ import BillingPeriodsForm from "Components/Admin/Forms/BillingPeriodsForm"
 import fetchFeatures from "apis/fetchFeatures"
 import { FeaturesTable } from "Components/Admin/FeaturesTable"
 import FeaturesForm from "Components/Admin/Forms/FeaturesForm"
+import { PropertyFeaturesTable } from "Components/Properties/PropertyFeaturesTable"
+import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
+import PropertyFeatureForm from "Components/Properties/Forms/PropertyFeatureForm"
+// import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
 
 
 type PageProps = {
@@ -28,11 +32,13 @@ export default function Features({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     // CONTEXT
     const {
-        setOpenFeaturesForm
+        setOpenPropertyFeaturesForm
     }: any = useContext(CollectionsContext)
 
     // SESSION
     const { status, data: session }: any = useSession()
+
+    const propertyId = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem("role") || "")?.property?._id : null;
 
     return (
         <>
@@ -46,10 +52,11 @@ export default function Features({
                         width: ["100%", "20rem"]
                     }}
                 />
-                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenFeaturesForm(true)}>Create New</Button>
+                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenPropertyFeaturesForm(true)}>Create New</Button>
             </Box>
-            <FeaturesTable />
-            <FeaturesForm />
+
+            <PropertyFeaturesTable property={propertyId} />
+            <PropertyFeatureForm property={propertyId} />
         </>
     )
 }
@@ -58,9 +65,8 @@ Features.auth = true
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
-    // Retrieve the access token from the session
-    const accessToken = session?.accessToken;
 
+    const propertyId: any = context.query.property
 
     if (!session) {
         return {
@@ -74,7 +80,8 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // REACT QUERY
     const queryClient = new QueryClient()
 
-    await queryClient.prefetchQuery(['features'], () => fetchFeatures(accessToken, null))
+    await queryClient.prefetchQuery(['property-features', propertyId], () => fetchPropertyFeatures(propertyId, 1))
+
     return {
         props: {
             dehydratedState: dehydrate(queryClient),

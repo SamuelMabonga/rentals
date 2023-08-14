@@ -1,16 +1,9 @@
 import { yupResolver } from "@hookform/resolvers/yup"
 import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, Snackbar, TextField, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
-import FileInput from "Components/FileInput"
-import fetchAProperty from "apis/fetchAProperty"
-import fetchBillingPeriods from "apis/fetchBillingPeriods"
-import fetchFeatures from "apis/fetchFeatures"
-import fetchPropertyFeatures from "apis/fetchPropertyFeatures"
-import fetchUnitTypes from "apis/fetchUnitTypes"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 import fetchPropertyUnits from "apis/property/fetchPropertyUnits"
 import { CollectionsContext } from "context/context"
-import { fetchAllBillingPeriods } from "controllers/billingPeriods"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import React, { useContext, useEffect, useState } from "react"
@@ -33,18 +26,15 @@ export default function UnitForm({property}: any) {
     }: any = useContext(CollectionsContext)
 
     const router = useRouter()
-    const { id }: any = router.query
 
     // SESSION
     const session: any = useSession()
     const token = session?.data?.accessToken
-    const { data, refetch }: any = useQuery({
+    const { refetch }: any = useQuery({
         queryKey: ['property-units', token, property],
-        queryFn: () => fetchPropertyUnits(token, property, null),
+        queryFn: () => fetchPropertyUnits(property, null, null, null),
     })
-    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', token, id], queryFn: () => fetchPropertyUnitTypes(token, id, null) })
-    // const { data: property }: any = useQuery({ queryKey: ['property'], queryFn: () => fetchAProperty(session.accessToken, id) })
-    // const { data: unitTypes }: any = useQuery({ queryKey: ['unitTypes'], queryFn: () => fetchUnitTypes(session.accessToken) })
+    const { data: unitTypes }: any = useQuery({ queryKey: ['property-unitTypes', property], queryFn: () => fetchPropertyUnitTypes(property, null) })
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -204,7 +194,7 @@ export default function UnitForm({property}: any) {
                             options={unitTypes?.data || []}
                             getOptionLabel={(option: any) => option.name}
                             onChange={(event, value) => {
-                                setValue("bunitType", value)
+                                setValue("unitType", value)
                                 setError("unitType", null)
                             }}
                             renderInput={(params) =>

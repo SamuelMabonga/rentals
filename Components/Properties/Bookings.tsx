@@ -31,20 +31,27 @@ type Item = {
     actions: any;
 }
 
+const statusOptions = [
+    {label: "Pending", value: "PENDING"},
+    {label: "Accepted", value: "ACCEPTED"},
+    {label: "Rejected", value:"REJECTED"}
+] 
+
+
 export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>) => {
 
     const router = useRouter()
     const session: any = useSession()
 
-    const [declining, setDeclining] = useState(false)
-    const [accepting, setAccepting] = useState(false)
-
     const {
         bookingPage: page,
         setBookingPage: setPage,
+        bookingSearchQuery: searchQuery,
+        setBookingSearchQuery: setSearchQuery,
+        bookingStatus,
+        setBookingStatus,
+        setOpenBookingForm,
     }: any = useContext(CollectionsContext)
-
-    const [openAccept, setOpenAccept] = useState(false)
 
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -64,14 +71,9 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
                 },
             },
             {
-                header: 'First Name',
+                header: 'Name',
                 cell: (row) => row.renderValue(),
-                accessorKey: "user.first_name",
-            },
-            {
-                header: 'Last Name',
-                cell: (row) => row.renderValue(),
-                accessorKey: "user.last_name",
+                accessorKey: "user.name",
             },
             {
                 header: 'Unit',
@@ -120,36 +122,6 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
                             content="If you decline, the user that created this booking will not become a tenant at your property"
                             action="reject"
                         />
-                        {/* <AlertDialog
-                            disabled={row.row.original.status !== "PENDING"}
-                            buttonLabel="Decline"
-                            buttonVariant="outlined"
-                            buttonColor="error"
-                            title="Are you sure you want to decline this booking?"
-                            content="If you decline, the user that created this booking will not become a tenant at your property"
-                            onAgree={async (event: any) => {
-                                event.stopPropagation()
-                                setDeclining(true)
-                                try {
-                                    const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/booking?id=${row.row.original._id}`, {
-                                        method: "PUT",
-                                        headers: {
-                                            Authorization: `Bearer ${session.data.accessToken}`,
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({
-                                            status: "Rejected"
-                                        })
-                                    })
-
-                                    console.log("RES", await res.json())
-                                    setDeclining(false)
-                                } catch (error) {
-                                    setDeclining(false)
-                                    alert("Failed to accept")
-                                }
-                            }}
-                        /> */}
                     </Box>
                 ),
             },
@@ -157,8 +129,8 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
         []
     );
 
-    const token = session.data.accessToken
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', token, property, page], queryFn: () => fetchPropertyBookings(token, property, page) })
+
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', property, page, searchQuery, bookingStatus], queryFn: () => fetchPropertyBookings(property, page, searchQuery, bookingStatus) })
 
     return (
         <TableRenderer
@@ -170,6 +142,17 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
             }}
             loading={isLoading}
             setPage={setPage}
+
+            status={bookingStatus}
+            setStatus={setBookingStatus}
+
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+
+            statusOptions={statusOptions}
+
+            buttonLabel='Create Booking'
+            buttonAction={setOpenBookingForm}
         />
     );
 };

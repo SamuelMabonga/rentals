@@ -1,5 +1,6 @@
 import { getPageInfo } from "helpers/page_info";
 import StaffRoles from "models/staffRoles";
+import UserRoles from "models/userRoles";
 
 // get all Staff Roles
 export async function fetchAllStaffRoles(req: any, res: any) {
@@ -39,6 +40,34 @@ export async function fetchRoleAllStaffRoles(req: any, res: any) {
         .skip((page - 1) * limit)
         .limit(limit),
       StaffRoles.countDocuments(),
+    ]);
+    res.status(200).json({
+      success: true,
+      msg: "Staff Roles fetched successfully",
+      data: staffRoles,
+      pageInfo: getPageInfo(limit, staffRolesCount, page),
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch Staff Roles",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// get all Staff Roles by user
+export async function fetchRolesByUser(req: any, res: any) {
+  let userId = req.query.userId;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+  try {
+    const [staffRoles, staffRolesCount] = await Promise.all([
+      UserRoles.find({ role: userId })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      UserRoles.countDocuments(),
     ]);
     res.status(200).json({
       success: true,

@@ -8,11 +8,17 @@ import Property from "./property";
 const TenantSchema: any = new Schema({
   user: {
     type: Schema.Types.ObjectId,
-    ref: User
+    ref: User,
+    index: {
+      "name": "text",
+    }
   },
   unit: {
     type: Schema.Types.ObjectId,
-    ref: Unit
+    ref: Unit,
+    index: {
+      "name": "text",
+    } 
   },
   startDate: {
     type: Date,
@@ -52,6 +58,13 @@ const TenantSchema: any = new Schema({
   }
 },{
   timestamps: true
+});
+
+//indexed fields for searching
+TenantSchema.index({
+  "user.name": "text",
+  "user.email": "text",
+  "unit.name": "text",
 });
 
 const Tenant = models.Tenant || model("Tenant", TenantSchema);

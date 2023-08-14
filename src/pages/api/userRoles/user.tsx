@@ -6,7 +6,7 @@ import {
     updateFeature,
   } from "controllers/feature";
 import { createRole, fetchAllRoles, updateRole } from "controllers/roles";
-import { createUserRole, fetchAllUserRoles, updateUserRole } from "controllers/userRoles";
+import { createUserRole, fetchAllUserRoles, fetchUserRolesByUserId, updateUserRole } from "controllers/userRoles";
   import authenticateUser from "helpers/authenticate_user";
   import { connectToMongoDB } from "lib/mongodb";
   import { NextApiRequest, NextApiResponse } from "next";
@@ -15,7 +15,7 @@ import { createUserRole, fetchAllUserRoles, updateUserRole } from "controllers/u
     req: NextApiRequest,
     res: NextApiResponse
   ) {
-    authenticateUser(req, res);
+    // authenticateUser(req, res);
     
     connectToMongoDB().catch((err) => res.json(err));
   
@@ -23,11 +23,11 @@ import { createUserRole, fetchAllUserRoles, updateUserRole } from "controllers/u
     const { method } = req;
     switch (method) {
       case "GET":
-        fetchAllUserRoles(req, res);
+        fetchUserRolesByUserId(req, res);
         break;
         // case "GET":
         //   fetchSingleFeature(req, res);
-        break;
+        // break;
       case "POST":
         createUserRole(req, res);
         break;

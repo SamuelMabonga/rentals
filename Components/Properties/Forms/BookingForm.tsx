@@ -22,12 +22,6 @@ import { formSchema, formSchema2 } from "./Schema/BookingForm"
 import currencyFormatter from "Components/Common/currencyFormatter"
 import fetchPropertyBookings from "apis/property/fetchPropertyBookings"
 
-// const steps = [
-//     'Select a tenant',
-//     'Select a unit',
-//     'Tenancy details',
-//     // 'Select your tenancy duration',
-// ];
 
 function HorizontalStepper({ step, steps }: any) {
     return (
@@ -70,23 +64,23 @@ export default function BookingForm({
 
     const { data: features, isLoading: featuresLoading }: any = useQuery({
         queryKey: ['property-features', property, token],
-        queryFn: () => fetchPropertyFeatures(token, property, null),
+        queryFn: () => fetchPropertyFeatures(property, null),
     })
 
     const { data: unitTypes, isLoading: unitTypesLoading }: any = useQuery({
         queryKey: ['property-unitTypes', property, token],
-        queryFn: () => fetchPropertyUnitTypes(token, property, null),
+        queryFn: () => fetchPropertyUnitTypes(property, null),
     })
 
-    const { refetch }: any = useQuery({ queryKey: ['property-bookings', token, property, page], queryFn: () => fetchPropertyBookings(token, property, page) })
+    const { refetch }: any = useQuery({ queryKey: ['property-bookings', property, page], queryFn: () => fetchPropertyBookings(property, page, "", "") })
 
     const { handleSubmit, register, watch, setValue, setError, reset, formState: { errors } }: any = useForm({
         defaultValues: {
             userSearchTerm: "",
             user: {
                 _id: "",
-                first_name: "",
-                last_name: ""
+                // first_name: "",
+                // last_name: ""
             },
             unitType: {
                 _id: "",

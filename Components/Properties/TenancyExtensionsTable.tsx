@@ -34,7 +34,7 @@ export const TenancyExtensionsTable = <T extends object>({ property }: ReactTabl
     // SESSION
     const session: any = useSession()
     const token = session?.data?.accessToken
-    const { data }: any = useQuery({ queryKey: ['tenancy-extensions', token, property], queryFn: () => fetchTenancyModifications(token, property) })
+    const { data }: any = useQuery({ queryKey: ['tenancy-extensions', property], queryFn: () => fetchTenancyModifications(property) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(

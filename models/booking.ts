@@ -13,10 +13,16 @@ const BookingSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: User,
+    index: {
+      "name": "text",
+    }
   },
   unit: {
     type: Schema.Types.ObjectId,
     ref: Unit,
+    index: {
+      "name": "text",
+    }
   },
   property: {
     type: Schema.Types.ObjectId,

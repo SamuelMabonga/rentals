@@ -23,6 +23,7 @@ import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 import currencyFormatter from "Components/Common/currencyFormatter"
 import fetchPropertyBookings from "apis/property/fetchPropertyBookings"
 import fetchRoles from "apis/admin/fetchRoles"
+import fetchStaff from "apis/property/fetchStaff"
 
 // const steps = [
 //     'Select a tenant',
@@ -35,8 +36,6 @@ export const formSchema = yup.object().shape({
     userSearchTerm: yup.string().required(),
     user: yup.object().shape({
         _id: yup.string().required("Required"),
-        first_name: yup.string().required("Required"),
-        last_name: yup.string().required("Required")
     }),
     role: yup.object().shape({
         _id: yup.string().required("Required"),
@@ -84,28 +83,17 @@ export default function StaffForm({
 
     const { data: roles }: any = useQuery({
         queryKey: ['roles', property, token],
-        queryFn: () => fetchRoles(token, null),
+        queryFn: () => fetchRoles(null)
     })
 
-    const { data: features, isLoading: featuresLoading }: any = useQuery({
-        queryKey: ['property-features', property, token],
-        queryFn: () => fetchPropertyFeatures(token, property, null),
-    })
 
-    const { data: unitTypes, isLoading: unitTypesLoading }: any = useQuery({
-        queryKey: ['property-unitTypes', property, token],
-        queryFn: () => fetchPropertyUnitTypes(token, property, null),
-    })
-
-    const { refetch }: any = useQuery({ queryKey: ['property-bookings', token, property, page], queryFn: () => fetchPropertyBookings(token, property, page) })
+    const { refetch }: any = useQuery({ queryKey: ['property-staff', property, page], queryFn: () => fetchStaff(property, page, "") })
 
     const { handleSubmit, register, watch, setValue, setError, reset, formState: { errors } }: any = useForm({
         defaultValues: {
             userSearchTerm: "",
             user: {
                 _id: "",
-                first_name: "",
-                last_name: ""
             },
             role: {
                 _id: "",

@@ -10,7 +10,7 @@ const UnitSchema = new Schema({
   name: {
     required: true,
     type: String,
-    unique: true
+    unique: true,
   },
   unitType: {
     type: Schema.Types.ObjectId,
@@ -32,6 +32,12 @@ const UnitSchema = new Schema({
   },
 }, {
   timestamps: true
+});
+
+//indexed fields for searching
+UnitSchema.index({
+  name: "text",
+  "unitType.name": "text"
 });
 
 const Unit = models.Unit || model("Unit", UnitSchema);

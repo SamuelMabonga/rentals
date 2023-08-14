@@ -24,6 +24,11 @@ type Item = {
     actions: any;
 }
 
+const statusOptions = [
+    {label: "Available", value: "AVAILABLE"},
+    {label: "Occupied", value: "OCCUPIED"},
+] 
+
 export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) => {
     // CONTEXT
     const {
@@ -33,14 +38,15 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
         setUnitToEdit,
         unitsPage: page,
         setUnitsPage: setPage,
+        unitSearchQuery: searchQuery,
+        setUnitSearchQuery: setSearchQuery,
+        unitStatus,
+        setUnitStatus,
     }: any = useContext(CollectionsContext)
 
-    // SESSION
-    const session: any = useSession()
-    const token = session?.data?.accessToken
     const { data, isLoading }: any = useQuery({
-        queryKey: ['property-units', token, property, page],
-        queryFn: () => fetchPropertyUnits(token, property, page),
+        queryKey: ['property-units', property, page, searchQuery, unitStatus],
+        queryFn: () => fetchPropertyUnits(property, page, searchQuery, unitStatus),
     })
 
     const columns: any = [
@@ -150,6 +156,17 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
             }}
             loading={isLoading}
             setPage={setPage}
+
+            buttonAction={setOpenUnitForm}
+            buttonLabel="Create Unit"
+
+            status={unitStatus}
+            setStatus={setUnitStatus}
+
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+
+            statusOptions={statusOptions}
         />
     );
 };

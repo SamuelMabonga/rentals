@@ -29,7 +29,7 @@ export default function BookingAlertDialog({
 
     const property = data?.property
 
-    const { refetch }: any = useQuery({ queryKey: ['property-bookings', token, property, page], queryFn: () => fetchPropertyBookings(token, property, page) })
+    const { refetch }: any = useQuery({ queryKey: ['property-bookings', token, property, page], queryFn: () => fetchPropertyBookings(token, property, page, "") })
 
     const [open, setOpen] = useState(false);
 

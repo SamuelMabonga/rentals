@@ -29,7 +29,6 @@ type Item = {
 }
 
 export const PropertyFeaturesTable = <T extends object>({ property }: ReactTableProps<T>) => {
-    console.log("PROPERTY", property)
     const {
         setPropertyFeatureToEdit,
         setOpenPropertyFeaturesForm,
@@ -41,7 +40,7 @@ export const PropertyFeaturesTable = <T extends object>({ property }: ReactTable
     const session: any = useSession()
     const token = session?.data?.accessToken
     // console.log("TOKEN", token)
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-features', token, property, page], queryFn: () => fetchPropertyFeatures(token, property, page) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-features', property, page], queryFn: () => fetchPropertyFeatures(property, page) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(

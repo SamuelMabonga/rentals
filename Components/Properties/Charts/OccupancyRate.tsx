@@ -3,7 +3,10 @@ import React from "react"
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts"
 import HolidayVillageOutlinedIcon from '@mui/icons-material/HolidayVillageOutlined';
 
-export default function OccupancyRate() {
+export default function OccupancyRate({
+    activeTenants,
+    unitCount
+}: any) {
     const data = [
         { name: 'Group A', value: 400 },
         { name: 'Group B', value: 300 },
@@ -25,10 +28,9 @@ export default function OccupancyRate() {
             }}
         >
             <Box display="flex" gap="0.5rem">
-                <Box width="2rem" height="2rem" color="grey">
-                    {/* {icon} */}
+                {/* <Box width="2rem" height="2rem" color="grey">
                     <HolidayVillageOutlinedIcon />
-                </Box>
+                </Box> */}
                 <Typography color="grey" fontSize="0.75rem" lineHeight={"130%"}>
                     Your <br />
                     <span style={{ fontWeight: "600", fontSize: "1rem" }}>
@@ -38,10 +40,10 @@ export default function OccupancyRate() {
             </Box>
 
             <Box>
-                <Typography color="primary" fontWeight={"600"} fontSize="1.5rem" textAlign={"right"} letterSpacing={-1}>
-                    30 <span style={{ color: "gray", fontSize: "1rem" }}>/ 40</span>
+                <Typography color="primary" fontWeight={"600"} fontSize="1.75rem" textAlign={"right"} letterSpacing={-1}>
+                    {activeTenants} <span style={{ color: "gray", fontSize: "1rem" }}>/ {unitCount}</span>
                 </Typography>
-                <Typography fontSize="0.875rem" textAlign={"right"} fontWeight={"600"} color="error.main" >10 vacant units</Typography>
+                <Typography fontSize="0.875rem" textAlign={"right"} fontWeight={"600"} color="error.main" >{unitCount - activeTenants} vacant units</Typography>
             </Box>
 
             {/* <Box width="10rem" height="10rem">

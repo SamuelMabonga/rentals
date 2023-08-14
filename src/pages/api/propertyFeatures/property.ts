@@ -19,14 +19,14 @@ export default async function handler(
   }: any = req;
 
 
-  const decodedToken = authenticateUser(req, res);
+  // const decodedToken = authenticateUser(req, res);
 
-  if (!decodedToken?.user?._id) {
-    return res.status(401).json({
-      success: false,
-      msg: "Not Authorized",
-    });
-  }
+  // if (!decodedToken?.user?._id) {
+  //   return res.status(401).json({
+  //     success: false,
+  //     msg: "Not Authorized",
+  //   });
+  // }
 
   connectToMongoDB().catch((err) => res.json(err));
 
@@ -45,19 +45,19 @@ export default async function handler(
   }
 
   // Get permissions
-  const userRoles = decodedToken.userRoles
-  const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
-  const permissions = userPropertyRoles?.role?.permissions
+  // const userRoles = decodedToken.userRoles
+  // const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
+  // const permissions = userPropertyRoles?.role?.permissions
 
   switch (method) {
     case "GET":
-      const getPermission = permissions?.find((permission: any) => permission.name === "View property feature")
-      if (!getPermission) {
-        return res.status(401).json({
-          success: false,
-          msg: "Not Authorized",
-        });
-      }
+      // const getPermission = permissions?.find((permission: any) => permission.name === "View property feature")
+      // if (!getPermission) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     msg: "Not Authorized",
+      //   });
+      // }
 
       // if (id) {
       //   fetchSinglePropertyFeature(req, res);
@@ -66,24 +66,24 @@ export default async function handler(
       // }
       break;
     case "POST":
-      const postPermission = permissions.find((permission: any) => permission.name === "Create property feature")
-      if (!postPermission) {
-        return res.status(401).json({
-          success: false,
-          msg: "Not Authorized",
-        });
-      }
+      // const postPermission = permissions.find((permission: any) => permission.name === "Create property feature")
+      // if (!postPermission) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     msg: "Not Authorized",
+      //   });
+      // }
 
       createPropertyFeature(req, res);
       break;
     case "PUT":
-      const putPermission = permissions.find((permission: any) => permission.name === "Edit property feature")
-      if (!putPermission) {
-        return res.status(401).json({
-          success: false,
-          msg: "Not Authorized",
-        });
-      }
+      // const putPermission = permissions.find((permission: any) => permission.name === "Edit property feature")
+      // if (!putPermission) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     msg: "Not Authorized",
+      //   });
+      // }
 
       updatePropertyFeature(req, res);
       break;

@@ -15,13 +15,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  authUser(req, res);
+  // authUser(req, res);
 
   connectToMongoDB().catch((err) => res.json(err));
 
-  const decodedToken = authenticateUser(req, res);
+  // const decodedToken = authenticateUser(req, res);
   // USER
-  const { _id: userId, role } = decodedToken.user;
+  // const { _id: userId, role } = decodedToken.user;
   const {
     query: { id: query, searchQuery },
   }: any = req;
@@ -35,9 +35,9 @@ export default async function handler(
         
       //  }
       if (query) {
-        return fetchSingleTenant(req, res, userId);
+        return fetchSingleTenant(req, res, "");
       }
-      fetchAllUserTenancies(req, res, userId);
+      fetchAllUserTenancies(req, res, "");
       break;
       // case "GET":
       //   fetchSingleTenant(req, res);

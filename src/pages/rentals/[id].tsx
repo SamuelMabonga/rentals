@@ -78,7 +78,7 @@ const config: any = {
 function TableSwitch({ activeTab, tenant, openFlutterwave }: any) {
     switch (activeTab) {
         case "bills":
-            return <BillsTable tenant={tenant} openFlutterwave={openFlutterwave} />
+            return <BillsTable tenant={tenant} />
 
         case "payments":
             return <PaymentsTable tenant={tenant?._id} />

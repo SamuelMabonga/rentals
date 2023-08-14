@@ -1,9 +1,9 @@
 import { useStaticPicker } from "@mui/x-date-pickers/internals"
-import {createContext, useState} from "react"
+import { createContext, useState } from "react"
 
 const CollectionsContext = createContext({})
 
-const CollectionsProvider = ({children}: any) => {
+const CollectionsProvider = ({ children }: any) => {
     const [collections, setCollections] = useState([])
 
     const refreshCollections = async () => {
@@ -24,13 +24,13 @@ const CollectionsProvider = ({children}: any) => {
         open: false,
         vertical: 'top',
         horizontal: 'center',
-      })
+    })
 
     // FORMS
     const [showUnitTypeForm, setShowUnitTypeForm] = useState(false)
     const [unitTypeToEdit, setUnitTypeToEdit] = useState({})
     const [unitTypesPage, setUnitTypesPage] = useState(1)
-    
+
     // PROPERTY FORM
     const [showPropertyForm, setShowPropertyForm] = useState(false)
     const [propertyToEdit, setPropertyToEdit] = useState()
@@ -50,16 +50,20 @@ const CollectionsProvider = ({children}: any) => {
     const [propertyFeatureToEdit, setPropertyFeatureToEdit] = useState({})
     const [propertyFeaturesPage, setPropertyFeaturesPage] = useState(1)
 
-    // UNIT FORM
+    // UNITS
     const [openUnitForm, setOpenUnitForm] = useState(false)
     const [unitToEdit, setUnitToEdit] = useState(false)
     const [unitsPage, setUnitsPage] = useState(1)
+    const [unitSearchQuery, setUnitSearchQuery] = useState("")
+    const [unitStatus, setUnitStatus] = useState("")
 
-    // BOOKING FORM
+    // BOOKINGS
     const [openBookingForm, setOpenBookingForm] = useState(false)
     const [bookingToEdit, setBookingToEdit] = useState({})
     const [unitToBook, setUnitToBook] = useState({})
     const [bookingPage, setBookingPage] = useState(1)
+    const [bookingSearchQuery, setBookingSearchQuery] = useState("")
+    const [bookingStatus, setBookingStatus] = useState("")
 
 
     // IMAGE UPLOADER
@@ -71,26 +75,26 @@ const CollectionsProvider = ({children}: any) => {
 
 
     // RENTAL
-    const [ activeRentalTab, setActiveRentalTab ] = useState("bills")
+    const [activeRentalTab, setActiveRentalTab] = useState("bills")
 
 
     // REQUEST EXTENSION
-    const [ openRequestExtension, setOpenRequestExtension ] = useState(false)
+    const [openRequestExtension, setOpenRequestExtension] = useState(false)
 
     // PAYMENT CONFIG
     const [paymentConfig, setPaymentConfig] = useState({
-            logo: "",
-            tx_ref: "",
-            amount: 0,
-            title: "",
-            description: "",
-            currency: "UGX",
-            // payment_options: "card,mobilemoneyuganda",
-            customer: {
-                email: "",
-                phonenumber: "",
-                name: ""
-            },
+        logo: "",
+        tx_ref: "",
+        amount: 0,
+        title: "",
+        description: "",
+        currency: "UGX",
+        // payment_options: "card,mobilemoneyuganda",
+        customer: {
+            email: "",
+            phonenumber: "",
+            name: ""
+        },
     })
 
     // PAYMENT FORM
@@ -98,18 +102,23 @@ const CollectionsProvider = ({children}: any) => {
 
 
     // LOADING BACKDROP
-    const [ openLoadingBackdrop, setOpenLoadingBackdrop] = useState(false)
+    const [openLoadingBackdrop, setOpenLoadingBackdrop] = useState(false)
 
     // VIEW TENANT
-    const [ openViewTenant, setOpenViewTenant ] = useState(false)
+    const [openViewTenant, setOpenViewTenant] = useState(false)
     const [tenantsPage, setTenantsPage] = useState(1)
+    const [tenantsSearchQuery, setTenantsSearchQuery] = useState("")
+    const [tenantStatus, setTenantStatus] = useState("")
 
     // TICKET FORM
-    const [ openTicketForm, setOpenTicketForm ] = useState(false)
-    const [ ticketToEdit, setTicketToEdit ] = useState({})
+    const [openTicketForm, setOpenTicketForm] = useState(false)
+    const [ticketToEdit, setTicketToEdit] = useState({})
+    const [ticketsPage, setTicketsPage] = useState(1)
+    const [ticketsSearchQuery, setTicketsSearchQuery] = useState("")
+    const [ticketStatus, setTicketStatus] = useState("")
 
     // REQUEST TENANCY EXTENSION
-    const [ openRequestTenancyExtension, setOpenRequestTenancyExtension ] = useState(false)
+    const [openRequestTenancyExtension, setOpenRequestTenancyExtension] = useState(false)
 
 
     // RENTALS
@@ -131,6 +140,8 @@ const CollectionsProvider = ({children}: any) => {
     const [openStaffForm, setOpenStaffForm] = useState(false)
     const [staffToEdit, setStaffToEdit] = useState({})
     const [staffPage, setStaffPage] = useState(1)
+    const [staffSearchQuery, setStaffSearchQuery] = useState("")
+    const [staffStatus, setStaffStatus] = useState("")
 
     return (
         <CollectionsContext.Provider value={{
@@ -188,9 +199,13 @@ const CollectionsProvider = ({children}: any) => {
             setUnitToEdit,
             unitsPage,
             setUnitsPage,
+            unitSearchQuery,
+            setUnitSearchQuery,
+            unitStatus,
+            setUnitStatus,
 
             // Bookings form
-            openBookingForm, 
+            openBookingForm,
             setOpenBookingForm,
             bookingToEdit,
             setBookingToEdit,
@@ -198,11 +213,15 @@ const CollectionsProvider = ({children}: any) => {
             setUnitToBook,
             bookingPage,
             setBookingPage,
+            bookingSearchQuery,
+            setBookingSearchQuery,
+            bookingStatus,
+            setBookingStatus,
 
             // SNACKBAR MESSAGE
             snackbarMessage,
             setSnackbarMessage,
-            
+
             // Image Uploader
             openImageUploader,
             setOpenImageUploader,
@@ -215,7 +234,7 @@ const CollectionsProvider = ({children}: any) => {
             imageType,
             setImageType,
 
-            
+
             // RENTALS
             activeRentalTab,
             setActiveRentalTab,
@@ -232,7 +251,6 @@ const CollectionsProvider = ({children}: any) => {
             openPaymentForm,
             setOpenPaymentForm,
 
-
             // LOADING BACKDROP
             openLoadingBackdrop,
             setOpenLoadingBackdrop,
@@ -242,12 +260,22 @@ const CollectionsProvider = ({children}: any) => {
             setOpenViewTenant,
             tenantsPage,
             setTenantsPage,
+            tenantsSearchQuery,
+            setTenantsSearchQuery,
+            tenantStatus,
+            setTenantStatus,
 
             // TICKET FORM
             openTicketForm,
             setOpenTicketForm,
             ticketToEdit,
             setTicketToEdit,
+            ticketStatus,
+            setTicketStatus,
+            ticketsSearchQuery,
+            setTicketsSearchQuery,
+            ticketsPage,
+            setTicketsPage,
 
             // REQUEST TENANCY EXTENSION
             openRequestTenancyExtension,
@@ -281,13 +309,15 @@ const CollectionsProvider = ({children}: any) => {
             setStaffToEdit,
             staffPage,
             setStaffPage,
-
-
+            staffSearchQuery,
+            setStaffSearchQuery,
+            staffStatus,
+            setStaffStatus
         }}>
             {children}
         </CollectionsContext.Provider>
     )
 }
 
-export {CollectionsContext, CollectionsProvider}
+export { CollectionsContext, CollectionsProvider }
 

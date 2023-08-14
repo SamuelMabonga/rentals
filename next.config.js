@@ -16,7 +16,8 @@ const nextConfig = {
       "picsum.photos",
       "fastly.picsum.photos",
       "https://obs.line-scdn.net",
-      "api.cloudinary.com"
+      "api.cloudinary.com",
+      "lh3.googleusercontent.com"
     ],
   },
   env: {

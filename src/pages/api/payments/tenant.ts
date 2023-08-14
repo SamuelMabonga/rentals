@@ -18,9 +18,9 @@ export default async function handler(
     query: { id, searchQuery },
   }: any = req;
 
-  console.log("TENANT ID", id)
+  // console.log("TENANT ID", id)
 
-  const decodedToken = authenticateUser(req, res);
+  // const decodedToken = authenticateUser(req, res);
   try {
     await mongoose
       .connect(
@@ -28,7 +28,7 @@ export default async function handler(
       )
       .then(() => {
         // USER
-        const { _id: userId, role } = decodedToken.user;
+        // const { _id: userId, role } = decodedToken.user;
 
         const { method } = req;
         switch (method) {
@@ -36,7 +36,7 @@ export default async function handler(
             // if (id) {
             //   return fetchSinglePayment(req, res);
             // } else
-             fetchPaymentsByTenant(req, res, userId);
+             fetchPaymentsByTenant(req, res, "");
 
             break;
           case "POST":

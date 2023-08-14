@@ -34,12 +34,12 @@ export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) =
         setPropertyToEdit
     }: any = useContext(CollectionsContext)
 
-    const tenantId = tenant?._id
+    // const tenantId = tenant?._id
 
     const session: any = useSession()
     const token = session.data?.accessToken
 
-    const {data, isLoading} = useQuery(["tenant-tickets", tenantId, token], () => fetchTickets(token, tenantId))
+    const {data, isLoading} = useQuery(["tenant-tickets", tenant], () => fetchTickets(tenant))
         
 
     const router = useRouter()

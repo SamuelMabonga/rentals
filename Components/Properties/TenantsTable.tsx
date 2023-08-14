@@ -28,21 +28,31 @@ type Item = {
     actions: any;
 }
 
+const statusOptions = [
+    {label: "Pending", value: "PENDING"},
+    {label: "Active", value: "ACTIVE"},
+    {label: "Inactive", value: "INACTIVE"},
+] 
+
 export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>) => {
 
     // CONTEXT
     const {
         setOpenViewTenant,
         tenantsPage: page,
-        setTenantsPage: setPage
+        setTenantsPage: setPage,
+        tenantsSearchQuery: searchQuery,
+        setTenantsSearchQuery: setSearchQuery,
+        tenantStatus,
+        setTenantStatus,
     }: any = useContext(CollectionsContext)
 
+    // STATE
+    const { data, isLoading }: any = useQuery({
+        queryKey: ['property-tenants', property, page, searchQuery, tenantStatus],
+        queryFn: () => fetchPropertyTenants(property, page, searchQuery, tenantStatus)
+    })
 
-    const session: any = useSession()
-    const token = session.data.accessToken
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-tenants', token, property, page], queryFn: () => fetchPropertyTenants(token, property, page) })
-
-    const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
             {
@@ -62,8 +72,8 @@ export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>)
             },
             {
                 header: 'Name',
-                cell: (row: any) => `${row.row.original.user.first_name} ${row.row.original.user.last_name}`,
-                // accessorKey: 'user.first_name',
+                cell: (row) => row.renderValue(),
+                accessorKey: 'user.name',
             },
             {
                 header: 'Unit',
@@ -127,9 +137,16 @@ export const TenantsTable = <T extends object>({ property }: ReactTableProps<T>)
 
                     setPage(data)
                 }}
+
+                status={tenantStatus}
+                setStatus={setTenantStatus}
+
+                statusOptions={statusOptions}
+
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
             />
             <ViewTenant tenant={tenantToView} />
         </>
-        // <h1>Hwey</h1>
     );
 };

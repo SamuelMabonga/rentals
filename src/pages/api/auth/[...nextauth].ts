@@ -11,7 +11,9 @@ import UserRoles from "models/userRoles";
 import clientPromise from "lib/setupAdapter";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import GoogleProvider from "next-auth/providers/google";
+import NodeCache from "node-cache";
 
+const myCache = new NodeCache();
 
 type AuthOptions = NextAuthOptions & {
   pages: {
@@ -22,28 +24,21 @@ type AuthOptions = NextAuthOptions & {
   };
 };
 
-const options: AuthOptions = {
+export const authOptions: AuthOptions = {
   debug: true,
   adapter: MongoDBAdapter(clientPromise, {
     databaseName: "test",
     collections: {
-      Users: "users",
-      Accounts: "accounts",
-      Sessions: "sessions",
-      VerificationTokens: "userVerifications"
+      Users: "User",
+      Accounts: "Account",
+      Sessions: "Session",
+      VerificationTokens: "VerificationToken"
     }
   }),
   providers: [
     GoogleProvider({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET || "",
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code"
-        },
-      }
+      clientSecret: process.env.NEXT_PUBLIC_GOOGLE_SECRET || "",
     }),
     CredentialsProvider({
       id: "credentials",
@@ -81,8 +76,10 @@ const options: AuthOptions = {
     selectRole: "/select-role",
   },
   session: {
-    strategy: "jwt",
+    // strategy: "jwt",
     maxAge: 24 * 60 * 60,
+    strategy: "database",
+
   },
   callbacks: {
     // jwt: async ({ token, user }: any) => {
@@ -110,7 +107,43 @@ const options: AuthOptions = {
 
     //   return token;
     // },
-    session: async ({ session, token }: any) => {
+    session: async ({ session, token, user, account }: any) => {
+      
+      // console.log("USER----", user)
+
+      // Add the user's MongoDB ID to the session object
+      // session.user.id = user.id;
+
+      await connectToMongoDB().catch((err) => {
+        throw new Error(err);
+      });
+
+      // console.log("PROFILE -->", account)
+
+      // console.log("SESSION", session)
+
+      const userDB = await User.findOne({ email: session.user.email })
+      session.user.id = userDB._id;
+
+      // console.log("USER SESSION", user)
+
+      // console.log("USER DB", userDB)
+
+      const userRoles = await UserRoles.find({ user: userDB._id }).populate({
+        path: "role",
+      }).populate({
+        path: "property",
+      }).populate({
+        path: "tenant",
+      })
+
+      // console.log("USER ROLES", userRoles)
+
+      session.user.roles = userRoles;
+
+      return session;
+
+
       // console.log("SESSION", session)
       // console.log("TOKEN", token)
 
@@ -148,15 +181,46 @@ const options: AuthOptions = {
       //   session.user = token.user as IUser;
       //   // console.log("ACCESS TOKEN", accessToken)
       // }
-      return session;
+      // console.log("SESSION", session)
+      // console.log("TOKEN", token)
+      // return session;
     },
     signIn: async (params: any) => {
       const { user, account, profile } = params;
 
-      if (account.provider === "google") {
-        // return profile.email_verified && profile.email.endsWith("@example.com")
-        return true;
+      // if (account.provider === "google") {
+      //   // return profile.email_verified && profile.email.endsWith("@example.com")
+      //   return true;
+      // }
+
+      await connectToMongoDB().catch((err) => {
+        throw new Error(err);
+      });
+
+      console.log("PROFILE", profile)
+
+      let userExists = await User.findOne({ email: profile.email });
+
+      console.log("USER EXISTS", userExists)
+      if (userExists) {
+        // Link the Google account to the existing user account
+        userExists.googleId = profile.id;
+        userExists.name = profile.name;
+        userExists.image = profile.image;
+        await userExists.save();
+      } else {
+        // Create a new user if one does not exist
+        console.log("CREATING NEW USER")
+        userExists = new User({
+          email: profile.email,
+          googleId: profile.id,
+          name: profile.name,
+          image: profile.image,
+        });
+        await userExists.save();
       }
+
+      return true;
 
       // // If the user hasn't selected an entity, redirect them to the entity selection page
       // if (!user.entity) {
@@ -188,9 +252,9 @@ const options: AuthOptions = {
       //   console.log(error);
       // }
 
-      return true;
+      // return true;
     },
   },
 };
 
-export default NextAuth(options);
+export default NextAuth(authOptions);

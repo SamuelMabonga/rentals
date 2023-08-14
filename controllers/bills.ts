@@ -52,7 +52,7 @@ export async function fetchAllTenantBills(req: any, res: any, userId: string) {
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
     const [bills, billsCount] = await Promise.all([
-      Bills.find({ tenant: id })
+      Bills.find({ tenant : id })
         .populate({
           path: "tenant",
         })
@@ -62,22 +62,76 @@ export async function fetchAllTenantBills(req: any, res: any, userId: string) {
         })
         .skip((page - 1) * limit)
         .limit(limit),
-      Bills.countDocuments({ tenant: id }),
+      Bills.countDocuments({ "tenant.user._id" : id }),
     ]);
 
-    if (bills[0].tenant.user != userId) {
-      return res.status(403).json({
-        success: false,
-        msg: "You are not authorized to view this tenant's bills",
-        data: null,
-      });
-    }
+    // if (bills[0].tenant.user != userId) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     msg: "You are not authorized to view this tenant's bills",
+    //     data: null,
+    //   });
+    // }
 
     res.json({
       success: true,
       msg: "Tenant's bills fetched successfully",
       data: bills,
       pageInfo: getPageInfo(limit, billsCount, page),
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch tenant's bills",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// get bills statistics
+export async function fetchBillsStatistics(req: any, res: any, userId: string) {
+  const {
+    query: { id },
+  }: any = req;
+
+  console.log("Property ID", id);
+
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+  try {
+    const [paidBills, allBills] = await Promise.all([
+      Bills.find({ "property" : id, status: "PAID" }),
+      Bills.find({ "property" : id }),
+    ]);
+
+    console.log("ALL BILLS", allBills)
+    console.log("PAID BILLS", paidBills)
+
+    const totalPaid = paidBills.reduce((acc: any, curr: any) => {
+      return acc + curr.amount;
+    }, 0);
+
+    const totalBills = allBills.reduce((acc: any, curr: any) => {
+      return acc + curr.amount;
+    }, 0);
+
+    // if (bills[0].tenant.user != userId) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     msg: "You are not authorized to view this tenant's bills",
+    //     data: null,
+    //   });
+    // }
+
+    res.json({
+      success: true,
+      msg: "Bills statistics fetched successfully",
+      data: {
+        totalPaid,
+        totalBills,
+      },
+      // pageInfo: getPageInfo(limit, billsCount, page),
     });
   } catch (error) {
     res.status(400).json({
@@ -211,7 +265,6 @@ export async function createCronBills(req: any, res: any) {
         populate: [{ path: "unitType", populate: [{ path: "billingPeriod" }] }],
       });
 
-    console.log("TENANTS", tenants)
 
     for (const tenant of tenants) {
       const {
@@ -222,6 +275,7 @@ export async function createCronBills(req: any, res: any) {
         customBillingPeriod,
         endDate,
         startDate,
+        property
       } = tenant;
 
       // Array to store created bills for the tenant
@@ -249,6 +303,7 @@ export async function createCronBills(req: any, res: any) {
               : moment().add(1, customBillingPeriod?.period).add(7, "days"),
             tenant: _id,
             type: "RENT",
+            property
           });
 
           console.log("NEW RENT", newRent)
@@ -281,6 +336,7 @@ export async function createCronBills(req: any, res: any) {
               tenant: _id,
               type: "FEATURE",
               propertyFeature: feature._id,
+              property
             });
 
             await newBill.save();

@@ -34,6 +34,36 @@ export async function fetchAllUserRoles(req: any, res: any) {
   }
 }
 
+// get roles by user id
+export async function fetchUserRolesByUserId(req: any, res: any) {
+  let userId = req.query.userId;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+  try {
+    const [userRoles, userRolesCount] = await Promise.all([
+      UserRoles.find({ user: userId })
+      .populate("property").populate("role").populate({path: "tenant", populate: {path: "property"}})
+        .skip((page - 1) * limit)
+        .limit(limit),
+      UserRoles.countDocuments({ user: userId }),
+    ]);
+
+    res.json({
+      success: true,
+      msg: "User roles fetched successfully",
+      data: userRoles,
+      pageInfo: getPageInfo(limit, userRolesCount, page),
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch user roles",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
 //fetch bill by id
 export async function fetchSingleUserRole(req: any, res: any) {
   try {

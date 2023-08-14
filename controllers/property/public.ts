@@ -1,5 +1,7 @@
 import { getPageInfo } from "helpers/page_info";
 import Property from "models/property";
+import Tenant from "models/tenant";
+import Unit from "models/unit";
 
 //@PUBLIC
 // @desc    get all properties
@@ -86,5 +88,41 @@ export async function searchProperty(req: any, res: any, searchQuery: string) {
       data: error,
     });
     console.log(error);
+  }
+}
+
+
+//@PUBLIC
+// @desc    get all properties
+// @route   GET /api/property
+export async function fetchOccupancy(req: any, res: any) {
+  const property = req?.query?.id;
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+  try {
+    const [unitCount, activeTenants, ] = await Promise.all([
+      Unit.countDocuments({ property }),
+      Tenant.countDocuments({ property, status: "ACTIVE" }),
+    ]);
+
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    return res.end(
+      JSON.stringify({
+        success: true,
+        msg: "Properties fetched successfully",
+        data: {
+          unitCount,
+          activeTenants,
+        },
+      })
+    );
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      msg: "failed to fetch  properties",
+      data: error,
+    });
+    // console.log(error);
   }
 }

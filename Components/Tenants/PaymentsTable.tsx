@@ -37,7 +37,7 @@ export const PaymentsTable = <T extends object>({ tenant: id }: ReactTableProps<
     const session: any = useSession()
     const token = session.data?.accessToken
 
-    const {data, isLoading} = useQuery(["payments", id, token], () => fetchPayments(token, id))
+    const {data, isLoading} = useQuery(["payments", id], () => fetchPayments(id))
         
 
     const router = useRouter()

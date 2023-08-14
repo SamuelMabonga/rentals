@@ -46,9 +46,9 @@ export default function UnitTypeForm({
     const session: any = useSession()
     const token = session?.data?.accessToken
 
-    const { data: features }: any = useQuery({ queryKey: ['property-features', token, property], queryFn: () => fetchPropertyFeatures(token, property, null) })
-    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods(token) })
-    const { refetch }: any = useQuery({ queryKey: ['property-unitTypes', token, property, page], queryFn: () => fetchPropertyUnitTypes(token, property, page) })
+    const { data: features }: any = useQuery({ queryKey: ['property-features', token, property], queryFn: () => fetchPropertyFeatures(property, null) })
+    const { data: billingPeriods }: any = useQuery({ queryKey: ['billingPeriods', token], queryFn: () => fetchBillingPeriods() })
+    const { refetch }: any = useQuery({ queryKey: ['property-unitTypes', token, property, page], queryFn: () => fetchPropertyUnitTypes(property, page) })
 
     const [isLoading, setIsLoading] = useState(false)
 

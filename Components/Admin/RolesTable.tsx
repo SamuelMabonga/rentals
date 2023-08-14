@@ -38,7 +38,7 @@ export const RolesTable = <T extends object>({ }: ReactTableProps<T>) => {
     // SESSION
     const session: any = useSession()
     const token = session?.data?.accessToken
-    const { data }: any = useQuery({ queryKey: ['roles', token], queryFn: () => fetchRoles(token, null) })
+    const { data }: any = useQuery({ queryKey: ['roles'], queryFn: () => fetchRoles(null) })
 
     // console.log(data)
     // const router = useRouter()

@@ -17,6 +17,12 @@ interface ReactTableProps<T extends object> {
     property: string;
 }
 
+const statusOptions = [
+    {label: "Pending", value: "PENDING"},
+    {label: "Active", value: "ACTIVE"},
+    {label: "Inactive", value: "INACTIVE"},
+]
+
 type Item = {
     image: string;
     name: string;
@@ -31,6 +37,12 @@ export const StaffTable = <T extends object>({ property }: ReactTableProps<T>) =
     const {
         staffPage: page,
         setStaffPage: setPage,
+        staffSearchQuery: searchQuery,
+        setStaffSearchQuery: setSearchQuery,
+        staffStatus,
+        setStaffStatus,
+        setOpenStaffForm,
+
     }: any = useContext(CollectionsContext)
 
     const router = useRouter()
@@ -38,11 +50,11 @@ export const StaffTable = <T extends object>({ property }: ReactTableProps<T>) =
         () => [
             {
                 header: 'Image',
-                cell: (row) => {
+                cell: (row: any) => {
                     return (
                         <Avatar
-                            src={row.row.original.image}
-                            alt="Avatar"
+                            src={row.row.original.user.image}
+                            alt={row.row.original.user.name}
                             sx={{
                                 width: "3rem",
                                 height: "3rem"
@@ -53,8 +65,8 @@ export const StaffTable = <T extends object>({ property }: ReactTableProps<T>) =
             },
             {
                 header: 'Name',
-                cell: (row: any) => `${row.renderValue().first_name} ${row.renderValue().last_name}`,
-                accessorKey: 'user',
+                cell: (row: any) => row.renderValue(),
+                accessorKey: 'user.name',
             },
             {
                 header: 'Email',
@@ -102,9 +114,9 @@ export const StaffTable = <T extends object>({ property }: ReactTableProps<T>) =
         []
     );
 
-    const session: any = useSession()
-    const token = session.data.accessToken
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', token, property, page], queryFn: () => fetchStaff(token, property, page) })
+    // const session: any = useSession()
+    // const token = session.data.accessToken
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-staff', property, page, searchQuery, staffStatus], queryFn: () => fetchStaff(property, page, searchQuery, staffStatus) })
 
     return (
         <TableRenderer
@@ -116,6 +128,16 @@ export const StaffTable = <T extends object>({ property }: ReactTableProps<T>) =
             }}
             loading={isLoading}
             setPage={setPage}
+
+            status={staffStatus}
+            setStatus={setStaffStatus}
+            statusOptions={statusOptions}
+
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+
+            buttonAction={setOpenStaffForm}
+            buttonLabel="Create Staff"
         />
     );
 };

@@ -1,14 +1,19 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/Common/TableRenderer';
+import fetchTickets from 'apis/property/fetchTickets';
+import { useQuery } from '@tanstack/react-query';
+import { CollectionsContext } from 'context/context';
+import moment from 'moment';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: any;
 }
 
 type Item = {
@@ -20,44 +25,22 @@ type Item = {
     actions: any;
 }
 
-export const TicketsTable = <T extends object>({ }: ReactTableProps<T>) => {
-    const data = [
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            unit: "string",
-            type: "string",
-            message: "I need help fixing my toilet that will not flash. I need help fixing my toilet that will not flash",
-            dateAdded: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            unit: "string",
-            type: "string",
-            message: "I need help fixing my toilet that will not flash. I need help fixing my toilet that will not flash",
-            dateAdded: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            unit: "string",
-            type: "string",
-            message: "I need help fixing my toilet that will not flash. I need help fixing my toilet that will not flash",
-            dateAdded: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            unit: "string",
-            type: "string",
-            message: "I need help fixing my toilet that will not flash. I need help fixing my toilet that will not flash",
-            dateAdded: "string",
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            unit: "string",
-            type: "string",
-            message: "I need help fixing my toilet that will not flash. I need help fixing my toilet that will not flash",
-            dateAdded: "string",
-        },
-    ]
+const statusOptions = [
+    {label: "Pending", value: "PENDING"},
+    {label: "Fixed", value: "FIXED"},
+    {label: "In-Progress", value: "INPROGRESS"},
+] 
+
+export const TicketsTable = <T extends object>({ property }: ReactTableProps<T>) => {
+    // CONTEXT
+    const {
+        ticketStatus,
+        setTicketStatus,
+        ticketsSearchQuery: searchQuery,
+        setTicketsSearchQuery: setSearchQuery,
+        ticketsPage: page,
+        setTicketsPage: setPage,
+    }: any = useContext(CollectionsContext)
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
@@ -66,7 +49,7 @@ export const TicketsTable = <T extends object>({ }: ReactTableProps<T>) => {
                 cell: (row) => {
                     return (
                         <Avatar
-                            src={row.row.original.image}
+                            // src={row.row.original.image}
                             alt="Avatar"
                             sx={{
                                 width: "3rem",
@@ -77,9 +60,14 @@ export const TicketsTable = <T extends object>({ }: ReactTableProps<T>) => {
                 },
             },
             {
+                header: 'Tenant',
+                cell: (row) => row.renderValue(),
+                accessorKey: 'tenant.user.name',
+            },
+            {
                 header: 'Unit',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'unit',
+                accessorKey: 'unit.name',
             },
             {
                 header: 'Type',
@@ -87,14 +75,23 @@ export const TicketsTable = <T extends object>({ }: ReactTableProps<T>) => {
                 accessorKey: 'type',
             },
             {
-                header: 'Message',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'message',
+                header: 'Status',
+                cell: (row: any) => <Chip
+                    label={row.row.original.status}
+                    // color={row.row.original.status === "PENDING" ? "warning" : "limegreen"}
+                    size="small"
+                    sx={{
+                        fontSize: "0.75rem",
+                        bgcolor: row.row.original.status === "PENDING" ? "warning.main" : row.row.original.status === "ACCEPTED" ? "limegreen" : "error.main",
+                        color: "white",
+                    }}
+                />,
+                accessorKey: 'status',
             },
             {
                 header: 'Date Created',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'dateAdded',
+                cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+                accessorKey: 'createdAt',
             },
             {
                 header: 'Actions',
@@ -122,12 +119,23 @@ export const TicketsTable = <T extends object>({ }: ReactTableProps<T>) => {
         []
     );
 
+
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-tickets', property, page, searchQuery, ticketStatus], queryFn: () => fetchTickets(property, page, searchQuery, ticketStatus) })
+
     return (
         <TableRenderer
-            data={data}
-            pageInfo={{}}
+            data={data?.data}
+            pageInfo={data?.pageInfo}
             columns={columns} onRowClick={function (obj: any): void {
-                throw new Error('Function not implemented.');
-            } }        />
+                console.log("Clicked")
+            }}
+            setPage={setPage}
+            loading={isLoading}
+            status={ticketStatus}
+            setStatus={setTicketStatus}
+            statusOptions={statusOptions}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+        />
     );
 };

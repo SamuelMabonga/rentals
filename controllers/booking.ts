@@ -51,13 +51,20 @@ export async function fetchAllBookings(req: any, res: any) {
 // get all Property Bookings
 export async function fetchAllPropertyBookings(req: any, res: any) {
   const {
-    query: { id, searchQuery },
+    query: { id, searchQuery, status },
   }: any = req;
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    console.log("status is", status);
+    queryCondition.status = status;
+  }
+
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
     const [bookings, bookingsCount] = await Promise.all([
-      Booking.find({ property: id })
+      Booking.find(queryCondition)
         .populate({
           path: "unit",
           populate: [{ path: "unitType" }],
@@ -71,7 +78,7 @@ export async function fetchAllPropertyBookings(req: any, res: any) {
         })
         .skip((page - 1) * limit)
         .limit(limit),
-      Booking.countDocuments({ property: id }),
+      Booking.countDocuments(queryCondition),
     ]);
 
     res.json({
@@ -232,8 +239,20 @@ export async function deleteBooking(req: any, res: any) {
 // @desc    search
 // @route   GET /api/booking?searchQuery=searchQuery
 export async function searchBooking(req: any, res: any, searchQuery: string) {
+  // const property = req.query?.id
+
+  const {
+    id, status
+  } = req.query
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    console.log("status is", status);
+    queryCondition.status = status;
+  }
+
   try {
-    let bookings = await Booking.find()
+    let bookings = await Booking.find(queryCondition)
       .populate({
         path: "unit",
         populate: [{ path: "unitType" }],
@@ -247,7 +266,7 @@ export async function searchBooking(req: any, res: any, searchQuery: string) {
       });
 
     const options = {
-      keys: ["user.last_name", "user.first_name", "user.email"],
+      keys: ["user.name", "user.email", "unit.name"],
       threshold: 0.3,
     };
 
@@ -387,7 +406,8 @@ export async function acceptBooking(req: any, res: any) {
             : moment(tenant?.startDate).add(
               1,
               tenant?.unit?.unitType?.billingPeriod?.period
-            ).add(7, "days"), // set dedault pay date to 7 days
+            ).add(7, "days"), // set dedault pay date to 7 days,
+          property: booking?.unit?.property,
         });
 
         await rentBill.save();
@@ -414,6 +434,7 @@ export async function acceptBooking(req: any, res: any) {
                 1,
                 feature?.billingPeriod?.period
               ).add(7, "days"), // set dedault pay date to 7 days
+            property: booking?.unit?.property,
           });
 
           await bill.save();
@@ -449,6 +470,7 @@ export async function acceptBooking(req: any, res: any) {
           user: booking?.user?._id,
           role: role?._id,
           property: booking?.unit?.property,
+          tenant: newTenant._id,
         })
 
         await tenantRole.save();
@@ -459,9 +481,9 @@ export async function acceptBooking(req: any, res: any) {
 
 
       // Send email to tenant
-      try { 
+      try {
         await newTenantEmail(booking, res)
-      } catch (error) { 
+      } catch (error) {
         console.log("SEND EMAIL ERROR", error);
         return res.status(400).json({ error: "Failed to send email" });
       }

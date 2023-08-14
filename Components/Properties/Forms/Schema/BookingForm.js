@@ -6,8 +6,8 @@ export const formSchema = yup.object().shape({
         is: (val) => val.length > 2,
         then: () => yup.object().shape({
             _id: yup.string().required("Required"),
-            first_name: yup.string().required("Required"),
-            last_name: yup.string().required("Required")
+            // first_name: yup.string().required("Required"),
+            // last_name: yup.string().required("Required")
         }),
     }),
     unitType: yup.object().when("user", {
@@ -50,8 +50,8 @@ export const formSchema2 = yup.object().shape({
     userSearchTerm: yup.string().required(),
     user: yup.object().shape({
         _id: yup.string().required("Required"),
-        first_name: yup.string().required("Required"),
-        last_name: yup.string().required("Required")
+        // first_name: yup.string().required("Required"),
+        // last_name: yup.string().required("Required")
     }),
     additionalFeatures: yup.array().of(
         yup.object().shape({

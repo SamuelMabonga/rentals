@@ -39,11 +39,8 @@ export const UnitTypesTable = <T extends object>({ property }: ReactTableProps<T
         setUnitTypesPage: setPage,
     }: any = useContext(CollectionsContext)
 
-    // SESSION
-    const session: any = useSession()
-    const token = session?.data?.accessToken
-    const { data, isLoading }: any = useQuery({ queryKey: ['property-unitTypes', token, property, page], queryFn: () => fetchPropertyUnitTypes(token, property, page) })
 
+    const { data, isLoading }: any = useQuery({ queryKey: ['property-unitTypes', property, page], queryFn: () => fetchPropertyUnitTypes(property, page) })
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(

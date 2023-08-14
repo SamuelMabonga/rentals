@@ -40,7 +40,7 @@ export const FeaturesTable = <T extends object>({ }: ReactTableProps<T>) => {
     }: any = useContext(CollectionsContext)
 
     // TABLE DATA
-    const { data }: any = useQuery({ queryKey: ['features', token, page], queryFn: () => fetchFeatures(token, page) })
+    const { data }: any = useQuery({ queryKey: ['features', page], queryFn: () => fetchFeatures(page) })
 
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [

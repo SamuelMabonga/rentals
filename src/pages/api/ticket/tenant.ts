@@ -14,16 +14,16 @@ import {
     req: NextApiRequest,
     res: NextApiResponse
   ) {
-    const decodedToken = authenticateUser(req, res);
+    // const decodedToken = authenticateUser(req, res);
 
-    const { _id: userId, role } = decodedToken.user;
+    // const { _id: userId, role } = decodedToken.user;
   
     connectToMongoDB().catch((err) => res.json(err));
     //type of request
     const { method } = req;
     switch (method) {
       case "GET":
-        fetchTicketsByTenant(req, res, userId);
+        fetchTicketsByTenant(req, res, "");
         break;
         // case "GET":
         //   fetchSingleTicket(req, res);
