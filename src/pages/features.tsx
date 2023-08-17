@@ -43,17 +43,6 @@ export default function Features({
     return (
         <>
             <Typography color="black" fontSize="1.5rem" fontWeight="600">Features</Typography>
-            <Box width="100%" display={"flex"} flexDirection={["column", "row"]} gap="1rem">
-                <TextField
-                    name="search"
-                    placeholder="Search"
-                    size="small"
-                    sx={{
-                        width: ["100%", "20rem"]
-                    }}
-                />
-                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenPropertyFeaturesForm(true)}>Create New</Button>
-            </Box>
 
             <PropertyFeaturesTable property={propertyId} />
             <PropertyFeatureForm property={propertyId} />

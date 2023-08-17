@@ -34,17 +34,6 @@ export default function RentExtensions({
     return (
         <>
             <Typography color="black" fontSize="1.5rem" fontWeight="600">Rent Extensions</Typography>
-            <Box width="100%" display={"flex"} flexDirection={["column", "row"]} gap="1rem">
-                <TextField
-                    name="search"
-                    placeholder="Search"
-                    size="small"
-                    sx={{
-                        width: ["100%", "20rem"]
-                    }}
-                />
-                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenBookingForm(true)}>Create New</Button>
-            </Box>
 
             <ExtensionsTable property={property} />
         </>

@@ -101,6 +101,9 @@ export const PropertyFeaturesTable = <T extends object>({ property }: ReactTable
             }}
             loading={isLoading}
             setPage={setPage}
+
+            buttonAction={setOpenPropertyFeaturesForm}
+            buttonLabel="Add Feature"
         />
     );
 };

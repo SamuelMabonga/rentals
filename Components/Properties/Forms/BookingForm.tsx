@@ -39,8 +39,6 @@ function HorizontalStepper({ step, steps }: any) {
 
 export default function BookingForm({
     property,
-    unitTypes: propertyUnitTypes,
-    features: propertyFeatures,
 }: any) {
     // CONTEXT
     const {
@@ -74,6 +72,8 @@ export default function BookingForm({
 
     const { refetch }: any = useQuery({ queryKey: ['property-bookings', property, page], queryFn: () => fetchPropertyBookings(property, page, "", "") })
 
+    const schema: any = Object?.keys(unit)?.length > 0 ? formSchema2 : formSchema
+
     const { handleSubmit, register, watch, setValue, setError, reset, formState: { errors } }: any = useForm({
         defaultValues: {
             userSearchTerm: "",
@@ -99,7 +99,7 @@ export default function BookingForm({
         },
         mode: "onChange",
         reValidateMode: "onChange",
-        resolver: yupResolver(Object.keys(unit).length > 0 ? formSchema2 : formSchema),
+        resolver: yupResolver(schema),
     });
 
     useEffect(() => {
@@ -314,8 +314,8 @@ export default function BookingForm({
                                         >
                                             <Avatar sx={{ width: "3.5rem", height: "3.5rem" }} />
                                             <Box>
-                                                <Typography>{`${user.first_name} ${user.last_name}`}</Typography>
-                                                {/* <Chip size="small" label={!user?.tenant ? "Vacant" : "Occupied"} /> */}
+                                                <Typography fontWeight="600">{user.name}</Typography>
+                                                <Typography variant="body2" color="gray">{user?.email}</Typography>
                                             </Box>
 
                                             <Box display={watch("user")?._id === user._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">

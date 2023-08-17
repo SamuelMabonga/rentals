@@ -122,6 +122,9 @@ export const UnitTypesTable = <T extends object>({ property }: ReactTableProps<T
             } }
             loading={isLoading}
             setPage={setPage}
+
+            buttonAction={setShowUnitTypeForm}
+            buttonLabel="Add Unit Type"
         />
     );
 };

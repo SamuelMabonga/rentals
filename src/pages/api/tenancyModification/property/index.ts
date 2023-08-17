@@ -7,9 +7,7 @@ import {
   updateUnit,
 } from "controllers/unit";
 import authenticateUser from "helpers/authenticate_user";
-import { connectToMongoDB } from "lib/mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import { createExtension } from "controllers/extensions";
 import { createTenancyModification, fetchTenancyModificationsByProperty } from "controllers/tenancyModification";
 
 export default async function handler(
@@ -21,19 +19,17 @@ export default async function handler(
     query: { id, searchQuery },
   }: any = req;
 
-  const decodedToken = authenticateUser(req, res);
+  // const decodedToken = authenticateUser(req, res);
 
-  if (!decodedToken?.user?._id) {
-    return res.status(401).json({
-      success: false,
-      msg: "Not Authorized",
-    });
-  }
+  // if (!decodedToken?.user?._id) {
+  //   return res.status(401).json({
+  //     success: false,
+  //     msg: "Not Authorized",
+  //   });
+  // }
 
   try {
     await mongoose.connect(process.env.NEXT_PUBLIC_MONGODB_SRV || "mongodb://localhost:27017/test_db").then(() => {
-      // USER
-      const { _id, role } = decodedToken.user;
 
       //type of request
       const { method } = req;
@@ -49,20 +45,20 @@ export default async function handler(
         });
       }
 
-      // Get permissions
-      const userRoles = decodedToken.userRoles
-      const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
-      const permissions = userPropertyRoles?.role?.permissions
+      // // Get permissions
+      // const userRoles = decodedToken.userRoles
+      // const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
+      // const permissions = userPropertyRoles?.role?.permissions
 
       switch (method) {
         case "GET":
-          const getPermission = permissions?.find((permission: any) => permission.name === "View tenancy modification")
-          if (!getPermission) {
-            return res.status(401).json({
-              success: false,
-              msg: "Not Authorized",
-            });
-          }
+          // const getPermission = permissions?.find((permission: any) => permission.name === "View tenancy modification")
+          // if (!getPermission) {
+          //   return res.status(401).json({
+          //     success: false,
+          //     msg: "Not Authorized",
+          //   });
+          // }
           //   if (id) {
           //     return fetchSingleUnit(req, res)
           //   }
@@ -72,33 +68,33 @@ export default async function handler(
         //   fetchSingleUnit(req, res);
         //   break;
         case "POST":
-          const postPermission = permissions?.find((permission: any) => permission.name === "Create tenancy modification")
-          if (!postPermission) {
-            return res.status(401).json({
-              success: false,
-              msg: "Not Authorized",
-            });
-          }
+          // const postPermission = permissions?.find((permission: any) => permission.name === "Create tenancy modification")
+          // if (!postPermission) {
+          //   return res.status(401).json({
+          //     success: false,
+          //     msg: "Not Authorized",
+          //   });
+          // }
           createTenancyModification(req, res);
           break;
         case "PUT":
-          const putPermission = permissions?.find((permission: any) => permission.name === "Edit tenancy modification")
-          if (!putPermission) {
-            return res.status(401).json({
-              success: false,
-              msg: "Not Authorized",
-            });
-          }
+          // const putPermission = permissions?.find((permission: any) => permission.name === "Edit tenancy modification")
+          // if (!putPermission) {
+          //   return res.status(401).json({
+          //     success: false,
+          //     msg: "Not Authorized",
+          //   });
+          // }
           updateUnit(req, res);
           break;
         case "DELETE":
-          const deletePermission = permissions?.find((permission: any) => permission.name === "Delete tenancy modification")
-          if (!deletePermission) {
-            return res.status(401).json({
-              success: false,
-              msg: "Not Authorized",
-            });
-          }
+          // const deletePermission = permissions?.find((permission: any) => permission.name === "Delete tenancy modification")
+          // if (!deletePermission) {
+          //   return res.status(401).json({
+          //     success: false,
+          //     msg: "Not Authorized",
+          //   });
+          // }
           deleteUnit(req, res);
           break;
         default:

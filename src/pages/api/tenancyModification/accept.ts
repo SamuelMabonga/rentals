@@ -9,14 +9,14 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const decodedToken = authenticateUser(req, res);
+  // const decodedToken = authenticateUser(req, res);
 
-  if (!decodedToken?.user?._id) {
-    return res.status(401).json({
-      success: false,
-      msg: "Not Authorized",
-    });
-  }
+  // if (!decodedToken?.user?._id) {
+  //   return res.status(401).json({
+  //     success: false,
+  //     msg: "Not Authorized",
+  //   });
+  // }
 
   connectToMongoDB().catch((err) => res.json(err));
 
@@ -34,20 +34,20 @@ export default async function handler(
     });
   }
 
-  // Get permissions
-  const userRoles = decodedToken.userRoles
-  const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
-  const permissions = userPropertyRoles?.role?.permissions
+  // // Get permissions
+  // const userRoles = decodedToken.userRoles
+  // const userPropertyRoles = userRoles?.find((role: any) => role.property === property)
+  // const permissions = userPropertyRoles?.role?.permissions
   
   switch (method) {
     case "POST":
-      const postPermission = permissions?.find((permission: any) => permission.name === "Accept tenancy modification")
-      if (!postPermission) {
-        return res.status(401).json({
-          success: false,
-          msg: "Not Authorized",
-        });
-      }
+      // const postPermission = permissions?.find((permission: any) => permission.name === "Accept tenancy modification")
+      // if (!postPermission) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     msg: "Not Authorized",
+      //   });
+      // }
       acceptTenancyModification(req, res);
       break;
     default:

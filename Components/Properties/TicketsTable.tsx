@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/Common/TableRenderer';
@@ -9,6 +9,7 @@ import fetchTickets from 'apis/property/fetchTickets';
 import { useQuery } from '@tanstack/react-query';
 import { CollectionsContext } from 'context/context';
 import moment from 'moment';
+import ViewTicket from './Common/ViewTicket';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -26,10 +27,10 @@ type Item = {
 }
 
 const statusOptions = [
-    {label: "Pending", value: "PENDING"},
-    {label: "Fixed", value: "FIXED"},
-    {label: "In-Progress", value: "INPROGRESS"},
-] 
+    { label: "Pending", value: "PENDING" },
+    { label: "Fixed", value: "FIXED" },
+    { label: "In-Progress", value: "INPROGRESS" },
+]
 
 export const TicketsTable = <T extends object>({ property }: ReactTableProps<T>) => {
     // CONTEXT
@@ -78,11 +79,10 @@ export const TicketsTable = <T extends object>({ property }: ReactTableProps<T>)
                 header: 'Status',
                 cell: (row: any) => <Chip
                     label={row.row.original.status}
-                    // color={row.row.original.status === "PENDING" ? "warning" : "limegreen"}
+                    color={row.row.original.status === "PENDING" ? "warning" : row.row.original.status === "INPROGRESS" ? "info" : "success"}
                     size="small"
                     sx={{
                         fontSize: "0.75rem",
-                        bgcolor: row.row.original.status === "PENDING" ? "warning.main" : row.row.original.status === "ACCEPTED" ? "limegreen" : "error.main",
                         color: "white",
                     }}
                 />,
@@ -122,20 +122,29 @@ export const TicketsTable = <T extends object>({ property }: ReactTableProps<T>)
 
     const { data, isLoading }: any = useQuery({ queryKey: ['property-tickets', property, page, searchQuery, ticketStatus], queryFn: () => fetchTickets(property, page, searchQuery, ticketStatus) })
 
+    const [openTicket, setOpenTicket] = useState(false)
+    const [ticket, setTicket] = useState(null)
+
     return (
-        <TableRenderer
-            data={data?.data}
-            pageInfo={data?.pageInfo}
-            columns={columns} onRowClick={function (obj: any): void {
-                console.log("Clicked")
-            }}
-            setPage={setPage}
-            loading={isLoading}
-            status={ticketStatus}
-            setStatus={setTicketStatus}
-            statusOptions={statusOptions}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-        />
+        <>
+            <TableRenderer
+                data={data?.data}
+                pageInfo={data?.pageInfo}
+                columns={columns} onRowClick={function (obj: any): void {
+                    console.log("Clicked")
+
+                    setTicket(obj)
+                    setOpenTicket(true)
+                }}
+                setPage={setPage}
+                loading={isLoading}
+                status={ticketStatus}
+                setStatus={setTicketStatus}
+                statusOptions={statusOptions}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+            />
+            <ViewTicket open={openTicket} setOpen={setOpenTicket} ticket={ticket} />
+        </>
     );
 };

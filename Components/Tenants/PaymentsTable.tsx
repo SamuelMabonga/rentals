@@ -83,6 +83,8 @@ export const PaymentsTable = <T extends object>({ tenant: id }: ReactTableProps<
             columns={columns}
             loading={isLoading}
             onRowClick={(rowId) => console.log(rowId)}
+
+            statusOptions={[]}
         />
     );
 };

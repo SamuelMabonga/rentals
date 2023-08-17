@@ -19,18 +19,10 @@ import StepLabel from '@mui/material/StepLabel';
 import moment from "moment"
 import fetchPropertyFeatures from "apis/property/fetchPropertyFeatures"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
-// import { formSchema, formSchema2 } from "./Schema/BookingForm"
 import currencyFormatter from "Components/Common/currencyFormatter"
 import fetchPropertyBookings from "apis/property/fetchPropertyBookings"
 import fetchRoles from "apis/admin/fetchRoles"
 import fetchStaff from "apis/property/fetchStaff"
-
-// const steps = [
-//     'Select a tenant',
-//     'Select a unit',
-//     'Tenancy details',
-//     // 'Select your tenancy duration',
-// ];
 
 export const formSchema = yup.object().shape({
     userSearchTerm: yup.string().required(),
@@ -39,6 +31,7 @@ export const formSchema = yup.object().shape({
     }),
     role: yup.object().shape({
         _id: yup.string().required("Required"),
+        name: yup.string().required("Required")
     }),
     // startDate: yup.string().required("Required"),
     // endDate: yup.string().required("Required")
@@ -87,7 +80,7 @@ export default function StaffForm({
     })
 
 
-    const { refetch }: any = useQuery({ queryKey: ['property-staff', property, page], queryFn: () => fetchStaff(property, page, "") })
+    const { refetch }: any = useQuery({ queryKey: ['property-staff', property, page], queryFn: () => fetchStaff(property, page, "", "") })
 
     const { handleSubmit, register, watch, setValue, setError, reset, formState: { errors } }: any = useForm({
         defaultValues: {
@@ -309,8 +302,8 @@ export default function StaffForm({
                                         >
                                             <Avatar sx={{ width: "3.5rem", height: "3.5rem" }} />
                                             <Box>
-                                                <Typography>{`${user.first_name} ${user.last_name}`}</Typography>
-                                                {/* <Chip size="small" label={!user?.tenant ? "Vacant" : "Occupied"} /> */}
+                                                <Typography fontWeight="600">{user.name}</Typography>
+                                                <Typography variant="body2" color="gray">{user?.email}</Typography>
                                             </Box>
 
                                             <Box display={watch("user")?._id === user._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">

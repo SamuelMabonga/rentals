@@ -263,3 +263,47 @@ export async function searchStaff(req: any, res: any) {
     console.log(error);
   }
 }
+
+
+// statistics
+export async function staffStatistics(req: any, res: any) {
+  const {
+    query: { id },
+  }: any = req;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      msg: "No property provided",
+    });
+  }
+
+  try {
+    const [
+      totalStaff,
+      totalStaffActive,
+      totalStaffInactive,
+    ] = await Promise.all([
+      UserRoles.countDocuments({ property: id }),
+      UserRoles.countDocuments({ property: id, status: "ACTIVE" }),
+      UserRoles.countDocuments({ property: id, status: "INACTIVE" }),
+    ])
+
+    res.json({
+      success: true,
+      msg: "Staff statistics fetched successfully",
+      data: {
+        totalStaff,
+        totalStaffActive,
+        totalStaffInactive,
+      }
+    })
+    
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch staff statistics",
+      data: error,
+    }); 
+  }
+}

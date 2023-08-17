@@ -275,3 +275,106 @@ export async function searchPropertyTickets(req: any, res: any) {
     console.log(error);
   }
 }
+
+
+//mark progress
+export async function ticketInProgress(req: any, res: any) {
+  try {
+    let ticket = await Ticket.findById(req.body.ticket);
+
+    const data = {
+      ...ticket._doc,
+      status: "INPROGRESS",
+    };
+
+    ticket = await Ticket.findByIdAndUpdate(req.body.ticket, data, {
+      new: true,
+    });
+    res.status(200).json({
+      success: true,
+      msg: "Ticket moved to in progress successfully",
+      data: ticket,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "failed to update ticket",
+      data: error,
+    });
+  }
+}
+
+
+//mark completed
+export async function ticketCompleted(req: any, res: any) {
+  try {
+    let ticket = await Ticket.findById(req.body.ticket);
+
+    const data = {
+      ...ticket._doc,
+      status: "FIXED",
+    };
+
+    ticket = await Ticket.findByIdAndUpdate(req.body.ticket, data, {
+      new: true,
+    });
+    res.status(200).json({
+      success: true,
+      msg: "Ticket moved to fixed successfully",
+      data: ticket,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to update ticket",
+      data: error,
+    });
+  }
+}
+
+// Ticket statistics
+export async function ticketStatistics(req: any, res: any) {
+  const {
+    query: { id },
+  }: any = req;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      msg: "No property provided",
+    });
+  }
+
+  try {
+    const [
+      totalTickets,
+      totalTicketsInProgress,
+      totalTicketsFixed,
+      totalTicketsPending,
+    ] = await Promise.all([
+      Ticket.countDocuments({ property: id }),
+      Ticket.countDocuments({ property: id, status: "INPROGRESS" }),
+      Ticket.countDocuments({ property: id, status: "FIXED" }),
+      Ticket.countDocuments({ property: id, status: "PENDING" }),
+    ])
+
+    res.json({
+      success: true,
+      msg: "Ticket statistics fetched successfully",
+      data: {
+        totalTickets,
+        totalTicketsInProgress,
+        totalTicketsFixed,
+        totalTicketsPending,
+      }
+    })
+    
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch ticket statistics",
+      data: error,
+    }); 
+  }
+}
+

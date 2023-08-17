@@ -15,16 +15,21 @@ const UserRolesSchema: any = new Schema(
       }
     },
     property: {
-        type: Schema.Types.ObjectId,
-        ref: Property
+      type: Schema.Types.ObjectId,
+      ref: Property
     },
     tenant: {
-        type: Schema.Types.ObjectId,
-        ref: Tenant
+      type: Schema.Types.ObjectId,
+      ref: Tenant
     },
     role: {
-        type: Schema.Types.ObjectId,
-        ref: Roles
+      type: Schema.Types.ObjectId,
+      ref: Roles
+    },
+    status: {
+      type: String,
+      enum: ["ACTIVE", "INACTIVE"],
+      default: "ACTIVE",
     }
   },
   {
@@ -32,6 +37,6 @@ const UserRolesSchema: any = new Schema(
   }
 );
 
-const UserRoles = models.UserRoles|| model("UserRoles", UserRolesSchema);
+const UserRoles = models.UserRoles || model("UserRoles", UserRolesSchema);
 
 export default UserRoles;

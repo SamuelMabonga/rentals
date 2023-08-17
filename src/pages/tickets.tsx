@@ -28,12 +28,6 @@ export default function Tickets({
         setOpenTicketForm
     }: any = useContext(CollectionsContext)
 
-    // const tenantId = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem("role") || "")?.property?._id : null;
-
-    // const session: any = useSession()
-
-    // const userId = session?.data?.user?.id
-
     const router = useRouter();
 
     // Get the query parameters from the router
@@ -46,17 +40,6 @@ export default function Tickets({
     return (
         <>
             <Typography color="black" fontSize="1.5rem" fontWeight="600">Tickets</Typography>
-            <Box width="100%" display={"flex"} flexDirection={["column", "row"]} gap="1rem">
-                <TextField
-                    name="search"
-                    placeholder="Search"
-                    size="small"
-                    sx={{
-                        width: ["100%", "20rem"]
-                    }}
-                />
-                <Button variant="contained" sx={{ ml: "auto" }} onClick={() => setOpenTicketForm(true)}>Create New</Button>
-            </Box>
 
             <TicketsTable tenant={tenant} />
             <TicketForm tenant={tenant} />
@@ -69,11 +52,7 @@ Tickets.auth = true
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
 
-    const userId = session?.user?.id
-
     const tenant: any = context.query.tenant
-
-    // const propertyId: any = context.query.property
 
     if (!session) {
         return {

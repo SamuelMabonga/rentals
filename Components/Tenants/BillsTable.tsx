@@ -12,6 +12,9 @@ import fetchBills from 'apis/tenant/fetchBills';
 import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3';
 import RequestExtension from './Forms/RequestExtension';
 import currencyFormatter from 'Components/Common/currencyFormatter';
+import { Download } from '@mui/icons-material';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import BillReceipt from './Common/BillReceipt';
 
 function AlertDialog({
     hide,
@@ -50,8 +53,8 @@ function AlertDialog({
     }, [agreeing])
 
     return (
-        <div style={{display: hide ? "none" : "block"}}>
-            <Button variant={buttonVariant} color={buttonColor} size="small" sx={{ fontSize: "0.875rem",  }} onClick={handleClickOpen}>
+        <div style={{ display: hide ? "none" : "block" }}>
+            <Button variant={buttonVariant} color={buttonColor} size="small" sx={{ fontSize: "0.875rem", }} onClick={handleClickOpen}>
                 {buttonLabel}
             </Button>
             <Dialog
@@ -59,7 +62,7 @@ function AlertDialog({
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
-                sx={{display: hide ? "none" : "block"}}
+                sx={{ display: hide ? "none" : "block" }}
             >
                 <LinearProgress sx={{ display: loading ? "flex" : "none" }} />
                 <DialogTitle id="alert-dialog-title">
@@ -70,7 +73,7 @@ function AlertDialog({
                         {content}
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions sx={{padding: "1rem"}}>
+                <DialogActions sx={{ padding: "1rem" }}>
                     <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
                     <Button
                         variant="contained"
@@ -121,16 +124,16 @@ export const BillsTable = <T extends object>({ tenant }: ReactTableProps<T>) => 
 
         tenantBillsPage: page,
         setTenantBillsPage: setPage,
+
+        setOpenPaymentForm
     }: any = useContext(CollectionsContext)
 
-    // const session: any = useSession()
-    // const token = session?.data?.accessToken
-    // const tenantId = tenant?._id
+
     const { data, isLoading, refetch }: any = useQuery({ queryKey: ['tenant-bills', tenant, page], queryFn: () => fetchBills(tenant, page) })
 
     const { data: user }: any = useSession()
 
-    
+
 
     const handleFlutterPayment = useFlutterwave(paymentConfig);
 
@@ -204,15 +207,13 @@ export const BillsTable = <T extends object>({ tenant }: ReactTableProps<T>) => 
                             buttonVariant="contained"
                             title="Are you sure you want to pay this bill?"
                             content="If you accept, you will be redirected to the payment page"
-                            // setAgreeing={setAccepting}
-                            // agreeing={accepting}
                             onAgree={async (event: any) => {
                                 event.stopPropagation()
                                 event.stopPropagation()
 
                                 const payment = {
                                     amount: row.row.original.amount,
-                                    bills: [row.row.original._id, ],
+                                    bills: [row.row.original._id,],
                                     tenant: tenant,
                                 }
 
@@ -228,7 +229,7 @@ export const BillsTable = <T extends object>({ tenant }: ReactTableProps<T>) => 
                                         })
                                     })
 
-                                    const {data: {_id}} = await res.json()
+                                    const { data: { _id } } = await res.json()
 
                                     await setPaymentConfig({
                                         public_key: process.env.NEXT_PUBLIC_FW_PUBLIC_KEY,
@@ -245,9 +246,9 @@ export const BillsTable = <T extends object>({ tenant }: ReactTableProps<T>) => 
                                             title: "Rent Payment",
                                             description: "Payment for rent",
                                             logo: "https://assets.piedpiper.com/logo.png",
-                                        }     
+                                        }
                                     })
-            
+
                                     // setAccepting(false)
                                 } catch (error) {
                                     // setAccepting(false)
@@ -257,22 +258,58 @@ export const BillsTable = <T extends object>({ tenant }: ReactTableProps<T>) => 
                                 }
                             }}
                         />
-                        <Button
+                        {/* <Button
+                            startIcon={<Download />}
                             variant={"outlined"}
                             size="small"
                             sx={{
                                 fontSize: "0.875rem",
-                                display: row?.row?.original?.status === "PAID" ? "block" : "none"
+                                display: row?.row?.original?.status === "PAID" ? "flex" : "none"
                             }}
                             onClick={async (event) => {
                                 event.preventDefault()
                                 event.stopPropagation()
 
+                                // ReactPDF.render(<MyDocument />, `${__dirname}/example.pdf`)
+                                // ReactPDF.render(<MyDocument />, path.join(require('os').homedir(), 'Downloads', 'example.pdf'));
 
                             }}
+                        > */}
+                        <PDFDownloadLink
+                            document={
+                                <BillReceipt
+                                    customerName="Mabonga Samuel"
+                                    rentalName="Test 3"
+                                    billDate="12-12-2021"
+                                    paidDate="12-12-2021"
+                                    startDate="12-12-2021"
+                                    endDate="12-12-2021"
+                                    amount={row?.row?.original?.amount}
+                                    property="Olympus"
+                                    service="Rent"
+                                    contactDetails="0784******"
+                                />
+                            }
+                            fileName="bill.pdf"
                         >
-                            {`Invoice`}
-                        </Button>
+                            {({ blob, url, loading, error }) =>
+                                loading ?
+                                    'Loading document...'
+                                    : <Button
+                                        startIcon={<Download />}
+                                        variant={"outlined"}
+                                        size="small"
+                                        sx={{
+                                            fontSize: "0.875rem",
+                                            display: row?.row?.original?.status === "PAID" ? "flex" : "none"
+                                        }}
+                                    >
+                                        Receipt
+                                    </Button>
+                            }
+                        </PDFDownloadLink>
+                        {/* {`Receipt`} */}
+                        {/* </Button> */}
 
                         <Button
                             variant="outlined"
@@ -310,6 +347,9 @@ export const BillsTable = <T extends object>({ tenant }: ReactTableProps<T>) => 
                 onRowClick={(rowId) => console.log(rowId)}
                 loading={isLoading}
                 setPage={setPage}
+
+                buttonAction={setOpenPaymentForm}
+                buttonLabel="Pay Bills"
             />
             <RequestExtension tenant={tenant} billToExtend={billToExtend} />
         </React.Fragment>

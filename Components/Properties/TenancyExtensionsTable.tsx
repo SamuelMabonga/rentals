@@ -56,7 +56,7 @@ export const TenancyExtensionsTable = <T extends object>({ property }: ReactTabl
             },
             {
                 header: 'Tenant',
-                cell: (row: any) => `${row?.row?.original?.tenant?.user?.first_name} ${row?.row?.original?.tenant?.user?.last_name}`,
+                cell: (row: any) => `${row?.row?.original?.tenant?.user?.name}`,
                 // accessorKey: 'name',
             },
             {

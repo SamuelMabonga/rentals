@@ -100,9 +100,10 @@ export async function fetchOccupancy(req: any, res: any) {
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    const [unitCount, activeTenants, ] = await Promise.all([
+    const [unitCount, availableUnits, occupiedUnits ] = await Promise.all([
       Unit.countDocuments({ property }),
-      Tenant.countDocuments({ property, status: "ACTIVE" }),
+      Unit.countDocuments({ property, status: "AVAILABLE" }),
+      Unit.countDocuments({ property, status: "OCCUPIED" }),
     ]);
 
     res.statusCode = 200;
@@ -113,7 +114,8 @@ export async function fetchOccupancy(req: any, res: any) {
         msg: "Properties fetched successfully",
         data: {
           unitCount,
-          activeTenants,
+          availableUnits,
+          occupiedUnits,
         },
       })
     );

@@ -268,3 +268,51 @@ export async function searchProperty(req: any, res: any, searchQuery: string) {
     console.log(error);
   }
 }
+
+
+// Statistics
+export async function tenancyModificationStatistics(req: any, res: any) {
+  const {
+    query: { id },
+  }: any = req;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      msg: "No property provided",
+    });
+  }
+
+  try {
+    const [
+      total,
+      totalAccepted,
+      totalRejected,
+      totalPending,
+    ] = await Promise.all([
+      TenancyModification.countDocuments({ property: id }),
+      TenancyModification.countDocuments({ property: id, status: "ACCEPTED" }),
+      TenancyModification.countDocuments({ property: id, status: "PENDING" }),
+      TenancyModification.countDocuments({ property: id, status: "REJECTED" }),
+    ])
+
+    res.json({
+      success: true,
+      msg: "Ticket statistics fetched successfully",
+      data: {
+        total,
+        totalAccepted,
+        totalRejected,
+        totalPending
+      }
+    })
+    
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch ticket statistics",
+      data: error,
+    }); 
+  }
+}
+

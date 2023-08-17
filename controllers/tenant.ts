@@ -262,3 +262,50 @@ export async function searchTenant(req: any, res: any, searchQuery: string) {
     console.log(error);
   }
 }
+
+
+// statistics
+export async function tenantStatistics(req: any, res: any) {
+  const {
+    query: { id },
+  }: any = req;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      msg: "No property provided",
+    });
+  }
+
+  try {
+    const [
+      totalTenants,
+      totalTenantsPending,
+      totalTenantsActive,
+      totalTenantsInactive,
+    ] = await Promise.all([
+      Tenant.countDocuments({ property: id }),
+      Tenant.countDocuments({ property: id, status: "PENDING" }),
+      Tenant.countDocuments({ property: id, status: "ACTIVE" }),
+      Tenant.countDocuments({ property: id, status: "INACTIVE" }),
+    ])
+
+    res.json({
+      success: true,
+      msg: "Tenant statistics fetched successfully",
+      data: {
+        totalTenants,
+        totalTenantsPending,
+        totalTenantsActive,
+        totalTenantsInactive,
+      }
+    })
+    
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch tenant statistics",
+      data: error,
+    }); 
+  }
+}

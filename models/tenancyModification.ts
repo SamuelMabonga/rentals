@@ -1,6 +1,5 @@
 import { Schema, model, models } from "mongoose";
 import Tenant from "./tenant";
-import Bills from "./bills";
 import Property from "./property";
 
 const TenancyModificationShema = new Schema(

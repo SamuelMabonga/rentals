@@ -31,7 +31,8 @@ export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) =
     // CONTEXT
     const {
         setShowPropertyForm,
-        setPropertyToEdit
+        setPropertyToEdit,
+        setOpenTicketForm 
     }: any = useContext(CollectionsContext)
 
     // const tenantId = tenant?._id
@@ -57,7 +58,12 @@ export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) =
             // },
             {
                 header: 'Status',
-                cell: (row: any) => <Chip label={row.renderValue()} color="primary" sx={{ fontWeight: "500", fontSize: "0.75rem"}} size="small" />,
+                cell: (row: any) => <Chip
+                    label={row.renderValue()}
+                    color={row.renderValue() === "PENDING" ? "warning" : row.renderValue() === "INPROGRESS" ? "info" : "success"}
+                    sx={{ fontWeight: "500", fontSize: "0.75rem"}}
+                    size="small"
+                />,
                 accessorKey: 'status',
             },
             {
@@ -90,6 +96,9 @@ export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) =
             columns={columns}
             loading={isLoading}
             onRowClick={(rowId) => console.log(rowId)}
+
+            buttonAction={setOpenTicketForm}
+            buttonLabel="Create Ticket"
         />
     );
 };

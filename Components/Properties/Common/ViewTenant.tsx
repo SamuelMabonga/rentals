@@ -81,7 +81,7 @@ export default function ViewTenant({ tenant }: any) {
                     <Box display="flex" gap="1rem" alignItems="center">
                         <Avatar sx={{ width: "4rem", height: "4rem" }} />
                         <Box>
-                            <Typography fontWeight="600" fontSize="1.125rem">{`${tenant?.user?.first_name} ${tenant?.user?.last_name}`}</Typography>
+                            <Typography fontWeight="600" fontSize="1.125rem">{`${tenant?.user?.name}`}</Typography>
                             <Typography color="grey" fontWeight="500">{tenant?.user?.email}</Typography>
                         </Box>
                     </Box>

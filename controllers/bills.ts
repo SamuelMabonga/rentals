@@ -95,18 +95,11 @@ export async function fetchBillsStatistics(req: any, res: any, userId: string) {
     query: { id },
   }: any = req;
 
-  console.log("Property ID", id);
-
-  const page = req.query?.page ? parseInt(req.query.page) : 1;
-  const limit = req.query?.limit ? req.query?.limit : 10;
   try {
     const [paidBills, allBills] = await Promise.all([
       Bills.find({ "property" : id, status: "PAID" }),
       Bills.find({ "property" : id }),
     ]);
-
-    console.log("ALL BILLS", allBills)
-    console.log("PAID BILLS", paidBills)
 
     const totalPaid = paidBills.reduce((acc: any, curr: any) => {
       return acc + curr.amount;
@@ -116,13 +109,6 @@ export async function fetchBillsStatistics(req: any, res: any, userId: string) {
       return acc + curr.amount;
     }, 0);
 
-    // if (bills[0].tenant.user != userId) {
-    //   return res.status(403).json({
-    //     success: false,
-    //     msg: "You are not authorized to view this tenant's bills",
-    //     data: null,
-    //   });
-    // }
 
     res.json({
       success: true,
@@ -131,7 +117,6 @@ export async function fetchBillsStatistics(req: any, res: any, userId: string) {
         totalPaid,
         totalBills,
       },
-      // pageInfo: getPageInfo(limit, billsCount, page),
     });
   } catch (error) {
     res.status(400).json({

@@ -308,3 +308,50 @@ export async function searchProperty(req: any, res: any, searchQuery: string) {
     console.log(error);
   }
 }
+
+
+// statistics
+export async function extensionStatistics(req: any, res: any) {
+  const {
+    query: { id },
+  }: any = req;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      msg: "No property provided",
+    });
+  }
+
+  try {
+    const [
+      totalExtensions,
+      totalExtensionsPending,
+      totalExtensionsAccepted,
+      totalExtensionsRejected,
+    ] = await Promise.all([
+      Extensions.countDocuments({ property: id }),
+      Extensions.countDocuments({ property: id, status: "PENDING" }),
+      Extensions.countDocuments({ property: id, status: "ACCEPTED" }),
+      Extensions.countDocuments({ property: id, status: "REJECTED" }),
+    ])
+
+    res.json({
+      success: true,
+      msg: "Extension statistics fetched successfully",
+      data: {
+        totalExtensions,
+        totalExtensionsPending,
+        totalExtensionsAccepted,
+        totalExtensionsRejected,
+      }
+    })
+    
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch extension statistics",
+      data: error,
+    }); 
+  }
+}

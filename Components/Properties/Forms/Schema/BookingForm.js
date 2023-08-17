@@ -50,6 +50,7 @@ export const formSchema2 = yup.object().shape({
     userSearchTerm: yup.string().required(),
     user: yup.object().shape({
         _id: yup.string().required("Required"),
+        name: yup.string().required("Required"),
         // first_name: yup.string().required("Required"),
         // last_name: yup.string().required("Required")
     }),

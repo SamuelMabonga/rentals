@@ -47,9 +47,6 @@ export default function DashboardLayout({ children }: any) {
     })
 
 
-    const { user }: any = session || {}
-
-
     // SIDE NAV WIDTH
     const sideNavRef: any = useRef()
     const container: any = useRef()
@@ -398,7 +395,7 @@ export default function DashboardLayout({ children }: any) {
                             right={0}
                             width={width}
                             zIndex={2}
-                            padding={["1rem", "1rem", "1rem", "1rem 8rem 1rem 2rem"]}
+                            padding={router.pathname === "/select-role" ? ["1rem", "1rem", "1rem", "1rem 8rem 1rem 8rem"] : ["1rem", "1rem", "1rem", "1rem 8rem 1rem 2rem"]}
                             bgcolor={"white"}
                             display={["flex"]}
                             justifyContent={"space-between"}
@@ -428,7 +425,7 @@ export default function DashboardLayout({ children }: any) {
                         <Box
                             mt={`${navBarHeight}px`}
                             width="100%"
-                            padding={["1rem", "1rem", "1rem", "2rem 8rem 2rem 2rem"]}
+                            padding={router.pathname === "/select-role" ? ["1rem", "1rem", "1rem", "2rem 8rem 2rem 8rem"] : ["1rem", "1rem", "1rem", "2rem 8rem 2rem 2rem"]}
                             display="flex"
                             flexDirection="column"
                             gap="1.5rem"

@@ -7,6 +7,7 @@ import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
 import { UnitsTable } from "Components/Properties/UnitsTable";
 import UnitForm from "Components/Properties/Forms/UnitForm";
 import fetchPropertyUnits from "apis/property/fetchPropertyUnits";
+import BookingForm from "Components/Properties/Forms/BookingForm";
 
 
 type PageProps = {
@@ -30,6 +31,7 @@ export default function Units({
             <Typography color="black" fontSize="1.5rem" fontWeight="600">Units</Typography>
             <UnitsTable property={propertyId} />
             <UnitForm property={propertyId} />
+            <BookingForm property={propertyId} />
         </>
     )
 }

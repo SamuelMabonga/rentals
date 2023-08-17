@@ -540,3 +540,52 @@ export async function rejectBooking(req: any, res: any) {
     });
   }
 }
+
+
+// Booking statistics
+export async function bookingStatistics(req: any, res: any) {
+  const {
+    query: { id },
+  }: any = req;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      msg: "No property provided",
+    });
+  }
+
+  try {
+    const [
+      totalBookings,
+      totalBookingsPending,
+      totalBookingsAccepted,
+      totalBookingsRejected,
+    ] = await Promise.all([
+      Booking.countDocuments({ property: id }),
+      Booking.countDocuments({ property: id, status: "PENDING" }),
+      Booking.countDocuments({ property: id, status: "ACCEPTED" }),
+      Booking.countDocuments({ property: id, status: "REJECTED" }),
+    ])
+
+    res.json({
+      success: true,
+      msg: "Ticket statistics fetched successfully",
+      data: {
+        totalBookings,
+        totalBookingsPending,
+        totalBookingsAccepted,
+        totalBookingsRejected,
+      }
+    })
+    
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch ticket statistics",
+      data: error,
+    }); 
+  }
+}
+
+
