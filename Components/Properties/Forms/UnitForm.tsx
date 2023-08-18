@@ -41,7 +41,7 @@ export default function UnitForm({property}: any) {
     const { handleSubmit, register, watch, setValue, reset, formState: { errors }, setError }: any = useForm({
         defaultValues: {
             name: "",
-            unitType: null
+            unitType: {}
         },
         mode: "onChange",
         reValidateMode: "onChange",

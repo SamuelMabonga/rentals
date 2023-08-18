@@ -1,6 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup"
 import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, TextField, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
+import RichTextEditor from "Components/Common/RichTextEditor"
 import FileInput from "Components/FileInput"
 import fetchARental from "apis/tenant/fetchARental"
 import fetchTickets from "apis/tenant/fetchTickets"
@@ -208,6 +209,10 @@ export default function TicketForm({ tenant }: any) {
                         />
                         <FormHelperText>{errors?.message?.message}</FormHelperText>
                     </FormControl>
+
+                    {/* <RichTextEditor
+
+                    /> */}
 
                 </form>
             </DialogContent>

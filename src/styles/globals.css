@@ -136,3 +136,7 @@ a {
 	height: 100%;
 }
 
+.e-rte-hidden {
+  display: none;
+}
+
