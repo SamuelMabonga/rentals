@@ -41,7 +41,6 @@ export default function Bills({
 
             <BillsTable tenant={tenant} />
             <PaymentsForm tenant={tenant} />
-            {/* <BookingForm property={propertyId} /> */}
         </>
     )
 }
@@ -50,12 +49,7 @@ Bills.auth = true
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async context => {
     const session: any = await getSession({ req: context.req });
-
-    const userId = session?.user?.id
-
     const tenant: any = context.query.tenant
-
-    // const propertyId: any = context.query.property
 
     if (!session) {
         return {
@@ -68,8 +62,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
 
     // REACT QUERY
     const queryClient = new QueryClient()
-
-    await queryClient.prefetchQuery(['tenant-bills'], () => fetchBills(tenant, 1))
+    await queryClient.prefetchQuery(['tenant-bills'], () => fetchBills(tenant, 1, "", ""))
 
     return {
         props: {

@@ -118,13 +118,20 @@ export const UnitTypesTable = <T extends object>({ property }: ReactTableProps<T
             pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
-                console.log(obj)
+                console.log(obj);
             } }
             loading={isLoading}
             setPage={setPage}
 
             buttonAction={setShowUnitTypeForm}
             buttonLabel="Add Unit Type"
+
+            statusOptions={[]}
+            setSearchQuery={(e: any) => console.log("Search Query")}
+
+            setStatus={(e: any) => console.log("Set Status")}
+            searchQuery={undefined}
+            status={''}            
         />
     );
 };

@@ -54,14 +54,12 @@ export const TableRenderer = <T extends object>({
                     placeholder="Search"
                     value={searchQuery}
                     sx={{
-                        width: ["100%", "20rem"]
+                        width: ["100%", "20rem"],
                     }}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     size="small"
                 />
 
-
-                {/* <FilterBadge /> */}
                 <FormControl sx={{ minWidth: "10rem" }}>
                     <Autocomplete
                         size="small"

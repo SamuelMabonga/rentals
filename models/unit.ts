@@ -20,6 +20,10 @@ const UnitSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: Property,
   },
+  availableAfter: {
+    type: Date,
+    default: null
+  },
   // tenant: {
   //   type: Schema.Types.ObjectId,
   //   ref: Tenant,

@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async context =
     // REACT QUERY
     const queryClient = new QueryClient()
 
-    await queryClient.prefetchQuery(['tenant-payments'], () => fetchPayments(tenant))
+    await queryClient.prefetchQuery(['tenant-payments', tenant], () => fetchPayments(tenant, 1, "", ""))
 
     return {
         props: {

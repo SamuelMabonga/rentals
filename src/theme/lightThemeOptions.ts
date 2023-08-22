@@ -24,22 +24,26 @@ const lightThemeOptions: ThemeOptions = {
     h1: {
       fontFamily: jakarta.style.fontFamily,
       color: "primary.main",
-      
     },
     h2: {
       fontFamily: jakarta.style.fontFamily,
+      color: "primary.main",
     },
     h3: {
       fontFamily: jakarta.style.fontFamily,
+      color: "primary.main",
     },
     h4: {
       fontFamily: jakarta.style.fontFamily,
+      color: "primary.main",
     },
     h5: {
       fontFamily: jakarta.style.fontFamily,
+      color: "primary.main",
     },
     h6: {
       fontFamily: jakarta.style.fontFamily,
+      color: "primary.main",
     },
     body1: {
       fontFamily: jakarta.style.fontFamily,
@@ -50,6 +54,11 @@ const lightThemeOptions: ThemeOptions = {
   },
   components: {
     MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: "0.5rem",
+        },
+      },
       variants: [
         {
           props: { variant: "contained" },
@@ -88,6 +97,17 @@ const lightThemeOptions: ThemeOptions = {
       ]
     },
     MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiInputBase-root": {
+            borderRadius: "0.5rem",
+            "& .MuiInputLabel-root": {
+              color: "gray",
+            }
+            
+          }
+        }
+      },
       variants: [
         {
           props: {variant: "outlined"},
@@ -117,7 +137,23 @@ const lightThemeOptions: ThemeOptions = {
           }
         }
       }
-    }
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          borderRadius: "1rem",
+        },
+      },
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        paper: {
+          borderRadius: "0.5rem",
+        },
+      },
+    },
+    
+    
   }
 };
 

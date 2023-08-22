@@ -107,6 +107,26 @@ export async function createBooking(req: any, res: any) {
     });
     console.log("required fields is", includesAllFields);
 
+    // FIND UNIT BEING BOOKED
+    console.log("UNIT ID IS", req.body.unit)
+    const unit: any = await Unit.findById(req.body.unit);
+
+    console.log("UNIT ===>", unit)
+
+    if (!unit) {
+      return res.status(404).json({
+        success: false,
+        msg: "Unit to book not found",
+      });
+    }
+
+    if (moment(unit.availableAfter).isAfter(req.body.startDate)) {
+      return res.status(400).json({
+        success: false,
+        msg: `Unit is not available before ${moment(unit.availableAfter).format("DD/MM/YYYY")}`,
+      });
+    }
+
     if (!includesAllFields) {
       return res.status(400).json({
         success: false,
@@ -126,11 +146,6 @@ export async function createBooking(req: any, res: any) {
       success: true,
       msg: "New booking created",
       _id: newBooking?._id,
-      // name: newBooking?.name,
-      // image: newBooking?.image,
-      // unit: newBooking?.unit,
-      // start_date: newBooking?.start_date,
-      // end_date: newBooking?.end_date,
     });
   } catch (error: any) {
     console.log(error);
@@ -451,6 +466,7 @@ export async function acceptBooking(req: any, res: any) {
           booking?.unit?._id,
           {
             status: "OCCUPIED",
+            availableAfter: newTenant?.endDate,
           },
           {
             new: true,

@@ -80,6 +80,9 @@ const CollectionsProvider = ({ children }: any) => {
 
     // REQUEST EXTENSION
     const [openRequestExtension, setOpenRequestExtension] = useState(false)
+    const [extensionsPage, setExtensionsPage] = useState(1)
+    const [extensionsSearchQuery, setExtensionsSearchQuery] = useState("")
+    const [extensionStatus, setExtensionStatus] = useState("")
 
     // PAYMENT CONFIG
     const [paymentConfig, setPaymentConfig] = useState({
@@ -99,6 +102,9 @@ const CollectionsProvider = ({ children }: any) => {
 
     // PAYMENT FORM
     const [openPaymentForm, setOpenPaymentForm] = useState(false)
+    const [paymentsStatus, setPaymentsStatus] = useState("")
+    const [paymentsPage, setPaymentsPage] = useState(1)
+    const [paymentsSearchQuery, setPaymentsSearchQuery] = useState("")
 
 
     // LOADING BACKDROP
@@ -119,6 +125,9 @@ const CollectionsProvider = ({ children }: any) => {
 
     // REQUEST TENANCY EXTENSION
     const [openRequestTenancyExtension, setOpenRequestTenancyExtension] = useState(false)
+    const [modificationStatus, setModificationStatus] = useState("")
+    const [modificationSearchQuery, setModificationSearchQuery] = useState("")
+    const [modificationsPage, setModificationsPage] = useState(1)
 
 
     // RENTALS
@@ -130,6 +139,9 @@ const CollectionsProvider = ({ children }: any) => {
 
     // TENANT BILLS
     const [tenantBillsPage, setTenantBillsPage] = useState(1)
+    const [billsPage, setBillPage] = useState(1)
+    const [billSearchQuery, setBillSearchQuery] = useState("")
+    const [billStatus, setBillStatus] = useState("")
 
     // ROLES
     const [rolesPage, setRolesPage] = useState(1)
@@ -242,6 +254,12 @@ const CollectionsProvider = ({ children }: any) => {
             // REQUEST EXTENSION
             openRequestExtension,
             setOpenRequestExtension,
+            extensionStatus,
+            setExtensionStatus,
+            extensionsSearchQuery,
+            setExtensionsSearchQuery,
+            extensionsPage,
+            setExtensionsPage,
 
             // PAYMENT CONFIG
             paymentConfig,
@@ -250,6 +268,12 @@ const CollectionsProvider = ({ children }: any) => {
             // PAYMENT FORM
             openPaymentForm,
             setOpenPaymentForm,
+            paymentsStatus,
+            setPaymentsStatus,
+            paymentsPage,
+            setPaymentsPage,
+            paymentsSearchQuery,
+            setPaymentsSearchQuery,
 
             // LOADING BACKDROP
             openLoadingBackdrop,
@@ -280,6 +304,12 @@ const CollectionsProvider = ({ children }: any) => {
             // REQUEST TENANCY EXTENSION
             openRequestTenancyExtension,
             setOpenRequestTenancyExtension,
+            modificationStatus,
+            setModificationStatus,
+            modificationSearchQuery,
+            setModificationSearchQuery,
+            modificationsPage,
+            setModificationsPage,
 
             // RENTALS
             rentalsPage,
@@ -292,6 +322,12 @@ const CollectionsProvider = ({ children }: any) => {
             // TENANT BILLS
             tenantBillsPage,
             setTenantBillsPage,
+            billsPage,
+            setBillPage,
+            billSearchQuery,
+            setBillSearchQuery,
+            billStatus,
+            setBillStatus,
 
 
             // ROLES

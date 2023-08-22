@@ -9,7 +9,7 @@ import {
 import authenticateUser from "helpers/authenticate_user";
 import { connectToMongoDB } from "lib/mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import { fetchExtensionsByProperty } from "controllers/extensions";
+import { fetchExtensionsByProperty, searchExtensions } from "controllers/extensions";
 
 export default async function handler(
   req: NextApiRequest,
@@ -67,6 +67,9 @@ export default async function handler(
           //   if (id) {
           //     return fetchSingleUnit(req, res)
           //   }
+          if (req?.query?.searchQuery) {
+            return searchExtensions(req, res)
+          }
           fetchExtensionsByProperty(req, res);
           break;
         //  case "GET":

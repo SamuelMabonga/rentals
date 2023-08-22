@@ -19,14 +19,14 @@ export async function fetchAllUnits(req: any, res: any) {
 
     unitType !== undefined
       ? (units = await Unit.find({ unitType: unitType })
-          .populate({ path: "unitType" })
-          .skip((page - 1) * limit)
-          .limit(limit))
+        .populate({ path: "unitType" })
+        .skip((page - 1) * limit)
+        .limit(limit))
       : // .populate({
-        //   path: "tenant",
-        //   populate: [{ path: "user" }],
-        // })
-        (units = await Unit.find().populate({ path: "unitType" }));
+      //   path: "tenant",
+      //   populate: [{ path: "user" }],
+      // })
+      (units = await Unit.find().populate({ path: "unitType" }));
     // .populate({
     //   path: "tenant",
     //   populate: [{ path: "user" }],
@@ -67,7 +67,7 @@ export async function fetchAllPropertyUnits(req: any, res: any) {
       Unit.find(queryCondition)
         .populate({
           path: "unitType",
-       })
+        })
         .skip((page - 1) * limit)
         .limit(limit),
       Unit.countDocuments(queryCondition),
@@ -287,5 +287,50 @@ export async function searchPropertyUnits(req: any, res: any, searchQuery: any) 
       msg: `Failed to search ${searchQuery}`,
       data: error,
     });
+  }
+}
+
+
+//fetch tenants by unit
+export async function fetchTenantsByUnit(req: any, res: any) {
+  const {
+    id, status, unit
+  } = req.query
+
+  let queryCondition: any = { property: id, unit: unit };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+
+  try {
+    const [tenants, tenantsCount] = await Promise.all([
+      Tenant.find(queryCondition)
+        .populate({
+          path: "user",
+        })
+        .populate({
+          path: "additionalFeatures",
+        })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Tenant.countDocuments(queryCondition),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      msg: "Tenants units fetched successfully",
+      data: tenants,
+      pageInfo: getPageInfo(limit, tenantsCount, page),
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch tenants",
+      data: error,
+    });
+    console.log(error);
   }
 }

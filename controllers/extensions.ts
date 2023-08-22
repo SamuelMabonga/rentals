@@ -2,6 +2,7 @@ import { getPageInfo } from "helpers/page_info";
 import Bills from "models/bills";
 import Extensions from "models/extensions";
 import Property from "models/property";
+import Fuse from "fuse.js";
 
 // get all properties
 //none admin fetch properties
@@ -63,21 +64,32 @@ export async function fetchAllProperties(req: any, res: any) {
 
 // fetch extensions by property id
 export async function fetchExtensionsByProperty(req: any, res: any) {
+  const {
+    query: { id, searchQuery, status },
+  }: any = req;
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    const [properties, propertiesCount] = await Promise.all([
-      Extensions.find({ property: req.query.id}).populate({path: "tenant", populate: [{path: "user"}]}).populate("bill")
+    const [extensions, extensionsCount] = await Promise.all([
+      Extensions.find(queryCondition)
+        .populate({ path: "tenant", populate: [{ path: "user" }, {path: "unit"}] })
+        .populate("bill")
         .skip((page - 1) * limit)
         .limit(limit),
-      Extensions.countDocuments(),
+      Extensions.countDocuments(queryCondition),
     ]);
 
     return res.status(200).json({
       success: true,
       msg: "Extensions fetched successfully",
-      data: properties,
-      pageInfo: getPageInfo(limit, propertiesCount, page),
+      data: extensions,
+      pageInfo: getPageInfo(limit, extensionsCount, page),
     });
   } catch (error) {
     return res.status(400).json({
@@ -203,7 +215,7 @@ export async function updateProperty(req: any, res: any) {
 
 // Accept an extension
 export async function acceptExtension(req: any, res: any) {
-  const {extensionId} = req.body;
+  const { extensionId } = req.body;
   try {
     let extension = await Extensions.findById(extensionId);
 
@@ -219,7 +231,7 @@ export async function acceptExtension(req: any, res: any) {
     // FIND AND UPDATE BILL
     try {
       const bill = await Bills.findById(extension.bill.toString());
-      
+
       const billData = {
         ...bill,
         pay_by: extension.pay_by,
@@ -280,24 +292,36 @@ export async function deleteProperty(req: any, res: any) {
 
 // @desc    search
 // @route   GET /api/user?searchQuery=searchQuery
-export async function searchProperty(req: any, res: any, searchQuery: string) {
-  try {
-    let findParams = searchQuery
-      ? {
-          $text: {
-            $search: searchQuery,
-            $caseSensitive: false,
-            $diacriticSensitive: false,
-          },
-        }
-      : {};
+export async function searchExtensions(req: any, res: any) {
+  const {
+    id, status, searchQuery
+  } = req.query
 
-    const properties = await Property.find({ ...findParams });
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
+  try {
+    let extensions = await Extensions.find(queryCondition)
+      .populate({ path: "tenant", populate: [{ path: "user" }] })
+      .populate({path: "bill", populate: [{path: "propertyFeature"}]});
+
+    const options = {
+      keys: ["tenant.user.name", "tenant.user.email", "bill.propertyFeature.name"],
+      threshold: 0.3,
+    }
+
+    if (searchQuery?.replace(/%/g, "")) {
+      const formatText = searchQuery?.replace(/%/g, "");
+      const fuse = new Fuse(extensions, options);
+      extensions = fuse.search(formatText)?.map(({ item }) => item);
+    }
 
     res.status(200).json({
       success: true,
       msg: `${searchQuery} searched successfully`,
-      data: properties,
+      data: extensions,
     });
   } catch (error) {
     res.status(400).json({
@@ -346,12 +370,12 @@ export async function extensionStatistics(req: any, res: any) {
         totalExtensionsRejected,
       }
     })
-    
+
   } catch (error) {
     res.status(400).json({
       success: false,
       msg: "Failed to fetch extension statistics",
       data: error,
-    }); 
+    });
   }
 }

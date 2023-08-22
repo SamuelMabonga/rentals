@@ -97,4 +97,16 @@ const permissions = [
     { name: 'Delete tenancy modification' },
     { name: 'Accept tenancy modification' },
     { name: 'Reject tenancy modification' },
+
+    // PROPERTY PAYMENTS
+    { name: 'Create property payment' },
+    { name: 'Edit property payment' },
+    { name: 'View property payments' },
+    { name: 'Delete property payment' },
+
+    // PROPERTY BILLS
+    { name: 'Create property bill' },
+    { name: 'Edit property bill' },
+    { name: 'View property bills' },
+    { name: 'Delete property bill' },
 ];

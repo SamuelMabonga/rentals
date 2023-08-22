@@ -47,10 +47,10 @@ export const TicketsTable = <T extends object>({ property }: ReactTableProps<T>)
         () => [
             {
                 header: 'Image',
-                cell: (row) => {
+                cell: (row: any) => {
                     return (
                         <Avatar
-                            // src={row.row.original.image}
+                            src={row?.row?.original?.tenant?.user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(row.row.original.tenant.user.name)}&background=random&color=fff`}
                             alt="Avatar"
                             sx={{
                                 width: "3rem",

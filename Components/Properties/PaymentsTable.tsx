@@ -1,16 +1,17 @@
 import { Avatar, Box, Button, Chip } from '@mui/material';
-import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useContext, useMemo } from 'react';
-import Image from "next/image"
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/Common/TableRenderer';
 import { CollectionsContext } from 'context/context';
-import moment from 'moment';
+import { useQuery } from '@tanstack/react-query';
+import fetchPayments from 'apis/property/fetchPayments';
+import currencyFormatter from 'Components/Common/currencyFormatter';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: string;
 }
 
 type Item = {
@@ -22,74 +23,31 @@ type Item = {
     actions: any;
 }
 
-export const PaymentsTable = <T extends object>({ }: ReactTableProps<T>) => {
+export const PaymentsTable = <T extends object>({ property }: ReactTableProps<T>) => {
+
     // CONTEXT
     const {
-        setShowPropertyForm,
-        setPropertyToEdit
+        paymentsStatus,
+        setPaymentsStatus,
+        paymentsPage,
+        setPaymentsPage,
+        paymentsSearchQuery,
+        setPaymentsSearchQuery,
     }: any = useContext(CollectionsContext)
 
-    const data = [
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-    ]
-        
+
+    const { data, isLoading } = useQuery(["property-payments", property, paymentsPage, paymentsStatus, paymentsSearchQuery], () => fetchPayments(property, paymentsPage, paymentsSearchQuery, paymentsStatus))
+
 
     const router = useRouter()
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
             {
                 header: 'Image',
-                cell: (row) => {
+                cell: (row: any) => {
                     return (
                         <Avatar
-                            // src={row.row.original.image}
+                            src={row?.row?.original?.tenant?.user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(row?.row?.original?.tenant?.user?.name)}&background=random&color=fff`}
                             alt="Avatar"
                             sx={{
                                 width: "3rem",
@@ -100,44 +58,44 @@ export const PaymentsTable = <T extends object>({ }: ReactTableProps<T>) => {
                 },
             },
             {
-                header: 'Item',
+                header: 'Name',
                 cell: (row) => row.renderValue(),
-                accessorKey: 'item',
+                accessorKey: 'tenant.user.name',
+            },
+            {
+                header: 'Unit',
+                cell: (row) => row.renderValue(),
+                accessorKey: 'tenant.unit.name',
+            },
+            {
+                header: 'Amount',
+                cell: (row: any) => currencyFormatter(row.renderValue(), "UGX"),
+                accessorKey: 'amount',
             },
             {
                 header: 'Status',
                 cell: (row: any) => <Chip label={row.renderValue()} color="primary" size="small" />,
                 accessorKey: 'status',
-            },
-            {
-                header: 'Start Date',
-                cell: (row: any) => row.renderValue(),
-                accessorKey: 'start_date',
-            },
-            {
-                header: 'End Date',
-                cell: (row: any) => row.renderValue(),
-                accessorKey: 'end_date',
-            },
-            {
-                header: 'Actions',
-                cell: (row) => (
-                    <Box display="flex" gap="1rem" >
-                        <Button variant="contained" size="small" sx={{fontSize: "0.875rem"}}>Pay</Button>
-                        <Button variant="outlined" size="small" sx={{fontSize: "0.875rem"}}>Request Extension</Button>
-                    </Box>
-                ),
-            },
+            }
         ],
         []
     );
 
     return (
         <TableRenderer
-            data={data}
-            pageInfo={{}}
+            data={data?.data || []}
+            pageInfo={data?.pageInfo || {}}
             columns={columns}
-            onRowClick={(rowId) => router.push(`/rentals/${rowId}`)}
+            onRowClick={(rowId) => console.log("Payment clicked")}
+
+            statusOptions={[]}
+            setStatus={(e: any) => console.log(e.target.value)}
+            searchQuery={""}
+
+            setPage={(e: any) => console.log(e.target.value)}
+
+            setSearchQuery={(e: any) => console.log(e.target.value)}
+            status={''}
         />
     );
 };

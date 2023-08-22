@@ -1,6 +1,6 @@
-export default async function fetchPayments(id: string) {
+export default async function fetchPayments(id: string, page: number, searchQuery: string, status: string) {
     console.log("fetchPayments", id)
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/payments/tenant?id=${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/payments/tenant?id=${id}&page=${page}&searchQuery=${searchQuery}&status=${status}`, {
         // headers: {
         //     Authorization: `Bearer ${token}`,
         // },

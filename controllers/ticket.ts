@@ -32,17 +32,25 @@ export async function fetchAllTickets(req: any, res: any) {
 
 // get all Tickets
 export async function fetchTicketsByTenant(req: any, res: any, userId: string) {
-  const { id } = req.query
+  const {
+    query: { id, searchQuery, status },
+  }: any = req;
+
+  let queryCondition: any = { tenant: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
     const [tickets, ticketsCount] = await Promise.all([
-      Ticket.find({ tenant: id })
+      Ticket.find(queryCondition)
         .populate({ path: "unit" })
         .populate({ path: "tenant" })
         .skip((page - 1) * limit)
         .limit(limit),
-      Ticket.countDocuments({ tenant: id }),
+      Ticket.countDocuments(queryCondition),
     ]);
 
     // if (tickets[0].tenant.user != userId) {
@@ -54,14 +62,14 @@ export async function fetchTicketsByTenant(req: any, res: any, userId: string) {
 
     res.status(200).json({
       success: true,
-      msg: "tickets fetched successfully",
+      msg: "Tickets fetched successfully",
       data: tickets,
       pageInfo: getPageInfo(limit, ticketsCount, page),
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      msg: "failed to fetch  tickets",
+      msg: "Failed to fetch  tickets",
       data: error,
     });
     console.log(error);
@@ -234,6 +242,48 @@ export async function deleteTicket(req: any, res: any) {
   }
 }
 
+// Search tenant tickets
+export async function searchTenantTickets(req: any, res: any) {
+  const {
+    id, status, searchQuery
+  } = req.query
+
+  let queryCondition: any = { tenant: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
+  try {
+    let tickets = await Ticket.find(queryCondition)
+      .populate({path: "tenant", populate: {path: "user"}})
+      .populate({path: "unit", populate: {path: "property"}})
+    const options = {
+      keys: ["type"],
+      threshold: 0.3,
+    };
+
+    if (searchQuery?.replace(/%/g, "")) {
+      const formatText = searchQuery?.replace(/%/g, "");
+      const fuse = new Fuse(tickets, options);
+      tickets = fuse.search(formatText)?.map(({ item }: any) => item);
+    }
+
+    res.status(200).json({
+      success: true,
+      msg: `${searchQuery} searched successfully`,
+      data: tickets,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: `Failed to search ${searchQuery}`,
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+
 // Search property tickets
 export async function searchPropertyTickets(req: any, res: any) {
   const {
@@ -247,9 +297,8 @@ export async function searchPropertyTickets(req: any, res: any) {
 
   try {
     let tickets = await Ticket.find(queryCondition)
-      .populate("tenant")
+      .populate({path: "tenant", populate: {path: "user"}})
       .populate({path: "unit", populate: {path: "property"}})
-
     const options = {
       keys: ["user.name", "user.email", "unit.name"],
       threshold: 0.3,

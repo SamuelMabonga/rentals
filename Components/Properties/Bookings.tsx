@@ -14,6 +14,7 @@ import AlertDialog from 'Components/Common/AlertDialog';
 import { CollectionsContext } from 'context/context';
 import { set } from 'mongoose';
 import BookingAlertDialog from './Forms/Components/BookingAlertDialog';
+import ViewBooking from './Common/ViewBooking';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -32,10 +33,10 @@ type Item = {
 }
 
 const statusOptions = [
-    {label: "Pending", value: "PENDING"},
-    {label: "Accepted", value: "ACCEPTED"},
-    {label: "Rejected", value:"REJECTED"}
-] 
+    { label: "Pending", value: "PENDING" },
+    { label: "Accepted", value: "ACCEPTED" },
+    { label: "Rejected", value: "REJECTED" }
+]
 
 
 export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>) => {
@@ -57,10 +58,10 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
         () => [
             {
                 header: 'Image',
-                cell: (row) => {
+                cell: (row: any) => {
                     return (
                         <Avatar
-                            src={row.row.original.image}
+                            src={row?.row?.original?.user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(row.row.original.user.name)}&background=random&color=fff`}
                             alt="Avatar"
                             sx={{
                                 width: "3rem",
@@ -99,32 +100,6 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
                 cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
                 accessorKey: 'createdAt',
             },
-            {
-                header: 'Actions',
-                cell: (row: any) => (
-                    <Box display="flex" gap="1rem">
-                        <BookingAlertDialog
-                            data={row.row.original}
-                            disabled={row.row.original.status !== "PENDING"}
-                            buttonLabel="Accept"
-                            buttonVariant="contained"
-                            title="Are you sure you want to accept this booking?"
-                            content="If you accept, the user that created this booking will become a tenant at your property"
-                            action="accept"
-                        />
-                        <BookingAlertDialog
-                            data={row.row.original}
-                            disabled={row.row.original.status !== "PENDING"}
-                            buttonLabel="Reject"
-                            buttonVariant="outlined"
-                            buttonColor="error"
-                            title="Are you sure you want to reject this booking?"
-                            content="If you decline, the user that created this booking will not become a tenant at your property"
-                            action="reject"
-                        />
-                    </Box>
-                ),
-            },
         ],
         []
     );
@@ -132,27 +107,35 @@ export const BookingsTable = <T extends object>({ property }: ReactTableProps<T>
 
     const { data, isLoading }: any = useQuery({ queryKey: ['property-bookings', property, page, searchQuery, bookingStatus], queryFn: () => fetchPropertyBookings(property, page, searchQuery, bookingStatus) })
 
+    const [viewBooking, setViewBooking] = useState<Boolean>(false)
+    const [booking, setBooking] = useState<any>(null)
+
     return (
-        <TableRenderer
-            data={data?.data || []}
-            pageInfo={data?.pageInfo}
-            columns={columns}
-            onRowClick={function (obj: any): void {
-                console.log("Clicked row")
-            }}
-            loading={isLoading}
-            setPage={setPage}
+        <>
+            <TableRenderer
+                data={data?.data || []}
+                pageInfo={data?.pageInfo}
+                columns={columns}
+                onRowClick={function (obj: any): void {
 
-            status={bookingStatus}
-            setStatus={setBookingStatus}
+                    setBooking(obj)
+                    setViewBooking(true)
+                }}
+                loading={isLoading}
+                setPage={setPage}
 
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
+                status={bookingStatus}
+                setStatus={setBookingStatus}
 
-            statusOptions={statusOptions}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
 
-            buttonLabel='Create Booking'
-            buttonAction={setOpenBookingForm}
-        />
+                statusOptions={statusOptions}
+
+                buttonLabel='Create Booking'
+                buttonAction={setOpenBookingForm}
+            />
+            <ViewBooking booking={booking} open={viewBooking} setIsOpen={setViewBooking} />
+        </>
     );
 };

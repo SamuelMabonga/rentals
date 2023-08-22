@@ -1,14 +1,9 @@
 import {
-    createBill,
     deletebill,
-    fetchAllBills,
-    fetchAllTenantBills,
-    fetchSinglebill,
-    searchBill,
+    fetchAllPropertyBills,
+    searchPropertyBills,
     updatebill,
   } from "controllers/bills";
-  import authenticateUser from "helpers/authenticate_user";
-  import { connectToMongoDB } from "lib/mongodb";
   import mongoose from "mongoose";
   import { NextApiRequest, NextApiResponse } from "next";
   
@@ -20,13 +15,11 @@ import {
       query: { id, searchQuery },
     }: any = req;
   
-    // const decodedToken = authenticateUser(req, res);
-  
     try {
       await mongoose
         .connect(
           process.env.NEXT_PUBLIC_MONGODB_SRV ||
-            "mongodb://localhost:27017/test_db"
+          "mongodb://localhost:27017/test_db"
         )
         .then(() => {
           // USER
@@ -35,13 +28,13 @@ import {
           const { method } = req;
           switch (method) {
             case "GET":
-            //   if (id) {
-            //     fetchSinglebill(req, res);
-            //   } else if (searchQuery) {
-            //     searchBill(req, res, searchQuery);
-            //   } else {
-                fetchAllTenantBills(req, res, "");
-            //   }
+              //   if (id) {
+              //     fetchSinglebill(req, res);
+              //   } else 
+              if (searchQuery) {
+                return searchPropertyBills(req, res);
+              }
+              fetchAllPropertyBills(req, res);
               break;
             // case "POST":
             //   createBill(req, res);

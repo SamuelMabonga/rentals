@@ -300,7 +300,10 @@ export default function StaffForm({
                                                 console.log("USER", user)
                                             }}
                                         >
-                                            <Avatar sx={{ width: "3.5rem", height: "3.5rem" }} />
+                                            <Avatar
+                                                src={user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name)}&background=random&color=fff`}
+                                                sx={{ width: "3.5rem", height: "3.5rem" }}
+                                            />
                                             <Box>
                                                 <Typography fontWeight="600">{user.name}</Typography>
                                                 <Typography variant="body2" color="gray">{user?.email}</Typography>

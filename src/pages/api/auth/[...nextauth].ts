@@ -206,7 +206,8 @@ export const authOptions: AuthOptions = {
         // Link the Google account to the existing user account
         userExists.googleId = profile.id;
         userExists.name = profile.name;
-        userExists.image = profile.image;
+        userExists.image = profile.picture;
+
         await userExists.save();
       } else {
         // Create a new user if one does not exist

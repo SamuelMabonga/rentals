@@ -15,6 +15,7 @@ export default function AlertDialog({
     disabled,
     open: openProp,
     setOpen: setOpenProp,
+    buttonSize = "small"
     // onOpen
 }: any) {
     const [open, setOpen] = useState(false);
@@ -53,7 +54,7 @@ export default function AlertDialog({
 
     return (
         <div style={{display: hide ? "none" : "block"}}>
-            <Button disabled={disabled} variant={buttonVariant} color={buttonColor} size="small" sx={{ fontSize: "0.875rem",  }} onClick={handleClickOpen}>
+            <Button disabled={disabled} variant={buttonVariant} color={buttonColor} size={buttonSize} onClick={handleClickOpen}>
                 {buttonLabel}
             </Button>
             <Dialog

@@ -4,6 +4,7 @@ import {
     fetchAllTickets,
     fetchSingleTicket,
     fetchTicketsByTenant,
+    searchTenantTickets,
     updateTicket,
   } from "controllers/ticket";
   import authenticateUser from "helpers/authenticate_user";
@@ -23,6 +24,9 @@ import {
     const { method } = req;
     switch (method) {
       case "GET":
+        if (req.query.searchQuery) {
+          return searchTenantTickets(req, res);
+        }
         fetchTicketsByTenant(req, res, "");
         break;
         // case "GET":

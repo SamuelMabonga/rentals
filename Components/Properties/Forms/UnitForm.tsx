@@ -25,8 +25,6 @@ export default function UnitForm({property}: any) {
         setSnackbarMessage
     }: any = useContext(CollectionsContext)
 
-    const router = useRouter()
-
     // SESSION
     const session: any = useSession()
     const token = session?.data?.accessToken
@@ -56,7 +54,6 @@ export default function UnitForm({property}: any) {
         }
 
         reset()
-        // setValue()
 
     }, [toEdit])
 

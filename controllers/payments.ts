@@ -78,27 +78,76 @@ export async function fetchSinglePayment(req: any, res: any) {
 
 // FETCH PAYMENTS BY TENANT
 export async function fetchPaymentsByTenant(req: any, res: any, userId: string) {
+  const {
+    query: { id, searchQuery, status },
+  }: any = req;
+
+  let queryCondition: any = { tenant: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+
   try {
-    let payments = await Payments.find({ tenant: req.query.id })
-      .populate("bills")
-      .populate("tenant");
+    let [payments, paymentsCount] = await Promise.all([
+      Payments.find(queryCondition)
+        .populate("bills")
+        .populate("tenant")
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Payments.countDocuments(queryCondition),
+    ])
+
     res.status(200).json({
       success: true,
       msg: "Tenant's payments fetched successfully",
       data: payments,
+      pageInfo: getPageInfo(limit, paymentsCount, page),
     });
-
-    // if (payments[0].tenant.user != userId) {
-    //   return res.status(403).json({
-    //     success: false,
-    //     msg: "You are not authorized to view this tenant's payments",
-    //   });
-    // }
-
   } catch (error) {
     res.status(400).json({
       success: false,
       msg: "Failed to fetch tenant's payments",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+// FETCH PAYMENTS BY TENANT
+export async function fetchPaymentsByProperty(req: any, res: any) {
+  const {
+    query: { id, searchQuery, status },
+  }: any = req;
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+
+  try {
+    let [payments, paymentsCount] = await Promise.all([
+      Payments.find(queryCondition)
+        .populate("bills")
+        .populate({path: "tenant", populate: [{path: "user"}, {path: "unit"}] })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Payments.countDocuments(queryCondition),
+    ])
+
+    res.status(200).json({
+      success: true,
+      msg: "Property's payments fetched successfully",
+      data: payments,
+      pageInfo: getPageInfo(limit, paymentsCount, page),
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch property's payments",
       data: error,
     });
     console.log(error);

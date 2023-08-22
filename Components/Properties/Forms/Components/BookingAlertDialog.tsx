@@ -51,7 +51,7 @@ export default function BookingAlertDialog({
 
     return (
         <div style={{ display: hide ? "none" : "block" }}>
-            <Button disabled={disabled} variant={buttonVariant} color={buttonColor} size="small" sx={{ fontSize: "0.875rem", }} onClick={handleClickOpen}>
+            <Button disabled={disabled} variant={buttonVariant} color={buttonColor} sx={{ fontSize: "0.875rem", }} onClick={handleClickOpen}>
                 {buttonLabel}
             </Button>
             <Dialog

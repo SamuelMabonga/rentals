@@ -53,7 +53,7 @@ export const StaffTable = <T extends object>({ property }: ReactTableProps<T>) =
                 cell: (row: any) => {
                     return (
                         <Avatar
-                            src={row.row.original.user.image}
+                            src={row.row.original.user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(row.row.original.user.name)}&background=random&color=fff`}
                             alt={row.row.original.user.name}
                             sx={{
                                 width: "3rem",

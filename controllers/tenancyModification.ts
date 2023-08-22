@@ -4,6 +4,8 @@ import Extensions from "models/extensions";
 import Property from "models/property";
 import TenancyModification from "models/tenancyModification";
 import Tenant from "models/tenant";
+import Unit from "models/unit";
+import Fuse from "fuse.js";
 
 // get all properties
 //none admin fetch properties
@@ -65,21 +67,31 @@ export async function fetchAllProperties(req: any, res: any) {
 
 // fetch extensions by property id
 export async function fetchTenancyModificationsByProperty(req: any, res: any) {
+  const {
+    query: { id, status },
+  }: any = req;
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
-    const [properties, propertiesCount] = await Promise.all([
-      TenancyModification.find({ property: req.query.id}).populate({path: "tenant", populate: [{path: "unit"}, {path: "user"}]})
+    const [modifications, modificationsCount] = await Promise.all([
+      TenancyModification.find(queryCondition)
+        .populate({path: "tenant", populate: [{path: "unit"}, {path: "user"}]})
         .skip((page - 1) * limit)
         .limit(limit),
-      TenancyModification.countDocuments(),
+      TenancyModification.countDocuments(queryCondition),
     ]);
 
     return res.status(200).json({
       success: true,
       msg: "Tenancy modifications fetched successfully",
-      data: properties,
-      pageInfo: getPageInfo(limit, propertiesCount, page),
+      data: modifications,
+      pageInfo: getPageInfo(limit, modificationsCount, page),
     });
   } catch (error) {
     return res.status(400).json({
@@ -163,7 +175,8 @@ export async function updateProperty(req: any, res: any) {
 export async function acceptTenancyModification(req: any, res: any) {
   const {tenancyModificationId} = req.body;
   try {
-    let tenancyModification = await TenancyModification.findById(tenancyModificationId);
+    let tenancyModification = await TenancyModification.findById(tenancyModificationId).populate("tenant");
+    const unitId = tenancyModification.tenant.unit;
 
     const data = {
       ...tenancyModification._doc,
@@ -174,18 +187,18 @@ export async function acceptTenancyModification(req: any, res: any) {
 
     tenancyModification = await TenancyModification.findByIdAndUpdate(tenancyModificationId, data, {
       new: true,
-    });
+    }).populate("tenant");
 
     // FIND AND UPDATE TENANT
     try {
-      const tenant = await Tenant.findById(tenancyModification.tenant.toString());
+      const tenant = await Tenant.findById(tenancyModification.tenant._id.toString());
       
       const tenantData = {
         ...tenant._doc,
         endDate: tenancyModification.newDate,
       }
 
-      await Tenant.findByIdAndUpdate(tenancyModification.tenant.toString(), tenantData, {
+      await Tenant.findByIdAndUpdate(tenancyModification.tenant._id.toString(), tenantData, {
         new: true,
       });
 
@@ -194,6 +207,28 @@ export async function acceptTenancyModification(req: any, res: any) {
       res.status(400).json({
         success: false,
         msg: "Failed to update tenant",
+        data: error,
+      });
+    }
+
+    // FIND AND UPDATE UNIT
+    try {
+      const unit = await Unit.findById(unitId)
+
+      const unitData = {
+        ...unit._doc,
+        availableAfter: tenancyModification.newDate,
+      }
+
+      await Unit.findByIdAndUpdate(unitId, unitData, {
+        new: true,
+      })
+
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({
+        success: false,
+        msg: "Failed to update unit",
         data: error,
       });
     }
@@ -240,24 +275,35 @@ export async function deleteProperty(req: any, res: any) {
 
 // @desc    search
 // @route   GET /api/user?searchQuery=searchQuery
-export async function searchProperty(req: any, res: any, searchQuery: string) {
-  try {
-    let findParams = searchQuery
-      ? {
-          $text: {
-            $search: searchQuery,
-            $caseSensitive: false,
-            $diacriticSensitive: false,
-          },
-        }
-      : {};
+export async function searchModifications(req: any, res: any) {
+  const {
+    id, status, searchQuery
+  } = req.query
 
-    const properties = await Property.find({ ...findParams });
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
+  try {
+    let extensions = await TenancyModification.find(queryCondition)
+      .populate({ path: "tenant", populate: [{ path: "user" }] })
+
+    const options = {
+      keys: ["tenant.user.name", "tenant.user.email"],
+      threshold: 0.3,
+    }
+
+    if (searchQuery?.replace(/%/g, "")) {
+      const formatText = searchQuery?.replace(/%/g, "");
+      const fuse = new Fuse(extensions, options);
+      extensions = fuse.search(formatText)?.map(({ item }) => item);
+    }
 
     res.status(200).json({
       success: true,
       msg: `${searchQuery} searched successfully`,
-      data: properties,
+      data: extensions,
     });
   } catch (error) {
     res.status(400).json({

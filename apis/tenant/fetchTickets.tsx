@@ -1,6 +1,6 @@
-export default async function fetchTickets(id: string) {
+export default async function fetchTickets(id: string, page: number, searchQuery: string, status: string) {
     
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/ticket/tenant?id=${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/ticket/tenant?id=${id}&page=${page}&searchQuery=${searchQuery}&status=${status}`, {
         // headers: {
         //     Authorization: `Bearer ${token}`,
         // },

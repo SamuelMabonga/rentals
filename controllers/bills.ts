@@ -1,4 +1,4 @@
-import bill from "models/bills";
+// import bill from "models/bills";
 import Tenant from "models/tenant";
 import Unit from "models/unit";
 import Fuse from "fuse.js";
@@ -43,16 +43,19 @@ export async function fetchAllBills(req: any, res: any) {
 // get tenant's bills
 export async function fetchAllTenantBills(req: any, res: any, userId: string) {
   const {
-    query: { id },
+    query: { id, searchQuery, status },
   }: any = req;
 
-  console.log("TENANT ID", id);
+  let queryCondition: any = { tenant: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
 
   const page = req.query?.page ? parseInt(req.query.page) : 1;
   const limit = req.query?.limit ? req.query?.limit : 10;
   try {
     const [bills, billsCount] = await Promise.all([
-      Bills.find({ tenant : id })
+      Bills.find(queryCondition)
         .populate({
           path: "tenant",
         })
@@ -62,16 +65,8 @@ export async function fetchAllTenantBills(req: any, res: any, userId: string) {
         })
         .skip((page - 1) * limit)
         .limit(limit),
-      Bills.countDocuments({ "tenant.user._id" : id }),
+      Bills.countDocuments(queryCondition),
     ]);
-
-    // if (bills[0].tenant.user != userId) {
-    //   return res.status(403).json({
-    //     success: false,
-    //     msg: "You are not authorized to view this tenant's bills",
-    //     data: null,
-    //   });
-    // }
 
     res.json({
       success: true,
@@ -89,6 +84,51 @@ export async function fetchAllTenantBills(req: any, res: any, userId: string) {
   }
 }
 
+// get property's bills
+export async function fetchAllPropertyBills(req: any, res: any) {
+  const {
+    query: { id, searchQuery, status },
+  }: any = req;
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
+  const page = req.query?.page ? parseInt(req.query.page) : 1;
+  const limit = req.query?.limit ? req.query?.limit : 10;
+  try {
+    const [bills, billsCount] = await Promise.all([
+      Bills.find(queryCondition)
+        .populate({
+          path: "tenant",
+          populate: [{ path: "user" }, { path: "unit" }],
+        })
+        .populate({
+          path: "propertyFeature",
+          populate: [{ path: "feature" }],
+        })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Bills.countDocuments(queryCondition),
+    ]);
+
+    res.json({
+      success: true,
+      msg: "Property's bills fetched successfully",
+      data: bills,
+      pageInfo: getPageInfo(limit, billsCount, page),
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch property's bills",
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
 // get bills statistics
 export async function fetchBillsStatistics(req: any, res: any, userId: string) {
   const {
@@ -97,8 +137,8 @@ export async function fetchBillsStatistics(req: any, res: any, userId: string) {
 
   try {
     const [paidBills, allBills] = await Promise.all([
-      Bills.find({ "property" : id, status: "PAID" }),
-      Bills.find({ "property" : id }),
+      Bills.find({ "property": id, status: "PAID" }),
+      Bills.find({ "property": id }),
     ]);
 
     const totalPaid = paidBills.reduce((acc: any, curr: any) => {
@@ -440,14 +480,26 @@ export async function deletebill(req: any, res: any) {
 
 // @desc    search
 // @route   GET /api/bill?searchQuery=searchQuery
-export async function searchBill(req: any, res: any, searchQuery: string) {
+export async function searchBill(req: any, res: any) {
+  const {
+    query: { id, searchQuery, status },
+  }: any = req;
+
+  let queryCondition: any = { tenant: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
   try {
-    let bills = await bill.find().populate({
-      path: "tenat",
-    });
+    let bills = await Bills.find(queryCondition)
+      .populate({path: "propertyFeature", populate: {path: "feature"}})
+      .populate({
+        path: "tenant",
+      });
+
 
     const options = {
-      keys: ["startDate", "endDate"],
+      keys: ["startDate", "endDate", "propertyFeature.feature.name", "type"],
       threshold: 0.3,
     };
 
@@ -465,9 +517,117 @@ export async function searchBill(req: any, res: any, searchQuery: string) {
   } catch (error) {
     res.status(400).json({
       success: false,
-      msg: `failed to search ${searchQuery}`,
+      msg: `Failed to search ${searchQuery}`,
       data: error,
     });
     console.log(error);
   }
 }
+
+// @desc    search
+// @route   GET /api/bill?searchQuery=searchQuery
+export async function searchPropertyBills(req: any, res: any) {
+  const {
+    query: { id, searchQuery, status },
+  }: any = req;
+
+  let queryCondition: any = { property: id };
+  if (status && status !== "" && status !== undefined && status !== null) {
+    queryCondition.status = status;
+  }
+
+  try {
+    let bills = await Bills.find(queryCondition)
+      .populate({path: "propertyFeature", populate: {path: "feature"}})
+      .populate({
+        path: "tenant",
+        populate: [{ path: "user" }, { path: "unit" }],
+      });
+
+
+    const options = {
+      keys: ["startDate", "endDate", "propertyFeature.feature.name", "type", "tenant.user.name", "tenant.unit.name"],
+      threshold: 0.3,
+    };
+
+    if (searchQuery?.replace(/%/g, "")) {
+      const formatText = searchQuery?.replace(/%/g, "");
+      const fuse = new Fuse(bills, options);
+      bills = fuse.search(formatText)?.map(({ item }) => item);
+    }
+
+    res.status(200).json({
+      success: true,
+      msg: `${searchQuery} searched successfully`,
+      data: bills,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: `Failed to search ${searchQuery}`,
+      data: error,
+    });
+    console.log(error);
+  }
+}
+
+
+// Tenant bills statistics
+export async function tenantBillsStatistics(req: any, res: any) {
+  const {
+    query: { id },
+  }: any = req;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      msg: "No property provided",
+    });
+  }
+
+  try {
+    const [
+      bills,
+      billsPaid,
+      billsPending,
+      billsOverdue
+    ] = await Promise.all([
+      Bills.find({ tenant: id }),
+      Bills.find({ tenant: id, status: "PAID" }),
+      Bills.find({ tenant: id, status: "PENDING" }),
+      Bills.find({ tenant: id, status: "OVERDUE" }),
+    ])
+
+    const totalAmount = bills.reduce((acc: any, curr: any) => {
+      return acc + curr.amount;
+    }, 0);
+    const totalPaid = billsPaid.reduce((acc: any, curr: any) => {
+      return acc + curr.amount;
+    }, 0);
+    const totalPending = billsPending.reduce((acc: any, curr: any) => {
+      return acc + curr.amount;
+    }, 0);
+    const totalOverdue = billsOverdue.reduce((acc: any, curr: any) => {
+      return acc + curr.amount;
+    }, 0);
+
+    res.json({
+      success: true,
+      msg: "Bills statistics fetched successfully",
+      data: {
+        totalAmount,
+        totalPaid,
+        totalPending,
+        totalOverdue
+      }
+    })
+
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      msg: "Failed to fetch bills statistics",
+      data: error,
+    });
+  }
+}
+

@@ -1,7 +1,4 @@
-import { Menu } from "@mui/icons-material"
 import { Avatar, Box, Button, CircularProgress, Collapse, IconButton, Snackbar, Typography } from "@mui/material"
-import ConsecutiveSnackbars from "Components/Common/ConsecutiveSnackbars"
-import ImageEditor from "Components/Common/ImageEditor"
 import LoadingBackdrop from "Components/Common/LoadingBackdrop"
 import MobileDrawer from "Components/Common/MobileDrawer"
 import NavItem from "Components/Common/NavItem"
@@ -10,16 +7,11 @@ import { CollectionsContext } from "context/context"
 // import ImageUploader from "Components/Common/ImageUploader"
 import { motion, useIsomorphicLayoutEffect } from "framer-motion"
 import { signOut, useSession } from "next-auth/react"
-import dynamic from "next/dynamic"
+// import dynamic from "next/dynamic"
 import Head from "next/head"
 import { useRouter } from "next/router"
 import React, { useContext, useEffect, useRef, useState } from "react"
 import AvatarMenu from "./Atoms/AvatarMenu"
-
-const ImageUploader = dynamic(() =>
-    import('../Common/ImageUploader'),
-    { ssr: false }
-)
 
 const MBox = motion(Box)
 const MTypo = motion(Typography)
@@ -263,6 +255,29 @@ export default function DashboardLayout({ children }: any) {
                                 }
                             />
                             <NavItem
+                                hidden={roleName !== "Tenant" && permissions?.some((permission: any) => permission.name.includes("View property bills"))}
+                                to={`/property-bills?property=${propertyId}`}
+                                label="Bills"
+                                svg={
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                    </svg>
+
+                                }
+                            />
+                            <NavItem
+                                hidden={roleName !== "Tenant" && permissions?.some((permission: any) => permission.name.includes("View property payments"))}
+                                to={`/property-payments?property=${propertyId}`}
+                                label="Payments"
+                                svg={
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                                    </svg>
+
+
+                                }
+                            />
+                            <NavItem
                                 hidden={roleName !== "Tenant" && permissions?.some((permission: any) => permission.name.includes("View bill extensions"))}
                                 to={`/rentExtensions?property=${propertyId}`}
                                 label="Rent Extensions"
@@ -288,8 +303,9 @@ export default function DashboardLayout({ children }: any) {
                                 label="Tickets"
                                 svg={
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
                                     </svg>
+
                                 }
                             />
 
@@ -301,8 +317,9 @@ export default function DashboardLayout({ children }: any) {
                                 label="Bills"
                                 svg={
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                                     </svg>
+
                                 }
                             />
                             <NavItem
@@ -310,9 +327,10 @@ export default function DashboardLayout({ children }: any) {
                                 to={`/payments?tenant=${tenantId}`}
                                 label="Payments"
                                 svg={
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
                                     </svg>
+
                                 }
                             />
                             <NavItem
@@ -320,9 +338,10 @@ export default function DashboardLayout({ children }: any) {
                                 to={`/tickets?tenant=${tenantId}`}
                                 label="Tickets"
                                 svg={
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
                                     </svg>
+
                                 }
                             />
 
@@ -337,8 +356,8 @@ export default function DashboardLayout({ children }: any) {
                                     </svg>
 
                                 }
-                            />
-                            <NavItem
+                            /> */}
+                            {/* <NavItem
                                 to="/features-setup"
                                 label="Features Setup"
                                 svg={
@@ -346,8 +365,8 @@ export default function DashboardLayout({ children }: any) {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z" />
                                     </svg>
                                 }
-                            />
-                            <NavItem
+                            /> */}
+                            {/* <NavItem
                                 to="/users"
                                 label="Users"
                                 svg={
@@ -356,8 +375,9 @@ export default function DashboardLayout({ children }: any) {
                                     </svg>
 
                                 }
-                            />
-                            <NavItem
+                            /> */}
+                            {/* <NavItem
+                            hidden={true}
                                 to="/roles"
                                 label="Roles Setup"
                                 svg={
@@ -365,8 +385,8 @@ export default function DashboardLayout({ children }: any) {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
                                     </svg>
                                 }
-                            />
-                            <NavItem
+                            /> */}
+                            {/* <NavItem
                                 label="My Payments"
                                 svg={
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -435,9 +455,6 @@ export default function DashboardLayout({ children }: any) {
                                 boxShadow: ["inset 0px 4px 20px rgba(211, 205, 218, 1)", "none",],
                                 border: ["1px solid rgba(211, 205, 218, 0.7)", "0px",],
                             }}
-                        // sx={{
-                        //     overflowY: ["hidden", "scroll"]
-                        // }}
                         >
                             {children}
                         </Box>
@@ -479,6 +496,7 @@ export default function DashboardLayout({ children }: any) {
                         fontWeight={"600"}
                         color="primary"
                         m="auto"
+                        variant="h5"
                     >
                         Rent It
                     </MTypo>

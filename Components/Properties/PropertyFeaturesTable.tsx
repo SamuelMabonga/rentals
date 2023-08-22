@@ -97,13 +97,18 @@ export const PropertyFeaturesTable = <T extends object>({ property }: ReactTable
             pageInfo={data?.pageInfo}
             columns={columns}
             onRowClick={function (obj: any): void {
-                console.log(obj)
-            }}
+                console.log(obj);
+            } }
             loading={isLoading}
             setPage={setPage}
 
             buttonAction={setOpenPropertyFeaturesForm}
             buttonLabel="Add Feature"
-        />
+
+            statusOptions={[]}
+            setSearchQuery={(e: any) => console.log("Search Query")}
+            
+            searchQuery={undefined}
+            status={''}        />
     );
 };

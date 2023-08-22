@@ -27,17 +27,28 @@ type Item = {
     actions: any;
 }
 
+const statusOptions = [
+    { label: "Pending", value: "PENDING" },
+    { label: "Successful", value: "SUCCESSFUL" },
+    { label: "Failed", value: "FAILED" }
+]
+
+
 export const PaymentsTable = <T extends object>({ tenant: id }: ReactTableProps<T>) => {
     // CONTEXT
     const {
-        setShowPropertyForm,
-        setPropertyToEdit
+        paymentsStatus,
+        setPaymentsStatus,
+        paymentsPage,
+        setPaymentsPage,
+        paymentsSearchQuery,
+        setPaymentsSearchQuery,
     }: any = useContext(CollectionsContext)
 
     const session: any = useSession()
     const token = session.data?.accessToken
 
-    const {data, isLoading} = useQuery(["payments", id], () => fetchPayments(id))
+    const {data, isLoading} = useQuery(["payments", id, paymentsPage, paymentsStatus, paymentsSearchQuery], () => fetchPayments(id, paymentsPage, paymentsSearchQuery, paymentsStatus))
         
 
     const router = useRouter()
@@ -63,15 +74,6 @@ export const PaymentsTable = <T extends object>({ tenant: id }: ReactTableProps<
                 cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
                 accessorKey: 'updatedAt',
             },
-            // {
-            //     header: 'Actions',
-            //     cell: (row) => (
-            //         <Box display="flex" gap="1rem" >
-            //             <Button variant="contained" size="small" sx={{fontSize: "0.875rem"}}>Pay</Button>
-            //             <Button variant="outlined" size="small" sx={{fontSize: "0.875rem"}}>Request Extension</Button>
-            //         </Box>
-            //     ),
-            // },
         ],
         []
     );
@@ -84,7 +86,15 @@ export const PaymentsTable = <T extends object>({ tenant: id }: ReactTableProps<
             loading={isLoading}
             onRowClick={(rowId) => console.log(rowId)}
 
-            statusOptions={[]}
+            statusOptions={statusOptions}
+            
+            status={paymentsStatus}
+            setStatus={setPaymentsStatus}
+
+            searchQuery={paymentsSearchQuery}
+            setSearchQuery={setPaymentsSearchQuery}
+
+            setPage={setPaymentsPage}
         />
     );
 };

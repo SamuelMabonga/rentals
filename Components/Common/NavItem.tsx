@@ -39,14 +39,14 @@ export default function NavItem({ label, to, svg, hidden = false }: any) {
                 width: "100%",
                 display: show ? "none" : "flex",
                 gap: "0.5rem",
-                p: "1rem",
+                p: "0.5rem 1rem",
                 justifyContent: ["flex-start"]
             }}
         >
             <Box width="1.5rem" height="1.5rem" mx={["auto", "auto", 0]}>
                 {svg}
             </Box>
-            <Typography display={["none", "none", "flex"]} fontWeight={active ? "600" : "300"}>{label}</Typography>
+            <Typography display={["none", "none", "flex"]} fontWeight={active ? "600" : "500"}>{label}</Typography>
         </Button>
     )
 }

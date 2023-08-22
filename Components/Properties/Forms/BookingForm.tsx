@@ -21,6 +21,7 @@ import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 import { formSchema, formSchema2 } from "./Schema/BookingForm"
 import currencyFormatter from "Components/Common/currencyFormatter"
 import fetchPropertyBookings from "apis/property/fetchPropertyBookings"
+import dayjs from "dayjs"
 
 
 function HorizontalStepper({ step, steps }: any) {
@@ -112,6 +113,10 @@ export default function BookingForm({
         reset()
 
     }, [toEdit])
+
+    const availableAfter = moment(watch("unit")?.availableAfter).format("MM/DD/YYYY")
+
+    console.log("AVAILABLE AFTER", availableAfter)
 
     async function onSubmit(values: any) {
         setIsLoading(true)
@@ -221,6 +226,15 @@ export default function BookingForm({
     const [searchingUsers, setSearchingUsers] = useState(false)
     const [searchedUsers, setSearchedUsers] = useState([])
     // const [selectedUser, setSelectedUser] = useState<any>()
+    const [minDate, setMinDate] = useState<any>(null)
+
+    useEffect(() => {
+        const selectedUnit = watch("unit")
+        if (selectedUnit?.availableAfter) {
+            setMinDate(dayjs(selectedUnit.availableAfter))
+        }
+
+    }, [watch("unit")])
 
     return (
         <Dialog
@@ -296,6 +310,7 @@ export default function BookingForm({
                                             key={i}
                                             width="100%"
                                             display="flex"
+                                            overflow={"hidden"}
                                             flexDirection="row"
                                             alignItems="center"
                                             gap="0.5rem"
@@ -307,15 +322,31 @@ export default function BookingForm({
                                             sx={{ cursor: "pointer" }}
                                             onClick={() => {
                                                 // setSelectedUser(user)
+                                                if (watch("user")?._id === user?._id) {
+                                                    return setValue("user", {})
+                                                }
                                                 setValue("user", user)
 
                                                 console.log("USER", user)
                                             }}
                                         >
-                                            <Avatar sx={{ width: "3.5rem", height: "3.5rem" }} />
-                                            <Box>
+                                            <Avatar
+                                                src={user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name)}&background=random&color=fff`}
+                                                sx={{ width: "3.5rem", height: "3.5rem" }}
+                                            />
+                                            <Box width="100%" overflow="hidden">
                                                 <Typography fontWeight="600">{user.name}</Typography>
-                                                <Typography variant="body2" color="gray">{user?.email}</Typography>
+                                                <Typography
+                                                    variant="body2"
+                                                    color="gray"
+                                                    width="100%"
+                                                    overflow={"hidden"}
+                                                    textOverflow="ellipsis"
+                                                    whiteSpace="nowrap"
+                                                    sx={{ textOverflow: "ellipsis" }}
+                                                >
+                                                    {user?.email}
+                                                </Typography>
                                             </Box>
 
                                             <Box display={watch("user")?._id === user._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
@@ -335,11 +366,9 @@ export default function BookingForm({
                         <FormControl>
                             <FormLabel>Select the unit type to book</FormLabel>
                             <Autocomplete
-                                // {...register("features")}
                                 options={unitTypes?.data || []}
                                 getOptionLabel={(option: any) => option.name}
                                 onChange={async (event, value) => {
-                                    // setSelectedUnit(null)
                                     setValue("unit", {})
                                     setValue("unitType", value)
                                     setLoadingUnits(true)
@@ -371,7 +400,6 @@ export default function BookingForm({
                         </FormControl>
 
                         <CircularProgress sx={{ display: loadingUnits ? "flex" : "none", mx: "auto" }} />
-
 
                         <Box display={loadingUnits ? "none" : "flex"} flexDirection="column" gap="0.5rem">
                             <Typography display={watch("unitType") ? "flex" : "none"}>Rooms Available</Typography>
@@ -410,8 +438,16 @@ export default function BookingForm({
                                                             sx={{
                                                                 fontWeight: "600",
                                                                 fontSize: "0.75rem",
+                                                                width: "fit-content"
                                                             }}
                                                         />
+                                                        <Typography
+                                                            display={item?.status === "AVAILABLE" ? "none" : "flex"}
+                                                            variant="body2"
+                                                            color="gray"
+                                                        >
+                                                            Available after: {moment(item.availableAfter).format("DD/MM/YYYY")}
+                                                        </Typography>
                                                     </Box>
 
                                                     <Box display={watch("unit")?._id === item._id ? "flex" : "none"} ml="auto" width="1.5rem" height="1.5rem" color="primary.main">
@@ -433,7 +469,6 @@ export default function BookingForm({
                         <FormControl sx={{ width: "100%" }}>
                             <FormLabel>Select additional features for your booking</FormLabel>
                             <Autocomplete
-                                // {...register("features")}
                                 multiple
                                 options={features?.data || []}
                                 getOptionLabel={(option: any) => `${option.feature.name} - ${currencyFormatter(option.price, "UGX")}`}
@@ -446,7 +481,6 @@ export default function BookingForm({
                                 renderInput={(params) =>
                                     <TextField
                                         {...params}
-                                        placeholder=""
                                     />
                                 }
                             />
@@ -457,9 +491,9 @@ export default function BookingForm({
                                 <FormLabel>When would you like to start</FormLabel>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
-                                        // disablePast
+                                        disablePast
                                         onChange={(event: any) => setValue("startDate", moment(event.$d).format("YYYY-MM-DD"))}
-                                        // minDate={watch("unit")?.}
+                                        minDate={minDate || dayjs(unit?.availableAfter)}
                                     />
                                 </LocalizationProvider>
                             </FormControl>
@@ -469,6 +503,7 @@ export default function BookingForm({
                                     <DatePicker
                                         // label="Basic date picker"
                                         disablePast
+                                        minDate={minDate || dayjs(unit?.availableAfter)}
                                         onChange={(event: any) => setValue("endDate", moment(event.$d).format("YYYY-MM-DD"))}
                                     />
                                 </LocalizationProvider>

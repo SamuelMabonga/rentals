@@ -26,9 +26,9 @@ export default function PaymentsForm({ tenant }: any) {
     }: any = useContext(CollectionsContext)
 
     const { data: user }: any = useSession()
-    const token = user?.accessToken
+    // const token = user?.accessToken
 
-    const { data, isLoading }: any = useQuery({ queryKey: ['tenant-bills', tenant], queryFn: () => fetchBills(tenant, null) })
+    const { data, isLoading }: any = useQuery({ queryKey: ['tenant-bills', tenant], queryFn: () => fetchBills(tenant, 1, "", "PENDING") })
 
     const [selectedBills, setSelectedBills] = useState<any>([])
     const [amount, setAmount] = useState<any>(0)
@@ -65,6 +65,7 @@ export default function PaymentsForm({ tenant }: any) {
             amount: amount,
             bills: selectedBills.map((item: any) => item._id),
             tenant: tenant,
+            property: data?.data?.[0]?.tenant?.property,
         }
 
         // POST A PROPERTY
@@ -73,7 +74,7 @@ export default function PaymentsForm({ tenant }: any) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
+                    // Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(payment)
             })

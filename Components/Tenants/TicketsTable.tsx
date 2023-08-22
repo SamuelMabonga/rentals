@@ -27,12 +27,25 @@ type Item = {
     actions: any;
 }
 
+const statusOptions = [
+    { label: "Pending", value: "PENDING" },
+    { label: "Paid", value: "PAID" },
+    { label: "Overdue", value: "OVERDUE" }
+]
+
 export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) => {
     // CONTEXT
     const {
         setShowPropertyForm,
         setPropertyToEdit,
-        setOpenTicketForm 
+        setOpenTicketForm,
+        
+        ticketStatus,
+        setTicketStatus,
+        ticketsSearchQuery,
+        setTicketsSearchQuery,
+        ticketsPage,
+        setTicketsPage,
     }: any = useContext(CollectionsContext)
 
     // const tenantId = tenant?._id
@@ -40,7 +53,7 @@ export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) =
     const session: any = useSession()
     const token = session.data?.accessToken
 
-    const {data, isLoading} = useQuery(["tenant-tickets", tenant], () => fetchTickets(tenant))
+    const {data, isLoading} = useQuery(["tenant-tickets", tenant, ticketStatus, ticketsPage, ticketsSearchQuery], () => fetchTickets(tenant, ticketsPage, ticketsSearchQuery, ticketStatus))
         
 
     const router = useRouter()
@@ -71,20 +84,6 @@ export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) =
                 cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
                 accessorKey: 'createdAt',
             },
-            // {
-            //     header: 'Date Paid',
-            //     cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
-            //     accessorKey: 'updatedAt',
-            // },
-            // {
-            //     header: 'Actions',
-            //     cell: (row) => (
-            //         <Box display="flex" gap="1rem" >
-            //             <Button variant="contained" size="small" sx={{fontSize: "0.875rem"}}>Pay</Button>
-            //             <Button variant="outlined" size="small" sx={{fontSize: "0.875rem"}}>Request Extension</Button>
-            //         </Box>
-            //     ),
-            // },
         ],
         []
     );
@@ -99,6 +98,15 @@ export const TicketsTable = <T extends object>({ tenant }: ReactTableProps<T>) =
 
             buttonAction={setOpenTicketForm}
             buttonLabel="Create Ticket"
+
+            status={ticketStatus}
+            setStatus={setTicketStatus}
+            statusOptions={statusOptions}
+
+            searchQuery={ticketsSearchQuery}
+            setSearchQuery={setTicketsSearchQuery}
+
+            setPage={setTicketsPage}
         />
     );
 };

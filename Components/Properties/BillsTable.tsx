@@ -1,16 +1,98 @@
-import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
-import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
+import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Icon, IconButton, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useContext, useMemo } from 'react';
-import Image from "next/image"
-import { useRouter } from 'next/router';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { TableRenderer } from 'Components/Common/TableRenderer';
 import { CollectionsContext } from 'context/context';
 import moment from 'moment';
+import { useSession } from 'next-auth/react';
+import { useQuery } from '@tanstack/react-query';
+// import fetchBills from 'apis/tenant/fetchBills';
+import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3';
+// import RequestExtension from './Forms/RequestExtension';
+import currencyFormatter from 'Components/Common/currencyFormatter';
+import fetchBills from 'apis/property/fetchBills';
+// import ViewBill from './Common/ViewBill';
+
+function AlertDialog({
+    hide,
+    buttonLabel,
+    buttonVariant,
+    buttonColor = "primary",
+    title,
+    content,
+    onAgree,
+    agreeing,
+    setAgreeing,
+    // onOpen
+}: any) {
+    const [open, setOpen] = useState(false);
+
+    const handleClickOpen = (event: any) => {
+        event.stopPropagation()
+        event.stopPropagation()
+        setOpen(true);
+        // onOpen(event)
+    };
+
+    const handleClose = (event: any) => {
+        event.stopPropagation()
+        setOpen(false);
+    };
+
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (agreeing) {
+            return setLoading(true)
+        }
+
+        return setLoading(false)
+    }, [agreeing])
+
+    return (
+        <div style={{ display: hide ? "none" : "block" }}>
+            <Button variant={buttonVariant} color={buttonColor} size="small" sx={{ fontSize: "0.875rem", }} onClick={handleClickOpen}>
+                {buttonLabel}
+            </Button>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                sx={{ display: hide ? "none" : "block" }}
+            >
+                <LinearProgress sx={{ display: loading ? "flex" : "none" }} />
+                <DialogTitle id="alert-dialog-title">
+                    {title}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {content}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ padding: "1rem" }}>
+                    <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        onClick={(event) => {
+                            // setAgreeing(true)
+                            onAgree(event)
+                        }}
+                        autoFocus
+                    >
+                        Continue
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
+    );
+}
 
 interface ReactTableProps<T extends object> {
     // data: T[];
     // columns: ColumnDef<T>[];
+    property: any
+    // openFlutterwave: any
 }
 
 type Item = {
@@ -22,73 +104,70 @@ type Item = {
     actions: any;
 }
 
-export const BillsTable = <T extends object>({ }: ReactTableProps<T>) => {
-    // CONTEXT
+const statusOptions = [
+    { label: "Pending", value: "PENDING" },
+    { label: "Paid", value: "PAID" },
+    { label: "Overdue", value: "OVERDUE" }
+]
+
+
+export const BillsTable = <T extends object>({ property }: ReactTableProps<T>) => {
+
+    const [billToExtend, setBillToExtend] = React.useState<any>(null)
+
     const {
-        setShowPropertyForm,
-        setPropertyToEdit
+        openRequestExtension: open,
+        setOpenRequestExtension: setIsOpen,
+
+        bookingToEdit: toEdit,
+        setBookingToEdit: setToEdit,
+        setSnackbarMessage,
+
+        paymentConfig,
+        setPaymentConfig,
+
+        tenantBillsPage: page,
+        setTenantBillsPage: setPage,
+        billSearchQuery,
+        setBillSearchQuery,
+        billStatus,
+        setBillStatus,
+
+        setOpenPaymentForm
     }: any = useContext(CollectionsContext)
 
-    const data = [
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-        {
-            image: "https://res.cloudinary.com/dfmoqlbyl/image/upload/v1681733894/dwiej6vmaimacevrlx7w.png",
-            name: "Wifi",
-            unit: "Nairobi",
-            start_date: "Wifi",
-            end_date: "Nairobi",
-            status: "Not Paid"
-        },
-    ]
-       
-    const router = useRouter()
+
+    const { data, isLoading, refetch }: any = useQuery({ queryKey: ['property-bills', property, page, billSearchQuery, billStatus], queryFn: () => fetchBills(property, page, billSearchQuery, billStatus) })
+    
+
+    const { data: user }: any = useSession()
+
+
+
+    const handleFlutterPayment = useFlutterwave(paymentConfig);
+
+    useEffect(() => {
+        if (!paymentConfig?.tx_ref) {
+            return
+        }
+
+        handleFlutterPayment({
+            callback: (response: any) => {
+                console.log(response);
+                closePaymentModal() // this will close the modal programmatically
+            },
+            onClose: () => { },
+        });
+    }, [paymentConfig?.tx_ref])
+
     const columns: any = useMemo<ColumnDef<Item>[]>(
         () => [
             {
                 header: 'Image',
-                cell: (row) => {
+                cell: (row: any) => {
                     return (
                         <Avatar
-                            // src={row.row.original.image}
+                            src={row?.row?.original?.tenant?.user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(row?.row?.original?.tenant?.user?.name)}&background=random&color=fff`}
                             alt="Avatar"
                             sx={{
                                 width: "3rem",
@@ -99,44 +178,91 @@ export const BillsTable = <T extends object>({ }: ReactTableProps<T>) => {
                 },
             },
             {
+                header: 'Name',
+                cell: (row: any) => row.renderValue(),
+                accessorKey: 'tenant.user.name',
+            },
+            {
+                header: 'Unit',
+                cell: (row: any) => row.renderValue(),
+                accessorKey: 'tenant.unit.name',
+            },
+            {
                 header: 'Item',
-                cell: (row) => row.renderValue(),
-                accessorKey: 'item',
+                cell: (row: any) => row?.row?.original?.propertyFeature?.feature?.name ?? row.renderValue(),
+                accessorKey: 'type',
+            },
+            {
+                header: 'Amount',
+                cell: (row) => currencyFormatter(row.renderValue(), "UGX"),
+                accessorKey: 'amount',
             },
             {
                 header: 'Status',
-                cell: (row: any) => <Chip label={row.renderValue()} color="primary" size="small" />,
+                cell: (row: any) => <Chip
+                    label={row.renderValue()}
+                    size="small"
+                    color="primary"
+                    sx={{
+                        bgcolor: row.renderValue() === "PAID" ? "limegreen" : row.renderValue() === "PENDING" ? "orange" : "red",
+                        fontWeight: "500",
+                        fontSize: "0.75rem"
+                    }}
+                />,
                 accessorKey: 'status',
             },
+            // {
+            //     header: 'Start Date',
+            //     cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+            //     accessorKey: 'startDate',
+            // },
+            // {
+            //     header: 'End Date',
+            //     cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+            //     accessorKey: 'endDate',
+            // },
             {
-                header: 'Start Date',
-                cell: (row: any) => row.renderValue(),
-                accessorKey: 'start_date',
+                header: 'Pay By',
+                cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+                accessorKey: 'pay_by',
             },
-            {
-                header: 'End Date',
-                cell: (row: any) => row.renderValue(),
-                accessorKey: 'end_date',
-            },
-            {
-                header: 'Actions',
-                cell: (row) => (
-                    <Box display="flex" gap="1rem" >
-                        <Button variant="contained" size="small" sx={{fontSize: "0.875rem"}}>Pay</Button>
-                        <Button variant="outlined" size="small" sx={{fontSize: "0.875rem"}}>Request Extension</Button>
-                    </Box>
-                ),
-            },
+            // {
+            //     header: 'Created At',
+            //     cell: (row: any) => moment(row.renderValue()).format("DD-MM-YYYY"),
+            //     accessorKey: 'createdAt',
+            // }
         ],
         []
     );
 
+    const [bill, setBill] = useState<any>(null)
+    const [viewBill, setViewBill] = useState<any>(null)
+
     return (
-        <TableRenderer
-            data={data}
-            pageInfo={{}}
-            columns={columns}
-            onRowClick={(rowId) => router.push(`/rentals/${rowId}`)}
-        />
+        <React.Fragment>
+            <TableRenderer
+                data={data?.data}
+                pageInfo={data?.pageInfo}
+                columns={columns}
+                onRowClick={(row) => {
+                    setBill(row)
+                    setViewBill(true)
+                }}
+                loading={isLoading}
+                setPage={setPage}
+
+                // buttonAction={setOpenPaymentForm}
+                // buttonLabel="Pay Bills"
+
+                status={billStatus}
+                setStatus={setBillStatus}
+                statusOptions={statusOptions}
+
+                searchQuery={billSearchQuery}
+                setSearchQuery={setBillSearchQuery}
+            />
+            {/* <RequestExtension tenant={tenant} billToExtend={billToExtend} />
+            <ViewBill bill={bill} open={viewBill} setIsOpen={setViewBill} setBillToExtend={setBillToExtend} /> */}
+        </React.Fragment>
     );
 };

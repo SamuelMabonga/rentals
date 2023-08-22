@@ -167,6 +167,7 @@ export default function RequestTenancyExtension({
                         <FormLabel>To what date would you like to extend</FormLabel>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
+                                disablePast
                                 onChange={(event: any) => setValue("newDate", moment(event.$d).format("YYYY-MM-DD"))}
                             />
                         </LocalizationProvider>

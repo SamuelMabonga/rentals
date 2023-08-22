@@ -1,5 +1,5 @@
 import { Avatar, Box, Button, Chip, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material';
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { TableRenderer } from 'Components/Common/TableRenderer';
 import { useSession } from 'next-auth/react';
@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import moment from 'moment';
 import fetchPropertyUnits from 'apis/property/fetchPropertyUnits';
 import { CollectionsContext } from 'context/context';
+import ViewUnit from './Common/ViewUnit';
 
 interface ReactTableProps<T extends object> {
     // data: T[];
@@ -25,9 +26,9 @@ type Item = {
 }
 
 const statusOptions = [
-    {label: "Available", value: "AVAILABLE"},
-    {label: "Occupied", value: "OCCUPIED"},
-] 
+    { label: "Available", value: "AVAILABLE" },
+    { label: "Occupied", value: "OCCUPIED" },
+]
 
 export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) => {
     // CONTEXT
@@ -101,7 +102,21 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
                     </Box>
                     Add Tenant
                 </Button> :
-                <Button variant="outlined" color="primary" size="small" sx={{ fontSize: "0.875rem", lineHeight: "100%", whiteSpace: "nowrap" }} >
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    sx={{ fontSize: "0.875rem", lineHeight: "100%", whiteSpace: "nowrap" }}
+                    onClick={(event) => {
+                        event.stopPropagation()
+                        event.preventDefault()
+
+                        // setUnitToBook(row.row.original)
+                        // setOpenBookingForm(true)
+                        setUnitToBook(row.row.original)
+                        setOpenBookingForm(true)
+                    }}
+                >
                     <Box width="1.5rem" height="1.5rem">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
@@ -122,7 +137,10 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
             cell: (row: any) => (
                 <Box display="flex" gap="1rem" >
                     <IconButton
-                        onClick={() => {
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            e.preventDefault()
+
                             setOpenUnitForm(true)
                             setUnitToEdit(row.row.original)
                         }}
@@ -146,27 +164,35 @@ export const UnitsTable = <T extends object>({ property }: ReactTableProps<T>) =
         },
     ]
 
+    // VIEW UNIT
+    const [viewUnit, setViewUnit] = useState(false);
+    const [unit, setUnit] = useState({});
+
     return (
-        <TableRenderer
-            data={data?.data || []}
-            pageInfo={data?.pageInfo}
-            columns={columns}
-            onRowClick={function (obj: any): void {
-                console.log("Unit clicked")
-            }}
-            loading={isLoading}
-            setPage={setPage}
+        <>
+            <TableRenderer
+                data={data?.data || []}
+                pageInfo={data?.pageInfo}
+                columns={columns}
+                onRowClick={function (obj: any): void {
+                    setUnit(obj)
+                    setViewUnit(true)
+                }}
+                loading={isLoading}
+                setPage={setPage}
 
-            buttonAction={setOpenUnitForm}
-            buttonLabel="Create Unit"
+                buttonAction={setOpenUnitForm}
+                buttonLabel="Create Unit"
 
-            status={unitStatus}
-            setStatus={setUnitStatus}
+                status={unitStatus}
+                setStatus={setUnitStatus}
 
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
 
-            statusOptions={statusOptions}
-        />
+                statusOptions={statusOptions}
+            />
+            <ViewUnit unit={unit} open={viewUnit} setIsOpen={setViewUnit} />
+        </>
     );
 };

@@ -26,7 +26,8 @@ export default function RequestExtension({
     tenant,
     unitTypes,
     features,
-    billToExtend
+    billToExtend,
+    setViewBill
 }: any) {
     // CONTEXT
     const {
@@ -173,6 +174,7 @@ export default function RequestExtension({
                 <IconButton onClick={() => {
                     // setToEdit({})
                     setIsOpen(false)
+                    setViewBill(true)
                 }}>
                     <Box width="1.5rem" height="1.5rem">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -191,6 +193,7 @@ export default function RequestExtension({
                         <FormLabel>When will you be able to clear this rent bill</FormLabel>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
+                                disablePast
                                 onChange={(event: any) => setValue("newDate", moment(event.$d).format("YYYY-MM-DD"))}
                             />
                         </LocalizationProvider>
@@ -207,6 +210,10 @@ export default function RequestExtension({
                 <Button
                     variant="outlined"
                     type="button"
+                    onClick={() => {
+                        setIsOpen(false)
+                        setViewBill(true)
+                    }}
                 >
                     Back
                 </Button>

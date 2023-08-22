@@ -8,7 +8,7 @@ import {
 } from "controllers/unit";
 import authenticateUser from "helpers/authenticate_user";
 import { NextApiRequest, NextApiResponse } from "next";
-import { createTenancyModification, fetchTenancyModificationsByProperty } from "controllers/tenancyModification";
+import { createTenancyModification, fetchTenancyModificationsByProperty, searchModifications } from "controllers/tenancyModification";
 
 export default async function handler(
   req: NextApiRequest,
@@ -62,6 +62,9 @@ export default async function handler(
           //   if (id) {
           //     return fetchSingleUnit(req, res)
           //   }
+          if (req.query.searchQuery) {
+            return searchModifications(req, res)
+          }
           fetchTenancyModificationsByProperty(req, res);
           break;
         // case "GET":

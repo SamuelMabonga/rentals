@@ -1,6 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup"
 import { Autocomplete, Avatar, Box, Button, Card, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, IconButton, Input, LinearProgress, Snackbar, TextField, Typography } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
+import TenantBillsCard from "Components/Tenants/Common/TenantBillsCard"
 import fetchPropertyUnitTypes from "apis/property/fetchPropertyUnitTypes"
 import { CollectionsContext } from "context/context"
 import moment from "moment"
@@ -79,7 +80,9 @@ export default function ViewTenant({ tenant }: any) {
             <DialogContent>
                 <Box display="flex" flexDirection="column" gap="1rem">
                     <Box display="flex" gap="1rem" alignItems="center">
-                        <Avatar sx={{ width: "4rem", height: "4rem" }} />
+                        <Avatar
+                            src={tenant?.user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(tenant?.user?.name)}&background=random&color=fff`}
+                            sx={{ width: "4rem", height: "4rem" }} />
                         <Box>
                             <Typography fontWeight="600" fontSize="1.125rem">{`${tenant?.user?.name}`}</Typography>
                             <Typography color="grey" fontWeight="500">{tenant?.user?.email}</Typography>
@@ -129,6 +132,7 @@ export default function ViewTenant({ tenant }: any) {
                             }
                         />
                     </Box>
+                    <TenantBillsCard tenant={tenant?._id} />
                 </Box>
 
             </DialogContent>

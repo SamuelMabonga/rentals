@@ -27,7 +27,8 @@ export default function ViewTicket({ open, setOpen, ticket }: { open: boolean, s
                     <Box display="flex" justifyContent={"space-between"}>
                         <Box display="flex" gap="0.5rem" alignItems="center">
                             <Avatar
-                                sx={{ width: "3rem", height: "3rem" }}
+                                src={ticket?.tenant?.user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(ticket?.tenant?.user?.name)}&background=random&color=fff`}
+                                sx={{ width: "4rem", height: "4rem" }}
                             />
                             <Box>
                                 <Typography fontWeight="600">{ticket?.tenant?.user?.name}</Typography>
